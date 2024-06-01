@@ -1,0 +1,6 @@
+@NET1806_LittleJoy.API_HostAddress = http://localhost:5088
+
+GET {{NET1806_LittleJoy.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
