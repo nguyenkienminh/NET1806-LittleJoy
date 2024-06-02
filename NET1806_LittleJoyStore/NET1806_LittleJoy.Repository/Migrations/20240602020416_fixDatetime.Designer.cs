@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NET1806_LittleJoy.Repository.Entities;
 
@@ -11,9 +12,11 @@ using NET1806_LittleJoy.Repository.Entities;
 namespace NET1806_LittleJoy.Repository.Migrations
 {
     [DbContext(typeof(LittleJoyContext))]
-    partial class LittleJoyContextModelSnapshot : ModelSnapshot
+    [Migration("20240602020416_fixDatetime")]
+    partial class fixDatetime
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -174,7 +177,7 @@ namespace NET1806_LittleJoy.Repository.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("Date")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
@@ -186,8 +189,8 @@ namespace NET1806_LittleJoy.Repository.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<int?>("TotalPrice")
-                        .HasColumnType("int");
+                    b.Property<double?>("TotalPrice")
+                        .HasColumnType("float");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -213,8 +216,8 @@ namespace NET1806_LittleJoy.Repository.Migrations
                     b.Property<int?>("OrderId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Price")
-                        .HasColumnType("int");
+                    b.Property<double?>("Price")
+                        .HasColumnType("float");
 
                     b.Property<int?>("ProductId")
                         .HasColumnType("int");
@@ -248,32 +251,6 @@ namespace NET1806_LittleJoy.Repository.Migrations
                         .HasName("PK__Origin__3214EC072BFD6020");
 
                     b.ToTable("Origin", (string)null);
-                });
-
-            modelBuilder.Entity("NET1806_LittleJoy.Repository.Entities.Otp", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<int>("OTPCode")
-                        .HasMaxLength(6)
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("OTPTime")
-                        .HasColumnType("datetime");
-
-                    b.HasKey("Id")
-                        .HasName("PK__OTP__3214EC079B39557F");
-
-                    b.ToTable("Otp", (string)null);
                 });
 
             modelBuilder.Entity("NET1806_LittleJoy.Repository.Entities.Payment", b =>
@@ -385,8 +362,8 @@ namespace NET1806_LittleJoy.Repository.Migrations
                     b.Property<int?>("OriginId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Price")
-                        .HasColumnType("int");
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
 
                     b.Property<string>("ProductName")
                         .HasMaxLength(500)
@@ -483,6 +460,13 @@ namespace NET1806_LittleJoy.Repository.Migrations
 
                     b.Property<string>("GoogleId")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("OTPCode")
+                        .HasMaxLength(6)
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("OTPTime")
+                        .HasColumnType("datetime");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");

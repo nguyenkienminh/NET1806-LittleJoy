@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NET1806_LittleJoy.Repository.Entities;
 
@@ -11,9 +12,11 @@ using NET1806_LittleJoy.Repository.Entities;
 namespace NET1806_LittleJoy.Repository.Migrations
 {
     [DbContext(typeof(LittleJoyContext))]
-    partial class LittleJoyContextModelSnapshot : ModelSnapshot
+    [Migration("20240602022035_ChangePriceToInt")]
+    partial class ChangePriceToInt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -250,32 +253,6 @@ namespace NET1806_LittleJoy.Repository.Migrations
                     b.ToTable("Origin", (string)null);
                 });
 
-            modelBuilder.Entity("NET1806_LittleJoy.Repository.Entities.Otp", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<int>("OTPCode")
-                        .HasMaxLength(6)
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("OTPTime")
-                        .HasColumnType("datetime");
-
-                    b.HasKey("Id")
-                        .HasName("PK__OTP__3214EC079B39557F");
-
-                    b.ToTable("Otp", (string)null);
-                });
-
             modelBuilder.Entity("NET1806_LittleJoy.Repository.Entities.Payment", b =>
                 {
                     b.Property<int>("Id")
@@ -483,6 +460,13 @@ namespace NET1806_LittleJoy.Repository.Migrations
 
                     b.Property<string>("GoogleId")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("OTPCode")
+                        .HasMaxLength(6)
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("OTPTime")
+                        .HasColumnType("datetime");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");

@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using NET1806_LittleJoy.Repository.Commons;
 using NET1806_LittleJoy.Repository.Entities;
 using NET1806_LittleJoy.Repository.Repositories.Interface;
 using NET1806_LittleJoy.Service.BusinessModels;
+using NET1806_LittleJoy.Service.Helpers;
 using NET1806_LittleJoy.Service.Services.Interface;
 using NET1806_LittleJoy.Service.Ultils;
 using System;
@@ -21,14 +24,19 @@ namespace NET1806_LittleJoy.Service.Services
         private readonly IRoleRepository _roleRepository;
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
+        private readonly IMailService _mailService;
+        private readonly IOtpService _otpService;
 
-        public UserService(IUserRepository userRepository, IRoleRepository roleRepository, IConfiguration configuration, IMapper mapper)
+        public UserService(IUserRepository userRepository, IRoleRepository roleRepository, IMailService mailService, IOtpService otpService, IConfiguration configuration, IMapper mapper)
         {
             _userRepository = userRepository;
             _roleRepository = roleRepository;
             _configuration = configuration;
             _mapper = mapper;
+            _mailService = mailService;
+            _otpService = otpService;
         }
+
         public async Task<AuthenModel> LoginByUsernameAndPassword(string username, string password)
         {
             var user = await _userRepository.GetUserByUserNameAsync(username);
@@ -66,9 +74,52 @@ namespace NET1806_LittleJoy.Service.Services
             }
         }
 
-        public Task<AuthenModel> RefreshToken(string jwtToken)
+        public async Task<AuthenModel> RefreshToken(string jwtToken)
         {
-            throw new NotImplementedException();
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:SecretKey"]));
+            var handler = new JwtSecurityTokenHandler();
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = authSigningKey,
+                ValidateIssuer = true,
+                ValidIssuer = _configuration["JWT:ValidIssuer"],
+                ValidateAudience = true,
+                ValidAudience = _configuration["JWT:ValidAudience"],
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
+            try
+            {
+                SecurityToken validatedToken;
+                var principal = handler.ValidateToken(jwtToken, validationParameters, out validatedToken);
+                var userName = principal.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name").Value;
+                if (userName != null)
+                {
+                    var existUser = await _userRepository.GetUserByUserNameAsync(userName);
+                    if (existUser != null)
+                    {
+                        var accessToken = await GenerateAccessToken(userName, existUser);
+                        var refreshToken = GenerateRefreshToken(userName);
+                        return new AuthenModel
+                        {
+                            HttpCode = 200,
+                            Message = "Refresh token successfully",
+                            AccessToken = accessToken,
+                            RefreshToken = refreshToken
+                        };
+                    }
+                }
+                return new AuthenModel
+                {
+                    HttpCode = 401,
+                    Message = "User does not exits."
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Token is not valid.");
+            }
         }
 
         public async Task<bool> RegisterAsync(RegisterModel model)
@@ -101,7 +152,7 @@ namespace NET1806_LittleJoy.Service.Services
                     var role = await _roleRepository.GetRoleByNameAsync("USER");
                     newUser.RoleId = role.Id;
 
-                    newUser.Status = true;
+                    newUser.Status = false;
 
                     await _userRepository.AddNewUserAsync(newUser);
 
@@ -114,6 +165,33 @@ namespace NET1806_LittleJoy.Service.Services
                     throw;
                 }
             }
+        }
+
+        public async Task<bool> SendOTP(string email)
+        {
+            var checkUser = await _userRepository.GetUserByEmailAsync(email);
+
+            if (checkUser == null)
+            {
+                throw new Exception("Account does not exist");
+            }
+
+            if (checkUser.GoogleId != null)
+            {
+                throw new Exception("Account cannot reset password");
+            }
+
+            var otp = await _otpService.AddNewOtp(email);
+
+            var requestMail = new MailRequest()
+            {
+                ToEmail = email,
+                Subject = "[LittleJoy] Password reset",
+                Body = EmailContent.EmailOTPContent(checkUser.UserName, otp.OTPCode)
+            };
+            await _mailService.sendEmailAsync(requestMail);
+            await _userRepository.UpdateUser(checkUser);
+            return true;
         }
 
         private async Task<string> GenerateAccessToken(string username, User user)

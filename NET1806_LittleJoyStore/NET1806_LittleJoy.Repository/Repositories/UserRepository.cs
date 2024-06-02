@@ -30,16 +30,6 @@ namespace NET1806_LittleJoy.Repository.Repositories
             return await _context.Database.BeginTransactionAsync();
         }
 
-        public Task<int> DeleteUserAsync(User user)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ICollection<User>> GetAllUserAsync()
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<User?> GetUserByEmailAsync(string email)
         {
             return await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
@@ -50,9 +40,11 @@ namespace NET1806_LittleJoy.Repository.Repositories
             return await _context.Users.FirstOrDefaultAsync(x => x.UserName == userName);
         }
 
-        public Task<ICollection<User>> SearchUserAsync(string search)
+        public async Task<User> UpdateUser(User user)
         {
-            throw new NotImplementedException();
+             _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+            return user;
         }
     }
 }

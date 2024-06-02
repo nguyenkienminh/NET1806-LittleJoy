@@ -19,7 +19,7 @@ public partial class User
 
     public string? Avatar { get; set; }
 
-    public string? GoogleId { get; set; } = null!;
+    public string? GoogleId { get; set; }
 
     public string? PhoneNumber { get; set; }
 

@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "apis1": {
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ApiManagement/service/NET1806LittleJoyAPIapi/apis/NET1806LittleJoyAPI",
+      "type": "apis.azure"
+    },
+    "mssql1": {
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('resourceGroupName')]/providers/Microsoft.Web/sites/LittleJoyAPI/providers/Microsoft.ServiceLinker/linkers/AZURE_SQL_CONNECTIONSTRING_67A7CDD4EB",
+      "secretStore": "AzureAppSettings",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/littlejoyazuredbserver/databases/LittleJoyAzure",
+      "type": "mssql.azure",
+      "connectionId": "AZURE_SQL_CONNECTIONSTRING"
+    }
+  }
+}

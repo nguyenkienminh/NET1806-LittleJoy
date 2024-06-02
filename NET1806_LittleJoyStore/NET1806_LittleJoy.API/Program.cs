@@ -57,10 +57,32 @@ namespace NET1806_LittleJoy.API
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
             builder.Services.AddAutoMapper(typeof(MapperConfigProfile).Assembly);
 
+            // ===================== FOR LOCAL DB =======================
+
             builder.Services.AddDbContext<LittleJoyContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("LittleJoyLocal"));
             });
+
+            // ==========================================================
+
+            // ===================== FOR AZURE DB =======================
+
+            //var connection = String.Empty;
+            //if (builder.Environment.IsDevelopment())
+            //{
+            //    connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
+            //}
+            //else
+            //{
+            //    connection = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
+            //}
+
+            //builder.Services.AddDbContext<LittleJoyContext>(options =>
+            //        options.UseSqlServer(connection));
+
+
+            // ==================== NO EDIT OR REMOVE COMMENT =======================
 
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
@@ -68,6 +90,10 @@ namespace NET1806_LittleJoy.API
             builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 
             builder.Services.AddScoped<IMailService, MailService>();
+
+            builder.Services.AddScoped<IOtpRepository, OtpRepository>();
+            builder.Services.AddScoped<IOtpService, OtpService>();
+
             builder.Services.AddTransient<IMailService, MailService>();
 
             var app = builder.Build();

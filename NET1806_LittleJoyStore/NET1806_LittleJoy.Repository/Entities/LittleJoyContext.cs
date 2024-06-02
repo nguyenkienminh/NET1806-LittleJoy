@@ -47,6 +47,8 @@ public partial class LittleJoyContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<Otp> Otps { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Address>(entity =>
@@ -79,6 +81,17 @@ public partial class LittleJoyContext : DbContext
             entity.ToTable("Brand");
 
             entity.Property(e => e.BrandName).HasMaxLength(250);
+        });
+
+        modelBuilder.Entity<Otp>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__OTP__3214EC079B39557F");
+
+            entity.ToTable("Otp");
+
+            entity.Property(e => e.Email).HasMaxLength(250);
+            entity.Property(e => e.OTPCode).HasMaxLength(6);
+            entity.Property(e => e.OTPTime).HasColumnType("datetime");
         });
 
         modelBuilder.Entity<Category>(entity =>
@@ -127,6 +140,7 @@ public partial class LittleJoyContext : DbContext
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.Address).HasMaxLength(500);
             entity.Property(e => e.Status).HasMaxLength(250);
+            entity.Property(e => e.Date).HasColumnType("datetime");
 
             entity.HasOne(d => d.IdNavigation).WithOne(p => p.Order)
                 .HasForeignKey<Order>(d => d.Id)

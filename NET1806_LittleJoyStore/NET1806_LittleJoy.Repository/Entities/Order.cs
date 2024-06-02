@@ -9,7 +9,7 @@ public partial class Order
 
     public int UserId { get; set; }
 
-    public double? TotalPrice { get; set; }
+    public int? TotalPrice { get; set; }
 
     public string? Address { get; set; }
 
@@ -19,7 +19,7 @@ public partial class Order
 
     public string? Status { get; set; }
 
-    public DateOnly? Date { get; set; }
+    public DateTime? Date { get; set; }
 
     public int? PaymentId { get; set; }
 

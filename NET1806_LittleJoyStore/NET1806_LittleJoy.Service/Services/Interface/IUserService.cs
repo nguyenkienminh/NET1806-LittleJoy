@@ -12,5 +12,6 @@ namespace NET1806_LittleJoy.Service.Services.Interface
         public Task<AuthenModel> LoginByUsernameAndPassword(string username, string password);
         public Task<bool> RegisterAsync(RegisterModel model);
         public Task<AuthenModel> RefreshToken(string jwtToken);
+        public Task<bool> SendOTP(string email);
     }
 }
