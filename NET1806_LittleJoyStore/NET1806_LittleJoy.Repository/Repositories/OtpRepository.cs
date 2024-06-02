@@ -25,7 +25,7 @@ namespace NET1806_LittleJoy.Repository.Repositories
             return otp;
         }
 
-        public async Task<Otp> GetOtpByCode(int code)
+        public async Task<Otp> GetOtp(int code, string mail)
         {
             TimeZoneInfo utcPlus7 = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
             DateTime timeNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, utcPlus7);

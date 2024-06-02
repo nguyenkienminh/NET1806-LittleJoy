@@ -12,10 +12,12 @@ namespace NET1806_LittleJoy.API.Controllers
     public class AuthenController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IOtpService _otpService;
 
-        public AuthenController(IUserService userService)
+        public AuthenController(IUserService userService, IOtpService otpService)
         {
             _userService = userService;
+            _otpService = otpService;
         }
 
         [HttpPost("Login")]
@@ -91,6 +93,29 @@ namespace NET1806_LittleJoy.API.Controllers
             }
         }
 
+        [HttpPost("VerifyOTP")]
+        public async Task<IActionResult> VerifyOTP(string email, int OTPCode)
+        {
+            try
+            {
+                await _otpService.VerifyOtp(email, OTPCode);
+                var resp = new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status200OK,
+                    Message = "Xác minh thành công",
+                };
+                return Ok(resp);
+            }
+            catch (Exception ex)
+            {
+                var resp = new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(resp);
+            }
+        }
 
         [HttpPost("Refresh-Token")]
         public async Task<IActionResult> RefreshToken([FromBody] string jwtToken)

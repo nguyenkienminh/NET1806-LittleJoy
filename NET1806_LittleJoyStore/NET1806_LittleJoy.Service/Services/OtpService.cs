@@ -32,9 +32,13 @@ namespace NET1806_LittleJoy.Service.Services
             return otp;
         }
 
-        public Task<Otp> GetOtp(Otp otp)
+        public async Task VerifyOtp(string mail, int OTPCode)
         {
-            throw new NotImplementedException();
+            var result = await _otpRepository.GetOtp(OTPCode, mail);
+            if(result == null)
+            {
+                throw new Exception("OTP sai hoặc đã hết hạn");
+            }
         }
     }
 }

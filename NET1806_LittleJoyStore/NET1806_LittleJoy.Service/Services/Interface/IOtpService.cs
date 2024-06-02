@@ -10,6 +10,6 @@ namespace NET1806_LittleJoy.Service.Services.Interface
     public interface IOtpService
     {
         Task<Otp> AddNewOtp(string email);
-        Task<Otp> GetOtp(Otp otp);
+        Task VerifyOtp(string mail, int OTPCode);
     }
 }

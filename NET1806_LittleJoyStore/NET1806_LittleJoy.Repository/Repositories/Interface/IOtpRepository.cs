@@ -9,7 +9,7 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
 {
     public interface IOtpRepository
     {
-        public Task<Otp> GetOtpByCode(int code);
         public Task<Otp> CreateOtp(Otp otp);
+        public Task<Otp> GetOtp(int code, string mail);
     }
 }
