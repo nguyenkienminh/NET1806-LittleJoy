@@ -40,7 +40,7 @@ namespace NET1806_LittleJoy.Repository.Repositories
             return await _context.Users.FirstOrDefaultAsync(x => x.UserName == userName);
         }
 
-        public async Task<User> UpdateUser(User user)
+        public async Task<User> UpdateUserAsync(User user)
         {
              _context.Users.Update(user);
             await _context.SaveChangesAsync();

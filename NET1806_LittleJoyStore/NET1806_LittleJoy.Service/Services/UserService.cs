@@ -37,6 +37,19 @@ namespace NET1806_LittleJoy.Service.Services
             _otpService = otpService;
         }
 
+        public async Task<bool> AddNewPassword(AddPasswordModel model)
+        {
+            var user = await _userRepository.GetUserByEmailAsync(model.Email);
+            if (user == null)
+            {
+                return false;
+            }
+            var hashPassword = PasswordUtils.HashPassword(model.Password);
+            user.PasswordHash = hashPassword;
+            await _userRepository.UpdateUserAsync(user);
+            return true;
+        }
+
         public async Task<AuthenModel> LoginByUsernameAndPassword(string username, string password)
         {
             var user = await _userRepository.GetUserByUserNameAsync(username);
@@ -190,7 +203,7 @@ namespace NET1806_LittleJoy.Service.Services
                 Body = EmailContent.EmailOTPContent(checkUser.UserName, otp.OTPCode)
             };
             await _mailService.sendEmailAsync(requestMail);
-            await _userRepository.UpdateUser(checkUser);
+            await _userRepository.UpdateUserAsync(checkUser);
             return true;
         }
 

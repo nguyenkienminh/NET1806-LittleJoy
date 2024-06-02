@@ -1,5 +1,6 @@
 ﻿using NET1806_LittleJoy.Repository.Entities;
 using NET1806_LittleJoy.Repository.Repositories.Interface;
+using NET1806_LittleJoy.Service.BusinessModels;
 using NET1806_LittleJoy.Service.Services.Interface;
 using NET1806_LittleJoy.Service.Ultils;
 using System;
@@ -32,13 +33,16 @@ namespace NET1806_LittleJoy.Service.Services
             return otp;
         }
 
-        public async Task VerifyOtp(string mail, int OTPCode)
+        public async Task<bool> VerifyOtp(string email, int otpcode)
         {
-            var result = await _otpRepository.GetOtp(OTPCode, mail);
-            if(result == null)
+            var otp = await _otpRepository.GetOtp(otpcode, email);
+            if(otp !=  null)
             {
-                throw new Exception("OTP sai hoặc đã hết hạn");
+                otp.IsUsed = true;
+                await _otpRepository.UpdateOtp(otp);
+                return true;
             }
+            return false;
         }
     }
 }

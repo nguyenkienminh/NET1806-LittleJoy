@@ -1,4 +1,5 @@
 ﻿using NET1806_LittleJoy.Repository.Entities;
+using NET1806_LittleJoy.Service.BusinessModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,6 @@ namespace NET1806_LittleJoy.Service.Services.Interface
     public interface IOtpService
     {
         Task<Otp> AddNewOtp(string email);
-        Task VerifyOtp(string mail, int OTPCode);
+        Task<bool> VerifyOtp(string email, int OtpCode);
     }
 }

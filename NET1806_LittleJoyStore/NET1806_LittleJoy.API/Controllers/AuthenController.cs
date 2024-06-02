@@ -70,7 +70,7 @@ namespace NET1806_LittleJoy.API.Controllers
         }
 
         [HttpPost("SendOTP")]
-        public async Task<IActionResult> SendOTP(string email)
+        public async Task<IActionResult> SendOTP([FromBody] string email)
         {
             try
             {
@@ -94,17 +94,26 @@ namespace NET1806_LittleJoy.API.Controllers
         }
 
         [HttpPost("VerifyOTP")]
-        public async Task<IActionResult> VerifyOTP(string email, int OTPCode)
+        public async Task<IActionResult> VerifyOTP(OtpRequestModel model)
         {
             try
             {
-                await _otpService.VerifyOtp(email, OTPCode);
-                var resp = new ResponseModels()
+                //await _otpService.VerifyOtp(model);
+                var result = await _otpService.VerifyOtp(model.Email, model.OTPCode);
+                if (result)
                 {
-                    HttpCode = StatusCodes.Status200OK,
-                    Message = "Xác minh thành công",
-                };
-                return Ok(resp);
+                    var resp = new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status200OK,
+                        Message = "Xác minh thành công",
+                    };
+                    return Ok(resp);
+                }
+                return BadRequest(new ResponseModels
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = "Otp is not valid"
+                });
             }
             catch (Exception ex)
             {
@@ -115,6 +124,30 @@ namespace NET1806_LittleJoy.API.Controllers
                 };
                 return BadRequest(resp);
             }
+        }
+
+        [HttpPost("AddNewPassword")]
+        public async Task<IActionResult> AddNewPassword(AddPasswordModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _userService.AddNewPassword(model);
+                if (result)
+                {
+                    var resp = new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status200OK,
+                        Message = "Đổi mật khẩu thành công",
+                    };
+                    return Ok(resp);
+                }
+                return BadRequest(new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = "Không tìm thấy tài khoản",
+                });
+            }
+            return ValidationProblem(ModelState);
         }
 
         [HttpPost("Refresh-Token")]

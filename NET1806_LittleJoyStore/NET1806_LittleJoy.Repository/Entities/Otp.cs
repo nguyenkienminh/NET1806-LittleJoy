@@ -10,10 +10,13 @@ namespace NET1806_LittleJoy.Repository.Entities
     {
         public int Id { get; set; }
 
-        public string Email { get; set; }
+        public string Email { get; set; } = "";
 
-        public int OTPCode { get; set; }
+        public int OTPCode { get; set; } = 0;
+
+        public bool IsUsed { get; set; } = false;
 
         public DateTime OTPTime { get; set; }
+
     }
 }

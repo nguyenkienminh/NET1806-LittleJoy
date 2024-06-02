@@ -11,5 +11,6 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
     {
         public Task<Otp> CreateOtp(Otp otp);
         public Task<Otp> GetOtp(int code, string mail);
+        public Task UpdateOtp(Otp otp);
     }
 }

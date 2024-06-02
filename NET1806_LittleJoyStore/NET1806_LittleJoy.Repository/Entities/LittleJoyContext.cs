@@ -91,6 +91,7 @@ public partial class LittleJoyContext : DbContext
 
             entity.Property(e => e.Email).HasMaxLength(250);
             entity.Property(e => e.OTPCode).HasMaxLength(6);
+            entity.Property(e => e.IsUsed);
             entity.Property(e => e.OTPTime).HasColumnType("datetime");
         });
 

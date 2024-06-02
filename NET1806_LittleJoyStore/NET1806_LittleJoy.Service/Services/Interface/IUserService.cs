@@ -13,5 +13,6 @@ namespace NET1806_LittleJoy.Service.Services.Interface
         public Task<bool> RegisterAsync(RegisterModel model);
         public Task<AuthenModel> RefreshToken(string jwtToken);
         public Task<bool> SendOTP(string email);
+        public Task<bool> AddNewPassword(AddPasswordModel model);
     }
 }

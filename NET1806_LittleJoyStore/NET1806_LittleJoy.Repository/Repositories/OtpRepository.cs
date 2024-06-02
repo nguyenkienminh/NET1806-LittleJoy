@@ -29,7 +29,13 @@ namespace NET1806_LittleJoy.Repository.Repositories
         {
             TimeZoneInfo utcPlus7 = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
             DateTime timeNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, utcPlus7);
-            return await _context.Otps.Where(x => x.OTPCode == code && x.OTPTime > timeNow).FirstOrDefaultAsync();
+            return await _context.Otps.Where(x => x.OTPCode == code && x.OTPTime > timeNow && x.Email == mail && x.IsUsed == false).FirstOrDefaultAsync();
+        }
+
+        public async Task UpdateOtp(Otp otp)
+        {
+            _context.Otps.Update(otp);
+            await _context.SaveChangesAsync();
         }
     }
 }

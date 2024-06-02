@@ -11,7 +11,7 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
     public interface IUserRepository
     {
         Task<User> AddNewUserAsync(User user);
-        Task<User> UpdateUser(User user);
+        Task<User> UpdateUserAsync(User user);
         public Task<User?> GetUserByUserNameAsync(string userName);
         public Task<User?> GetUserByEmailAsync(string email);
         Task<IDbContextTransaction> BeginTransactionAsync();
