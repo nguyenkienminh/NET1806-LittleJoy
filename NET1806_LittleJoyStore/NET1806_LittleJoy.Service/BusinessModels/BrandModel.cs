@@ -9,7 +9,6 @@ namespace NET1806_LittleJoy.Service.BusinessModels
 {
     public class BrandModel
     {
-
         public int Id { get; set; }
 
         public string? BrandName { get; set; }
@@ -18,6 +17,5 @@ namespace NET1806_LittleJoy.Service.BusinessModels
 
         public string? BrandDescription { get; set; }
 
-        public virtual ICollection<Product> Products { get; set; } = new List<Product>();
     }
 }

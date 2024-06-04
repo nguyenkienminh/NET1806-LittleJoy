@@ -18,6 +18,8 @@ namespace NET1806_LittleJoy.Service.Mapper
             CreateMap<ProductModel, Product>().ReverseMap();
 
             CreateMap<BrandModel, Brand>().ReverseMap();
+
+            CreateMap<AgeGroupProductModel, AgeGroupProduct>().ReverseMap();
         }
     }
 }

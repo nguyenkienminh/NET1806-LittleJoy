@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using NET1806_LittleJoy.Repository.Commons;
 using NET1806_LittleJoy.Repository.Entities;
 using NET1806_LittleJoy.Repository.Repositories;
 using NET1806_LittleJoy.Repository.Repositories.Interface;
@@ -23,24 +24,97 @@ namespace NET1806_LittleJoy.Service.Services
             _mapper = mapper;
         }
 
-        public async Task<Brand> AddBrandAsync(BrandModel brandModel)
+
+        public async Task<Pagination<BrandModel>> GetAllBrandPagingAsync(PaginationParameter paginationParameter)
         {
-            if (brandModel == null)
+            var listBrands = await _brandRepository.GetAllBrandPagingAsync(paginationParameter);
+
+            if (!listBrands.Any())
             {
                 return null;
             }
-            var brand = _mapper.Map<Brand>(brandModel);
 
-            var result = await _brandRepository.AddBrandAsync(brand);
-
-            if (result != null)
+            var listBrandModels = listBrands.Select(b => new BrandModel
             {
-                return brand;
-            }
-            else
+                Id = b.Id,
+                BrandName = b.BrandName,
+                Logo = b.Logo,
+                BrandDescription = b.BrandDescription,  
+            }).ToList();
+
+
+            return new Pagination<BrandModel>(listBrandModels,
+                listBrands.TotalCount,
+                listBrands.CurrentPage,
+                listBrands.PageSize);
+        }
+
+
+        public async Task<BrandModel?> GetBrandByIdAsync(int brandId)
+        {
+            var brandDetail = await _brandRepository.GetBrandByIdAsync(brandId);
+
+            if (brandDetail == null)
             {
                 return null;
             }
+
+            var brandDetailModel = _mapper.Map<BrandModel>(brandDetail);
+
+            return brandDetailModel;
+        }
+
+
+        public async Task<bool?> AddBrandAsync(BrandModel brandModel)
+        {
+            try
+            {
+                var brandInfo = _mapper.Map<Brand>(brandModel);
+                var item =  await _brandRepository.AddBrandAsync(brandInfo);
+                
+                if(item == null)
+                {
+                    return false;
+                }
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Fail to add Brand {ex.Message}");
+                return false;
+            }
+        }
+
+
+        public async Task<bool> RemoveBrandAsync(int removeBrandById)
+        {
+            var productsBrand = await _brandRepository.GetProductsByBrandId(removeBrandById);
+
+            if (productsBrand.Any())
+            {
+                return false;
+            }
+
+            var item = await _brandRepository.GetBrandByIdAsync(removeBrandById);
+
+            return await _brandRepository.RemoveBrandAsync(item);
+        }
+
+
+        public async Task<BrandModel> UpdateBrandAsync(BrandModel brandModel)
+        {
+            var brandModify = _mapper.Map<Brand>(brandModel);
+
+            var brandPlace = await _brandRepository.GetBrandByIdAsync(brandModel.Id);
+
+            var updateBrand = await _brandRepository.UpdateBrandAsync(brandModify, brandPlace);
+
+            if (updateBrand != null)
+            {
+                return _mapper.Map<BrandModel>(updateBrand);
+            }
+            return null;
         }
     }
 }

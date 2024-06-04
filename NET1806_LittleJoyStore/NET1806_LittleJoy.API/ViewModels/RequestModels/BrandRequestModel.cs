@@ -4,6 +4,8 @@ namespace NET1806_LittleJoy.API.ViewModels.RequestModels
 {
     public class BrandRequestModel
     {
+        public int Id { get; set; }
+
         public string? BrandName { get; set; }
 
         [MaxLength]
