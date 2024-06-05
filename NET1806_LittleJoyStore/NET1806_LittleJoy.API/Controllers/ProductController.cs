@@ -112,7 +112,6 @@ namespace NET1806_LittleJoy.API.Controllers
                     OriginId = productRequestModel.OriginId,
                     BrandId = productRequestModel.BrandId,
                     CateId = productRequestModel.CateId,
-                    UnsignProductName = productRequestModel.UnsignProductName,
                 };
 
                 var result = await _productService.AddNewProductAsync(productModel);
