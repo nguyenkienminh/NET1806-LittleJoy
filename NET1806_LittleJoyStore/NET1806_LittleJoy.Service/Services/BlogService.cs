@@ -24,14 +24,14 @@ namespace NET1806_LittleJoy.Service.Services
             _mapper = mapper;
         }
 
-        public async Task<BlogModel> CreateNewBlog(BlogModel model)
+        public async Task<BlogModel> CreateNewBlogAsync(BlogModel model)
         {
             if(model == null)
             {
                 return null;
             }
             var blogModel = _mapper.Map<Post>(model);
-            var blog = await _blogRepository.CreateNewBlog(blogModel);
+            var blog = await _blogRepository.CreateNewBlogAsync(blogModel);
             if(blog != null)
             {
                 return _mapper.Map<BlogModel>(blog);
@@ -43,7 +43,7 @@ namespace NET1806_LittleJoy.Service.Services
             
         }
 
-        public async Task<BlogModel> GetBlogById(int Id)
+        public async Task<BlogModel> GetBlogByIdAsync(int Id)
         {
             var result = await _blogRepository.GetBlogByIdAsync(Id);
             if(result == null)
@@ -64,7 +64,7 @@ namespace NET1806_LittleJoy.Service.Services
             return new Pagination<BlogModel>(listBlogModels, listBlog.TotalCount, listBlog.CurrentPage, listBlog.PageSize);
         }
 
-        public async Task<bool> RemoveBlog(int id)
+        public async Task<bool> RemoveBlogAsync(int id)
         {
             var blog = await _blogRepository.GetBlogByIdAsync(id);
             if(blog == null)
@@ -78,7 +78,7 @@ namespace NET1806_LittleJoy.Service.Services
             }
         }
 
-        public async Task<BlogModel> UpdateBlog(BlogModel blog)
+        public async Task<BlogModel> UpdateBlogAsync(BlogModel blog)
         {
             if(blog == null)
             {

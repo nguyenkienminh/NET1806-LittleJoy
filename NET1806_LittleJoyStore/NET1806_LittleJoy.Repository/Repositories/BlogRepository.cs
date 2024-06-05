@@ -20,7 +20,7 @@ namespace NET1806_LittleJoy.Repository.Repositories
             _context = context;
         }
 
-        public async Task<Post> CreateNewBlog(Post blog)
+        public async Task<Post> CreateNewBlogAsync(Post blog)
         {
             blog.Date = DateTime.UtcNow.AddHours(7);
             _context.Posts.Add(blog);

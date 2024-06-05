@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace NET1806_LittleJoy.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/blog")]
     [ApiController]
     public class BlogController : ControllerBase
     {
@@ -67,7 +67,7 @@ namespace NET1806_LittleJoy.API.Controllers
         {
             try
             {
-                var result = await _blogService.GetBlogById(id);
+                var result = await _blogService.GetBlogByIdAsync(id);
                 if(result == null)
                 {
                     return NotFound(new ResponseModels
@@ -101,7 +101,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     Content = blog.Content,
                     Title = blog.Title,
                 };
-                var result = await _blogService.CreateNewBlog(model);
+                var result = await _blogService.CreateNewBlogAsync(model);
                 if (result == null)
                 {
                     return BadRequest(new ResponseModels
@@ -139,7 +139,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     Id = blog.Id,
                     UserId = blog.UserId,
                 };
-                var result = await _blogService.UpdateBlog(blogModel);
+                var result = await _blogService.UpdateBlogAsync(blogModel);
                 if (result == null)
                 {
                     return BadRequest(new ResponseModels
@@ -168,7 +168,7 @@ namespace NET1806_LittleJoy.API.Controllers
         {
             try
             {
-                var result = await _blogService.RemoveBlog(id);
+                var result = await _blogService.RemoveBlogAsync(id);
                 if (result)
                 {
                     return Ok(new ResponseModels

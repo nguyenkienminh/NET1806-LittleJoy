@@ -11,9 +11,9 @@ namespace NET1806_LittleJoy.Service.Services.Interface
     public interface IBlogService
     {
         public Task<Pagination<BlogModel>> GetListBlogAsync(PaginationParameter paginationParameter);
-        public Task<BlogModel> CreateNewBlog(BlogModel model);
-        public Task<BlogModel> GetBlogById(int Id);
-        public Task<BlogModel> UpdateBlog(BlogModel blog);
-        public Task<bool> RemoveBlog(int id);
+        public Task<BlogModel> CreateNewBlogAsync(BlogModel model);
+        public Task<BlogModel> GetBlogByIdAsync(int Id);
+        public Task<BlogModel> UpdateBlogAsync(BlogModel blog);
+        public Task<bool> RemoveBlogAsync(int id);
     }
 }

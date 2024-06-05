@@ -11,7 +11,7 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
     public interface IBlogRepository
     {
         public Task<Pagination<Post>> GetListBlogAsync(PaginationParameter paginationParameter);
-        public Task<Post> CreateNewBlog(Post blog);
+        public Task<Post> CreateNewBlogAsync(Post blog);
         public Task<Post> UpdateBlogAsync(Post blog);
         public Task DeleteBlogAsync(Post blog);
         public Task<Post?> GetBlogByIdAsync(int id);
