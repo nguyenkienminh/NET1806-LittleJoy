@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NET1806_LittleJoy.API.ViewModels.RequestModels;
 using NET1806_LittleJoy.API.ViewModels.ResponeModels;
 using NET1806_LittleJoy.Repository.Commons;
-using NET1806_LittleJoy.Repository.Entities;
 using NET1806_LittleJoy.Service.BusinessModels;
 using NET1806_LittleJoy.Service.Services;
 using NET1806_LittleJoy.Service.Services.Interface;
@@ -14,22 +12,22 @@ namespace NET1806_LittleJoy.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BrandController : ControllerBase
+    public class OriginController : ControllerBase
     {
-        private readonly IBrandService _brandService;
+        private readonly IOriginService _originService;
 
-        public BrandController(IBrandService brandService)
+        public OriginController(IOriginService originService)
         {
-            _brandService = brandService;
+            _originService = originService;
         }
 
         [HttpGet]
         //[Authorize(Roles = "STAFF,ADMIN")]
-        public async Task<IActionResult> GetAllBrandPagingAsync([FromQuery] PaginationParameter paginationParameter)
+        public async Task<IActionResult> GetAllOriginPagingAsync([FromQuery] PaginationParameter paginationParameter)
         {
             try
             {
-                var result = await _brandService.GetAllBrandPagingAsync(paginationParameter);
+                var result = await _originService.GetAllOriginPagingAsync(paginationParameter);
 
                 if (result != null)
                 {
@@ -54,7 +52,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     return NotFound(new ResponseModels
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "Brand is empty"
+                        Message = "Origins are empty"
                     });
                 }
             }
@@ -72,13 +70,13 @@ namespace NET1806_LittleJoy.API.Controllers
 
         //[Authorize(Roles = "STAFF,ADMIN")]
         [HttpGet("{Id}")]
-        public async Task<IActionResult> GetBrandByIdAsync(int Id)
+        public async Task<IActionResult> GetOriginByIdAsync(int Id)
         {
             try
             {
-                var brandDetailModel = await _brandService.GetBrandByIdAsync(Id);
+                var origin = await _originService.GetOriginByIdAsync(Id);
 
-                if (brandDetailModel == null)
+                if (origin == null)
                 {
                     return NotFound(new ResponseModels()
                     {
@@ -86,7 +84,7 @@ namespace NET1806_LittleJoy.API.Controllers
                         Message = "Brand does not exist"
                     });
                 }
-                return Ok(brandDetailModel);
+                return Ok(origin);
             }
             catch (Exception ex)
             {
@@ -102,25 +100,23 @@ namespace NET1806_LittleJoy.API.Controllers
 
         [HttpPost]
         //[Authorize(Roles = "STAFF,ADMIN")]
-        public async Task<IActionResult> AddBrandAsync([FromBody] BrandRequestModel brandRequestModel)
+        public async Task<IActionResult> AddOriginAsync([FromBody] OriginRequestModel originRequestModel)
         {
             try
             {
-                BrandModel brandModelAdd = new BrandModel()
+                OriginModel originAdd = new OriginModel()
                 {
-                    BrandName = brandRequestModel.BrandName,
-                    BrandDescription = brandRequestModel.BrandDescription,
-                    Logo = brandRequestModel.Logo,
+                    OriginName = originRequestModel.OriginName,
                 };
 
-                var result = await _brandService.AddBrandAsync(brandModelAdd);
+                var result = await _originService.AddOriginAsync(originAdd);
 
                 if (result == false)
                 {
                     return NotFound(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "Can not add this brand"
+                        Message = "Can not add this Origin"
                     });
                 }
 
@@ -129,7 +125,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     return Ok(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status201Created,
-                        Message = "Create Brand success"
+                        Message = "Create Origin success"
                     });
                 }
             }
@@ -146,18 +142,18 @@ namespace NET1806_LittleJoy.API.Controllers
 
         [HttpDelete]
         //[Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> RemoveBrandByIdAsync(int Id)
+        public async Task<IActionResult> RemoveOriginByIdAsync(int Id)
         {
             try
             {
-                var result = await _brandService.RemoveBrandByIdAsync(Id);
+                var result = await _originService.RemoveOriginByIdAsync(Id);
 
                 if (result)
                 {
                     return Ok(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status200OK,
-                        Message = "Remove brand success"
+                        Message = "Remove origin success"
                     });
                 }
                 else
@@ -165,13 +161,12 @@ namespace NET1806_LittleJoy.API.Controllers
                     return NotFound(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "The brand can not remove"
+                        Message = "The origin can not remove"
                     });
                 }
             }
             catch (Exception ex)
             {
-
                 return BadRequest(new ResponseModels()
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
@@ -183,33 +178,31 @@ namespace NET1806_LittleJoy.API.Controllers
 
         [HttpPut]
         //[Authorize(Roles = "STAFF,ADMIN")]
-        public async Task<IActionResult> UpdateBrandAsync([FromBody] BrandModel brandModel)
+        public async Task<IActionResult> UpdateOriginAsync([FromBody] OriginModel originModel)
         {
             try
             {
-                BrandModel brandModelAdd = new BrandModel()
+                OriginModel originModelAdd = new OriginModel()
                 {
-                    Id = brandModel.Id,
-                    Logo = brandModel.Logo,
-                    BrandDescription = brandModel.BrandDescription,
-                    BrandName = brandModel.BrandName 
+                    Id = originModel.Id,
+                    OriginName = originModel.OriginName,
                 };
 
-                var result = await _brandService.UpdateBrandAsync(brandModelAdd);
+                var result = await _originService.UpdateOriginAsync(originModel);
 
                 if (result == null)
                 {
                     return NotFound(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "Can not update this Brand"
+                        Message = "Can not update this Origin"
                     });
                 }
 
                 return Ok(new ResponseModels()
                 {
                     HttpCode = StatusCodes.Status200OK,
-                    Message = "Update brand success"
+                    Message = "Update origin success"
                 });
             }
             catch (Exception ex)

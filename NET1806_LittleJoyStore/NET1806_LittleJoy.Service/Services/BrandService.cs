@@ -87,9 +87,9 @@ namespace NET1806_LittleJoy.Service.Services
         }
 
 
-        public async Task<bool> RemoveBrandAsync(int removeBrandById)
+        public async Task<bool> RemoveBrandByIdAsync(int removeBrandById)
         {
-            var productsBrand = await _brandRepository.GetProductsByBrandId(removeBrandById);
+            var productsBrand = await _brandRepository.GetProductsByBrandIdAsync(removeBrandById);
 
             if (productsBrand.Any())
             {
@@ -97,6 +97,11 @@ namespace NET1806_LittleJoy.Service.Services
             }
 
             var item = await _brandRepository.GetBrandByIdAsync(removeBrandById);
+
+            if (item == null)
+            {
+                return false;
+            }
 
             return await _brandRepository.RemoveBrandAsync(item);
         }
@@ -107,6 +112,11 @@ namespace NET1806_LittleJoy.Service.Services
             var brandModify = _mapper.Map<Brand>(brandModel);
 
             var brandPlace = await _brandRepository.GetBrandByIdAsync(brandModel.Id);
+
+            if (brandPlace == null)
+            {
+                return null;
+            }
 
             var updateBrand = await _brandRepository.UpdateBrandAsync(brandModify, brandPlace);
 

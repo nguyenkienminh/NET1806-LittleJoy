@@ -1,4 +1,5 @@
 ﻿using NET1806_LittleJoy.Repository.Commons;
+using NET1806_LittleJoy.Repository.Entities;
 using NET1806_LittleJoy.Service.BusinessModels;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,13 @@ namespace NET1806_LittleJoy.Service.Services.Interface
     {
         public Task<Pagination<AgeGroupProductModel>> GetAllAgeGroupPagingAsync(PaginationParameter paginationParameter);
 
-        public Task<AgeGroupProductModel?> GetAgeGroupByIdAsync(int ageID);
+        public Task<AgeGroupProductModel?> GetAgeGroupByIdAsync(int ageId);
+
+        public Task<bool?> AddAgeGroupAsync(AgeGroupProductModel ageGroup);
+
+        public Task<bool> RemoveAgeGroupByIdAsync(int ageId);
+
+        public Task<AgeGroupProductModel> UpdateAgeGroupAsync(AgeGroupProductModel ageGroup);
+
     }
 }

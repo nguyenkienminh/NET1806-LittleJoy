@@ -5,6 +5,8 @@ using NET1806_LittleJoy.API.ViewModels.ResponeModels;
 using NET1806_LittleJoy.Repository.Commons;
 using NET1806_LittleJoy.Service.Services;
 using Newtonsoft.Json;
+using NET1806_LittleJoy.API.ViewModels.RequestModels;
+using NET1806_LittleJoy.Service.BusinessModels;
 namespace NET1806_LittleJoy.API.Controllers
 {
     [Route("api/[controller]")]
@@ -19,7 +21,7 @@ namespace NET1806_LittleJoy.API.Controllers
         }
 
 
-        [HttpGet("GetAllAgeGroup")]
+        [HttpGet]
         //[Authorize(Roles = "STAFF,ADMIN")]
         public async Task<IActionResult> GetAllAgeGroupPagingAsync([FromQuery] PaginationParameter paginationParameter)
         {
@@ -66,13 +68,13 @@ namespace NET1806_LittleJoy.API.Controllers
         }
 
 
+        [HttpGet("{Id}")]
         //[Authorize(Roles = "STAFF,ADMIN")]
-        [HttpGet("{getAgeGroupDetailById}")]
-        public async Task<IActionResult> GetBrandDetailByIdAsync(int getAgeGroupDetailById)
+        public async Task<IActionResult> GetBrandDetailByIdAsync(int Id)
         {
             try
             {
-                var AgeGroupModel = await _ageGroupService.GetAgeGroupByIdAsync(getAgeGroupDetailById);
+                var AgeGroupModel = await _ageGroupService.GetAgeGroupByIdAsync(Id);
 
                 if (AgeGroupModel == null)
                 {
@@ -83,6 +85,127 @@ namespace NET1806_LittleJoy.API.Controllers
                     });
                 }
                 return Ok(AgeGroupModel);
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                });
+            }
+        }
+
+
+        [HttpPost]
+        //[Authorize(Roles = "STAFF,ADMIN")]
+        public async Task<IActionResult> AddAgeGroupAsync([FromBody] AgeGroupProductRequestModel ageGroupModel)
+        {
+            try
+            {
+                AgeGroupProductModel ageGroupProductModel = new AgeGroupProductModel()
+                {
+                    AgeRange = ageGroupModel.AgeRange,
+                };
+
+                var result = await _ageGroupService.AddAgeGroupAsync(ageGroupProductModel);
+
+                if (result == false)
+                {
+                    return NotFound(new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "Can not add this Age"
+                    });
+                }
+
+                else
+                {
+                    return Ok(new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status201Created,
+                        Message = "Create Age success"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                });
+            }
+        }
+
+
+        [HttpDelete]
+        //[Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> RemoveAgeGroupByIdAsync(int Id)
+        {
+            try
+            {
+                var result = await _ageGroupService.RemoveAgeGroupByIdAsync(Id);
+
+                if (result)
+                {
+                    return Ok(new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status200OK,
+                        Message = "Remove Age success"
+                    });
+                }
+                else
+                {
+                    return NotFound(new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "This Age does not exist"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                });
+            }
+        }
+
+
+        [HttpPut]
+        //[Authorize(Roles = "STAFF,ADMIN")]
+        public async Task<IActionResult> UpdateAgeGroupAsync([FromBody] AgeGroupProductModel ageGroupModel)
+        {
+            try
+            {
+                AgeGroupProductModel AgeModelAdd = new AgeGroupProductModel()
+                {
+                    Id = ageGroupModel.Id,
+                    AgeRange = ageGroupModel.AgeRange,
+                    
+                };
+
+                var result = await _ageGroupService.UpdateAgeGroupAsync(AgeModelAdd);
+
+                if (result == null)
+                {
+                    return NotFound(new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "Can not update this Age"
+                    });
+                }
+
+                return Ok(new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status200OK,
+                    Message = "Update Age success"
+                });
             }
             catch (Exception ex)
             {

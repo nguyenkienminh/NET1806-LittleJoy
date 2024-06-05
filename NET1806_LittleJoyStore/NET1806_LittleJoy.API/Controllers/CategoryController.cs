@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NET1806_LittleJoy.API.ViewModels.RequestModels;
 using NET1806_LittleJoy.API.ViewModels.ResponeModels;
 using NET1806_LittleJoy.Repository.Commons;
-using NET1806_LittleJoy.Repository.Entities;
 using NET1806_LittleJoy.Service.BusinessModels;
 using NET1806_LittleJoy.Service.Services;
 using NET1806_LittleJoy.Service.Services.Interface;
@@ -14,22 +12,22 @@ namespace NET1806_LittleJoy.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BrandController : ControllerBase
+    public class CategoryController : ControllerBase
     {
-        private readonly IBrandService _brandService;
+        private readonly ICategoryService _categoryService;
 
-        public BrandController(IBrandService brandService)
+        public CategoryController( ICategoryService categoryService)
         {
-            _brandService = brandService;
+            _categoryService = categoryService; 
         }
 
         [HttpGet]
         //[Authorize(Roles = "STAFF,ADMIN")]
-        public async Task<IActionResult> GetAllBrandPagingAsync([FromQuery] PaginationParameter paginationParameter)
+        public async Task<IActionResult> GetAllCategoryPagingAsync([FromQuery] PaginationParameter paginationParameter)
         {
             try
             {
-                var result = await _brandService.GetAllBrandPagingAsync(paginationParameter);
+                var result = await _categoryService.GetAllCategoryPagingAsync(paginationParameter);
 
                 if (result != null)
                 {
@@ -54,7 +52,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     return NotFound(new ResponseModels
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "Brand is empty"
+                        Message = "Category is empty"
                     });
                 }
             }
@@ -70,23 +68,23 @@ namespace NET1806_LittleJoy.API.Controllers
         }
 
 
-        //[Authorize(Roles = "STAFF,ADMIN")]
         [HttpGet("{Id}")]
-        public async Task<IActionResult> GetBrandByIdAsync(int Id)
+        //[Authorize(Roles = "STAFF,ADMIN")]
+        public async Task<IActionResult> GetCategoryByIdAsync(int Id)
         {
             try
             {
-                var brandDetailModel = await _brandService.GetBrandByIdAsync(Id);
+                var CategoryModel = await _categoryService.GetCategoryByIdAsync(Id);
 
-                if (brandDetailModel == null)
+                if (CategoryModel == null)
                 {
                     return NotFound(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "Brand does not exist"
+                        Message = "Category does not exist"
                     });
                 }
-                return Ok(brandDetailModel);
+                return Ok(CategoryModel);
             }
             catch (Exception ex)
             {
@@ -102,25 +100,23 @@ namespace NET1806_LittleJoy.API.Controllers
 
         [HttpPost]
         //[Authorize(Roles = "STAFF,ADMIN")]
-        public async Task<IActionResult> AddBrandAsync([FromBody] BrandRequestModel brandRequestModel)
+        public async Task<IActionResult> AddCategoryAsync([FromBody] CategoryRequestModel categoryRequestModel)
         {
             try
             {
-                BrandModel brandModelAdd = new BrandModel()
+                CategoryModel cateModelAdd = new CategoryModel()
                 {
-                    BrandName = brandRequestModel.BrandName,
-                    BrandDescription = brandRequestModel.BrandDescription,
-                    Logo = brandRequestModel.Logo,
+                    CategoryName = categoryRequestModel.CategoryName,
                 };
 
-                var result = await _brandService.AddBrandAsync(brandModelAdd);
+                var result = await _categoryService.AddCategoryAsync(cateModelAdd);
 
                 if (result == false)
                 {
                     return NotFound(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "Can not add this brand"
+                        Message = "Can not add this category"
                     });
                 }
 
@@ -129,7 +125,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     return Ok(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status201Created,
-                        Message = "Create Brand success"
+                        Message = "Create category success"
                     });
                 }
             }
@@ -146,18 +142,18 @@ namespace NET1806_LittleJoy.API.Controllers
 
         [HttpDelete]
         //[Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> RemoveBrandByIdAsync(int Id)
+        public async Task<IActionResult> RemoveCategoryByIdAsync(int Id)
         {
             try
             {
-                var result = await _brandService.RemoveBrandByIdAsync(Id);
+                var result = await _categoryService.RemoveCategoryByIdAsync(Id);
 
                 if (result)
                 {
                     return Ok(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status200OK,
-                        Message = "Remove brand success"
+                        Message = "Remove category success"
                     });
                 }
                 else
@@ -165,7 +161,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     return NotFound(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "The brand can not remove"
+                        Message = "The category can not remove"
                     });
                 }
             }
@@ -183,33 +179,31 @@ namespace NET1806_LittleJoy.API.Controllers
 
         [HttpPut]
         //[Authorize(Roles = "STAFF,ADMIN")]
-        public async Task<IActionResult> UpdateBrandAsync([FromBody] BrandModel brandModel)
+        public async Task<IActionResult> UpdateCategoryAsync([FromBody] CategoryModel cateModel)
         {
             try
             {
-                BrandModel brandModelAdd = new BrandModel()
+                CategoryModel cateModelAdd = new CategoryModel()
                 {
-                    Id = brandModel.Id,
-                    Logo = brandModel.Logo,
-                    BrandDescription = brandModel.BrandDescription,
-                    BrandName = brandModel.BrandName 
+                    Id = cateModel.Id,
+                    CategoryName = cateModel.CategoryName, 
                 };
 
-                var result = await _brandService.UpdateBrandAsync(brandModelAdd);
+                var result = await _categoryService.UpdateCategoryAsync(cateModelAdd);
 
                 if (result == null)
                 {
                     return NotFound(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "Can not update this Brand"
+                        Message = "Can not update this Category"
                     });
                 }
 
                 return Ok(new ResponseModels()
                 {
                     HttpCode = StatusCodes.Status200OK,
-                    Message = "Update brand success"
+                    Message = "Update category success"
                 });
             }
             catch (Exception ex)

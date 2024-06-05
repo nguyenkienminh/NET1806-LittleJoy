@@ -13,7 +13,7 @@ namespace NET1806_LittleJoy.Service.Services.Interface
 
         public Task<bool?> AddBrandAsync(BrandModel brandModel);
 
-        public Task<bool> RemoveBrandAsync(int removeBrandById);
+        public Task<bool> RemoveBrandByIdAsync(int removeBrandById);
 
         public Task<BrandModel> UpdateBrandAsync(BrandModel brandModel);
     }

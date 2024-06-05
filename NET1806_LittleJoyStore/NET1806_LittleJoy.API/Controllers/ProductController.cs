@@ -23,7 +23,7 @@ namespace NET1806_LittleJoy.API.Controllers
         }
 
 
-        [HttpGet("GetAllProductPaging")]
+        [HttpGet]
         public async Task<IActionResult> GetListProductPagingAsync([FromQuery] PaginationParameter paginationParameter)
         {
             try
@@ -66,12 +66,12 @@ namespace NET1806_LittleJoy.API.Controllers
         }
 
 
-        [HttpGet("{GetProductDetailById}")]
-        public async Task<IActionResult> GetProductByIdAsync(int GetProductDetailById)
+        [HttpGet("{Id}")]
+        public async Task<IActionResult> GetProductByIdAsync(int Id)
         {
             try
             {
-                var productDetailModel = await _productService.GetProductByIdAsync(GetProductDetailById);
+                var productDetailModel = await _productService.GetProductByIdAsync(Id);
                 if (productDetailModel == null)
                 {
                     return NotFound(new ResponseModels()
@@ -94,8 +94,8 @@ namespace NET1806_LittleJoy.API.Controllers
         }
 
 
+        [HttpPost]
         //[Authorize(Roles = "STAFF,ADMIN")]
-        [HttpPost("AddNewProduct")]
         public async Task<IActionResult> AddNewProductAsync([FromBody] ProductRequestModel productRequestModel)
         {
             try
@@ -145,13 +145,13 @@ namespace NET1806_LittleJoy.API.Controllers
         }
 
 
+        [HttpDelete]
         //[Authorize(Roles = "ADMIN")]
-        [HttpDelete("{removeProductById}")]
-        public async Task<IActionResult> RemoveProductByIdAsync(int removeProductById)
+        public async Task<IActionResult> RemoveProductByIdAsync(int Id)
         {
             try
             {
-                var result = await _productService.DeleteProductByIdAsync(removeProductById);
+                var result = await _productService.DeleteProductByIdAsync(Id);
                 if (result)
                 {
                     return Ok(new ResponseModels()
@@ -165,7 +165,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     return NotFound(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "The product does not exist"
+                        Message = "The product can not remove"
                     });
                 }
             }
@@ -181,30 +181,30 @@ namespace NET1806_LittleJoy.API.Controllers
         }
 
 
+        [HttpPut]
         //[Authorize(Roles = "STAFF,ADMIN")]
-        [HttpPut("UpdateProduct")]
-        public async Task<IActionResult> UpdateProductAsync([FromBody] ProductRequestModel productRequestModel)
+        public async Task<IActionResult> UpdateProductAsync([FromBody] ProductModel productModel)
         {
             try
             {
-                ProductModel productModel = new ProductModel()
+                ProductModel productModelChange = new ProductModel()
                 {
-                    Id = productRequestModel.Id,
-                    ProductName = productRequestModel.ProductName,
-                    Price = productRequestModel.Price,
-                    Description = productRequestModel.Description,
-                    Weight = productRequestModel.Weight,
-                    Quantity = productRequestModel.Quantity,
-                    Image = productRequestModel.Image,
-                    IsActive = productRequestModel.IsActive,
-                    AgeId = productRequestModel.AgeId,
-                    OriginId = productRequestModel.OriginId,
-                    BrandId = productRequestModel.BrandId,
-                    CateId = productRequestModel.CateId,
-                    UnsignProductName = productRequestModel.UnsignProductName,
+                    Id = productModel.Id,
+                    ProductName = productModel.ProductName,
+                    Price = productModel.Price,
+                    Description = productModel.Description,
+                    Weight = productModel.Weight,
+                    Quantity = productModel.Quantity,
+                    Image = productModel.Image,
+                    IsActive = productModel.IsActive,
+                    AgeId = productModel.AgeId,
+                    OriginId = productModel.OriginId,
+                    BrandId = productModel.BrandId,
+                    CateId = productModel.CateId,
+                    UnsignProductName = productModel.UnsignProductName,
                 };
 
-                var result = await _productService.UpdateProductAsync(productModel);
+                var result = await _productService.UpdateProductAsync(productModelChange);
 
                 if (result == null)
                 {

@@ -53,7 +53,7 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
         public async Task<Product> AddNewProductAsync(Product productInfo)
         {
-            _context.Add(productInfo);
+            _context.Products.Add(productInfo);
 
             await _context.SaveChangesAsync();
 
@@ -64,7 +64,7 @@ namespace NET1806_LittleJoy.Repository.Repositories
         {
             product.IsActive = false;
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return true;
         }

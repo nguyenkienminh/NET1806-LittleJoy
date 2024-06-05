@@ -133,6 +133,12 @@ namespace NET1806_LittleJoy.API
             builder.Services.AddScoped<IAgeGroupProductRepository, AgeGroupProductRepository>();
             builder.Services.AddScoped<IAgeGroupProductService, AgeGroupProductService>();
 
+            builder.Services.AddScoped<IOriginRepository, OriginRepository>();
+            builder.Services.AddScoped<IOriginService, OriginService>();
+
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+
             builder.Services.AddTransient<IMailService, MailService>();
 
             var app = builder.Build();

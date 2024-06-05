@@ -42,5 +42,38 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
             return item;
         }
+
+        public async Task<AgeGroupProduct> AddAgeGroupAsync(AgeGroupProduct ageGroup)
+        {
+            _context.AgeGroupProducts.Add(ageGroup);
+
+            await _context.SaveChangesAsync();
+
+            return ageGroup;
+
+        }
+
+        public async Task<bool> RemoveAgeGroupAsync(AgeGroupProduct ageGroup)
+        {
+            _context.AgeGroupProducts.Remove(ageGroup);
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<ICollection<Product>> GetProductsByAgeIdAsync(int ageId)
+        {
+            return await _context.Products.Where(a => a.AgeId == ageId).ToListAsync();
+        }
+
+        public async Task<AgeGroupProduct> UpdateAgeGroupAsync(AgeGroupProduct ageModify, AgeGroupProduct agePlace)
+        {
+            agePlace.Id = ageModify.Id;
+            agePlace.AgeRange = ageModify.AgeRange;
+
+            await _context.SaveChangesAsync();
+            return agePlace;
+        }
     }
 }

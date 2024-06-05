@@ -13,5 +13,13 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
         public Task<Pagination<AgeGroupProduct>> GetAllAgeGroupPagingAsync(PaginationParameter paginationParameter);
 
         public Task<AgeGroupProduct?> GetAgeGroupByIdAsync(int ageId);
+
+        public Task<AgeGroupProduct> AddAgeGroupAsync(AgeGroupProduct ageGroup);
+
+        public Task<bool> RemoveAgeGroupAsync(AgeGroupProduct ageGroup);
+
+        public Task<ICollection<Product>> GetProductsByAgeIdAsync(int ageId);
+
+        public Task<AgeGroupProduct> UpdateAgeGroupAsync(AgeGroupProduct ageModify, AgeGroupProduct agePlace);
     }
 }

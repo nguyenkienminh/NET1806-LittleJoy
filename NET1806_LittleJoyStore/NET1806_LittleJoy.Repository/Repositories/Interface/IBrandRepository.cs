@@ -19,7 +19,7 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
 
         public Task<bool> RemoveBrandAsync(Brand brand);
 
-        public Task<ICollection<Product>> GetProductsByBrandId(int brandId);
+        public Task<ICollection<Product>> GetProductsByBrandIdAsync(int brandId);
 
         public Task<Brand> UpdateBrandAsync(Brand brandModify, Brand brandPlace);
     }

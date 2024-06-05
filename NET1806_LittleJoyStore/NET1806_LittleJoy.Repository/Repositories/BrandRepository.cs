@@ -36,14 +36,12 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
         public async Task<Brand?> GetBrandByIdAsync(int brandId)
         {
-            var item = await _context.Brands.SingleOrDefaultAsync(b => b.Id == brandId);
-
-            return item;
+            return await _context.Brands.SingleOrDefaultAsync(b => b.Id == brandId);
         }
 
         public async Task<Brand> AddBrandAsync(Brand brand)
         {
-            _context.Add(brand);
+            _context.Brands.Add(brand);
 
             await _context.SaveChangesAsync();
 
@@ -57,14 +55,14 @@ namespace NET1806_LittleJoy.Repository.Repositories
             // neu co thi ko dc xoa
             // neu ko thi xoa
 
-            _context.Remove(brand);
+            _context.Brands.Remove(brand);
 
             await _context.SaveChangesAsync();
 
             return true;
         }
 
-        public async Task<ICollection<Product>> GetProductsByBrandId(int id)
+        public async Task<ICollection<Product>> GetProductsByBrandIdAsync(int id)
         {
             return await _context.Products.Where(pb => pb.BrandId == id).ToListAsync();
         }
