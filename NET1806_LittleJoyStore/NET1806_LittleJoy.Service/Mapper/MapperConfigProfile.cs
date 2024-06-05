@@ -13,6 +13,7 @@ namespace NET1806_LittleJoy.Service.Mapper
     {
         public MapperConfigProfile() { 
             CreateMap<UserModel, User>().ReverseMap();
+            CreateMap<BlogModel, Post>().ReverseMap();
         }
     }
 }
