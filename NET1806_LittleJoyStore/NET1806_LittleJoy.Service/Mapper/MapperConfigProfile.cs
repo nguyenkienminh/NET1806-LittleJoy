@@ -24,6 +24,8 @@ namespace NET1806_LittleJoy.Service.Mapper
             CreateMap<OriginModel, Origin>().ReverseMap();
 
             CreateMap<CategoryModel, Category>().ReverseMap();
+
+            CreateMap<FeedBackModel, Feedback>().ReverseMap();
         }
     }
 }

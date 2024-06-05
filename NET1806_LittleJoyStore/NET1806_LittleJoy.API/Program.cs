@@ -147,6 +147,9 @@ namespace NET1806_LittleJoy.API
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
 
+            builder.Services.AddScoped<IFeedBackRepository, FeedBackRepository>();
+            builder.Services.AddScoped<IFeedBackService, FeedBackService>();
+
             builder.Services.AddTransient<IMailService, MailService>();
 
             var app = builder.Build();

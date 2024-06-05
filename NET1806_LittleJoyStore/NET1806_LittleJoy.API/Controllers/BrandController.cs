@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 
 namespace NET1806_LittleJoy.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/brand")]
     [ApiController]
     public class BrandController : ControllerBase
     {
@@ -70,8 +70,8 @@ namespace NET1806_LittleJoy.API.Controllers
         }
 
 
-        //[Authorize(Roles = "STAFF,ADMIN")]
         [HttpGet("{Id}")]
+        //[Authorize(Roles = "STAFF,ADMIN")]
         public async Task<IActionResult> GetBrandByIdAsync(int Id)
         {
             try

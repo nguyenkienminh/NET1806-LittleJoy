@@ -1,33 +1,34 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using NET1806_LittleJoy.Service.Services.Interface;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using NET1806_LittleJoy.API.ViewModels.RequestModels;
 using NET1806_LittleJoy.API.ViewModels.ResponeModels;
 using NET1806_LittleJoy.Repository.Commons;
-using NET1806_LittleJoy.Service.Services;
-using Newtonsoft.Json;
-using NET1806_LittleJoy.API.ViewModels.RequestModels;
 using NET1806_LittleJoy.Service.BusinessModels;
+using NET1806_LittleJoy.Service.Services;
+using NET1806_LittleJoy.Service.Services.Interface;
+using Newtonsoft.Json;
+
 namespace NET1806_LittleJoy.API.Controllers
 {
-    [Route("api/age-group-product")]
+    [Route("api/feedback")]
     [ApiController]
-    public class AgeGroupProductController : ControllerBase
+    public class FeedBackController : ControllerBase
     {
-        private readonly IAgeGroupProductService _ageGroupService;
+        private readonly IFeedBackService _service;
 
-        public AgeGroupProductController(IAgeGroupProductService ageGroupProductService)
+        public FeedBackController(IFeedBackService service)
         {
-            _ageGroupService = ageGroupProductService;
+            _service = service;
         }
-
 
         [HttpGet]
         //[Authorize(Roles = "STAFF,ADMIN")]
-        public async Task<IActionResult> GetAllAgeGroupPagingAsync([FromQuery] PaginationParameter paginationParameter)
+        public async Task<IActionResult> GetAllFeedBackPagingAsync([FromQuery] PaginationParameter paginationParameter)
         {
             try
             {
-                var result = await _ageGroupService.GetAllAgeGroupPagingAsync(paginationParameter);
+                var result = await _service.GetAllFeedBackPagingAsync(paginationParameter);
 
                 if (result != null)
                 {
@@ -52,7 +53,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     return NotFound(new ResponseModels
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "Age Group is empty"
+                        Message = "FeedBack is empty"
                     });
                 }
             }
@@ -70,21 +71,21 @@ namespace NET1806_LittleJoy.API.Controllers
 
         [HttpGet("{Id}")]
         //[Authorize(Roles = "STAFF,ADMIN")]
-        public async Task<IActionResult> GetBrandDetailByIdAsync(int Id)
+        public async Task<IActionResult> GetFeedBackByIdAsync(int Id)
         {
             try
             {
-                var AgeGroupModel = await _ageGroupService.GetAgeGroupByIdAsync(Id);
+                var detailModel = await _service.GetFeedBackByIdAsync(Id);
 
-                if (AgeGroupModel == null)
+                if (detailModel == null)
                 {
                     return NotFound(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "Age does not exist"
+                        Message = "Feedback does not exist"
                     });
                 }
-                return Ok(AgeGroupModel);
+                return Ok(detailModel);
             }
             catch (Exception ex)
             {
@@ -99,24 +100,27 @@ namespace NET1806_LittleJoy.API.Controllers
 
 
         [HttpPost]
-        //[Authorize(Roles = "STAFF,ADMIN")]
-        public async Task<IActionResult> AddAgeGroupAsync([FromBody] AgeGroupProductRequestModel ageGroupModel)
+        //[Authorize(Roles = "STAFF,ADMIN,USER")]
+        public async Task<IActionResult> AddFeedBackAsync([FromBody] FeedBackRequestModel request)
         {
             try
             {
-                AgeGroupProductModel ageGroupProductModel = new AgeGroupProductModel()
+                FeedBackModel ModelAdd = new FeedBackModel()
                 {
-                    AgeRange = ageGroupModel.AgeRange,
+                    ProductId = request.ProductId,
+                    UserId = request.UserId,
+                    Rating = request.Rating,
+                    Comment = request.Comment,
                 };
 
-                var result = await _ageGroupService.AddAgeGroupAsync(ageGroupProductModel);
+                var result = await _service.AddFeedBackAsync(ModelAdd);
 
                 if (result == false)
                 {
                     return NotFound(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "Can not add this Age"
+                        Message = "Can not create this feedback"
                     });
                 }
 
@@ -125,7 +129,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     return Ok(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status201Created,
-                        Message = "Create Age success"
+                        Message = "Create FeedBack success"
                     });
                 }
             }
@@ -142,18 +146,18 @@ namespace NET1806_LittleJoy.API.Controllers
 
         [HttpDelete]
         //[Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> RemoveAgeGroupByIdAsync(int Id)
+        public async Task<IActionResult> RemoveFeedBackByIdAsync(int Id)
         {
             try
             {
-                var result = await _ageGroupService.RemoveAgeGroupByIdAsync(Id);
+                var result = await _service.RemoveFeedBackByIdAsync(Id);
 
                 if (result)
                 {
                     return Ok(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status200OK,
-                        Message = "Remove Age success"
+                        Message = "Remove Feedback success"
                     });
                 }
                 else
@@ -161,7 +165,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     return NotFound(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "This Age does not exist"
+                        Message = "The feedback can not remove"
                     });
                 }
             }
@@ -178,33 +182,33 @@ namespace NET1806_LittleJoy.API.Controllers
 
 
         [HttpPut]
-        //[Authorize(Roles = "STAFF,ADMIN")]
-        public async Task<IActionResult> UpdateAgeGroupAsync([FromBody] AgeGroupProductModel ageGroupModel)
+        //[Authorize(Roles = "STAFF,ADMIN,USER")]
+        public async Task<IActionResult> UpdateFeedBackAsync([FromBody] FeedBackUpdateRequestModel model)
         {
             try
             {
-                AgeGroupProductModel AgeModelAdd = new AgeGroupProductModel()
+                FeedBackModel feedBackModel = new FeedBackModel()
                 {
-                    Id = ageGroupModel.Id,
-                    AgeRange = ageGroupModel.AgeRange,
-                    
+                    Id = model.Id,
+                    Comment = model.Comment,
+                    Rating = model.Rating,
                 };
 
-                var result = await _ageGroupService.UpdateAgeGroupAsync(AgeModelAdd);
+                var result = await _service.UpdateFeedBackAsync(feedBackModel);
 
                 if (result == null)
                 {
                     return NotFound(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "Can not update this Age"
+                        Message = "Can not feedback this Brand"
                     });
                 }
 
                 return Ok(new ResponseModels()
                 {
                     HttpCode = StatusCodes.Status200OK,
-                    Message = "Update Age success"
+                    Message = "Update feedback success"
                 });
             }
             catch (Exception ex)
@@ -218,5 +222,36 @@ namespace NET1806_LittleJoy.API.Controllers
             }
         }
 
+
+        [HttpGet("average-product-id")]
+        //[Authorize(Roles = "STAFF,ADMIN,USER")]
+        public async Task<IActionResult> AverageFeedBackInProductAsync(int productId)
+        {
+            try
+            {
+                var aver = _service.AverageFeedBackInProductAsync(productId);
+
+                if (aver == null)
+                {
+                    return NotFound(new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "FeedBack does not exist"
+                    });
+                }
+
+                return Ok(aver.Result);
+            }
+
+            catch (Exception ex)
+            {
+
+                return BadRequest(new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                });
+            }
+        }
     }
 }

@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace NET1806_LittleJoy.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/product")]
     [ApiController]
     public class ProductController : ControllerBase
     {
@@ -237,7 +237,7 @@ namespace NET1806_LittleJoy.API.Controllers
         ///     2 - Cao đến thấp |
         ///     3 - Thấp đến cao
         /// </summary>
-        [HttpGet("Filter")]
+        [HttpGet("filter")]
         public async Task<IActionResult> FilterProductPagingAsync([FromQuery] ProductFilterModel model)
         {
             try

@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace NET1806_LittleJoy.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/origin")]
     [ApiController]
     public class OriginController : ControllerBase
     {
