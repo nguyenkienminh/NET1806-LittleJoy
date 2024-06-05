@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using NET1806_LittleJoy.Repository.Commons;
 using NET1806_LittleJoy.Repository.Entities;
 using NET1806_LittleJoy.Repository.Repositories.Interface;
 using NET1806_LittleJoy.Service.BusinessModels;
 using NET1806_LittleJoy.Service.Mapper;
 using NET1806_LittleJoy.Service.Services.Interface;
+using NET1806_LittleJoy.Service.Ultils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -77,6 +79,9 @@ namespace NET1806_LittleJoy.Service.Services
                 productModel.IsActive = true;
 
                 var productInfo = _mapper.Map<Product>(productModel);
+
+                productInfo.UnsignProductName = StringUtils.ConvertToUnSign(productInfo.ProductName);
+
                 await _productRepositoty.AddNewProductAsync(productInfo);
                 return true; 
             }
@@ -103,6 +108,8 @@ namespace NET1806_LittleJoy.Service.Services
 
         public async Task<ProductModel> UpdateProductAsync(ProductModel productModel)
         {
+            productModel.UnsignProductName = StringUtils.ConvertToUnSign(productModel.ProductName);
+
             var productModify = _mapper.Map<Product>(productModel);
 
             var productPlace = await _productRepositoty.GetProductByIdAsync(productModel.Id);
@@ -114,6 +121,39 @@ namespace NET1806_LittleJoy.Service.Services
                 return _mapper.Map<ProductModel>(updateProduct);
             }
             return null;
+        }
+
+        public async Task<Pagination<ProductModel>> FilterProductPagingAsync(ProductFilterModel model)
+        {
+            var listProduct =  await _productRepositoty.FilterProductPagingAsync(model);
+
+            if (!listProduct.Any())
+            {
+                return null;
+            }
+
+            var listProductModels = listProduct.Select(p => new ProductModel
+            {
+                Id = p.Id,
+                CateId = p.CateId,
+                ProductName = p.ProductName,
+                Price = p.Price,
+                Description = p.Description,
+                Weight = p.Weight,
+                IsActive = p.IsActive,
+                Quantity = p.Quantity,
+                Image = p.Image,
+                AgeId = p.AgeId,
+                OriginId = p.OriginId,
+                BrandId = p.BrandId,
+                UnsignProductName = p.UnsignProductName,
+            }).ToList();
+
+
+            return new Pagination<ProductModel>(listProductModels,
+                listProduct.TotalCount,
+                listProduct.CurrentPage,
+                listProduct.PageSize);
         }
     }
 }

@@ -31,7 +31,5 @@ namespace NET1806_LittleJoy.API.ViewModels.RequestModels
 
         public int? CateId { get; set; }
 
-        [MaxLength]
-        public string? UnsignProductName { get; set; }
     }
 }

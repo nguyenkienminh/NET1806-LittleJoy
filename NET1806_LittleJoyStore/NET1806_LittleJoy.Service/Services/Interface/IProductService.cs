@@ -19,5 +19,7 @@ namespace NET1806_LittleJoy.Service.Services.Interface
         public Task<bool> DeleteProductByIdAsync(int productId);
 
         public Task<ProductModel> UpdateProductAsync(ProductModel productModel);
+
+        public Task<Pagination<ProductModel>> FilterProductPagingAsync(ProductFilterModel model);
     }
 }

@@ -83,9 +83,69 @@ namespace NET1806_LittleJoy.Repository.Repositories
             productPlace.BrandId = productModify.BrandId;
             productPlace.CateId = productModify.CateId;
             productPlace.UnsignProductName = productModify.UnsignProductName;
-                
+
             await _context.SaveChangesAsync();
             return productPlace;
+        }
+
+        public async Task<Pagination<Product>> FilterProductPagingAsync(ProductFilterModel model)
+        {
+            var products = _context.Products.AsQueryable();
+
+            if (!string.IsNullOrEmpty(model.keyword))
+            {
+                products = products.Where(p => p.UnsignProductName.Contains(model.keyword));
+            }
+
+            if (model.cateId.HasValue)
+            {
+                products = products.Where(p => p.CateId == model.cateId);
+            }
+
+            if (model.brandId.HasValue)
+            {
+                products = products.Where(p => p.BrandId == model.brandId);
+            }
+
+            if (model.ageId.HasValue)
+            {
+                products = products.Where(p => p.AgeId == model.ageId);
+            }
+
+            if (model.originId.HasValue)
+            {
+                products = products.Where(p => p.OriginId == model.originId);
+            }
+
+
+            if (model.sortOrder.HasValue)
+            {
+                switch (model.sortOrder)
+                {
+                    case 1:
+                        products = products.OrderByDescending(p => p.Id);
+                        break;
+
+                    case 2:
+                        products = products.OrderByDescending(p => p.Price);
+                        break;
+
+                    case 3:
+                        products = products.OrderBy(p => p.Price);
+                        break;
+                }
+            }
+
+            var itemCount = await products.CountAsync();
+
+            var item = await products.Skip((model.paging.PageIndex - 1) * model.paging.PageSize)
+                                     .Take(model.paging.PageSize)
+                                     .AsNoTracking()
+                                     .ToListAsync();
+
+            var result = new Pagination<Product>(item, itemCount, model.paging.PageIndex, model.paging.PageSize);
+
+            return result;
         }
     }
 }

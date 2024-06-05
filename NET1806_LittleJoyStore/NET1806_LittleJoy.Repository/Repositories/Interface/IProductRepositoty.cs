@@ -20,5 +20,7 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
 
         public Task<Product> UpdateProductAsync(Product productModify, Product productPlace);
 
+        public Task<Pagination<Product>> FilterProductPagingAsync (ProductFilterModel model);
+
     }
 }
