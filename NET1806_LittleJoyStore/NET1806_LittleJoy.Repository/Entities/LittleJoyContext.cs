@@ -23,8 +23,6 @@ public partial class LittleJoyContext : DbContext
 
     public virtual DbSet<Category> Categories { get; set; }
 
-    public virtual DbSet<Delivery> Deliveries { get; set; }
-
     public virtual DbSet<Feedback> Feedbacks { get; set; }
 
     public virtual DbSet<Order> Orders { get; set; }
@@ -104,15 +102,6 @@ public partial class LittleJoyContext : DbContext
             entity.Property(e => e.CategoryName).HasMaxLength(500);
         });
 
-        modelBuilder.Entity<Delivery>(entity =>
-        {
-            entity.HasKey(e => e.OrderId).HasName("PK__Delivery__C3905BCFBC21537C");
-
-            entity.ToTable("Delivery");
-
-            entity.Property(e => e.Status).HasMaxLength(250);
-        });
-
         modelBuilder.Entity<Feedback>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Feedback__3214EC07E0A2CFC9");
@@ -142,12 +131,7 @@ public partial class LittleJoyContext : DbContext
             entity.Property(e => e.Address).HasMaxLength(500);
             entity.Property(e => e.Status).HasMaxLength(250);
             entity.Property(e => e.Date).HasColumnType("datetime");
-
-            entity.HasOne(d => d.IdNavigation).WithOne(p => p.Order)
-                .HasForeignKey<Order>(d => d.Id)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Order__Id__693CA210");
-
+            entity.Property(e => e.DeliveryStatus).HasMaxLength(250);
             entity.HasOne(d => d.Payment).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.PaymentId)
                 .HasConstraintName("FK__Order__PaymentId__6A30C649");
