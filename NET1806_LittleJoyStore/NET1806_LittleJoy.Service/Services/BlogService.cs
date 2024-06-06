@@ -5,6 +5,7 @@ using NET1806_LittleJoy.Repository.Repositories;
 using NET1806_LittleJoy.Repository.Repositories.Interface;
 using NET1806_LittleJoy.Service.BusinessModels;
 using NET1806_LittleJoy.Service.Services.Interface;
+using NET1806_LittleJoy.Service.Ultils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +32,8 @@ namespace NET1806_LittleJoy.Service.Services
                 return null;
             }
             var blogModel = _mapper.Map<Post>(model);
+            blogModel.UnsignTitle = StringUtils.ConvertToUnSign(blogModel.Title);
+            blogModel.Date = DateTime.UtcNow.AddHours(7);
             var blog = await _blogRepository.CreateNewBlogAsync(blogModel);
             if(blog != null)
             {
@@ -41,6 +44,17 @@ namespace NET1806_LittleJoy.Service.Services
                 return null;
             }
             
+        }
+
+        public async Task<Pagination<BlogModel>> GetListBlogFilterAsync(PaginationParameter paging, BlogFilterModel filter)
+        {
+            var list = await _blogRepository.GetListBlogFilterAsync(paging, filter);
+            if (list == null)
+            {
+                return null;
+            }
+            var listBlogModels = _mapper.Map<List<BlogModel>>(list);
+            return new Pagination<BlogModel>(listBlogModels, list.TotalCount, list.CurrentPage, list.PageSize);
         }
 
         public async Task<BlogModel> GetBlogByIdAsync(int Id)
@@ -96,6 +110,7 @@ namespace NET1806_LittleJoy.Service.Services
                 blogExist.Content = blog.Content;
                 blogExist.UserId = blog.UserId;
                 blogExist.Banner = blog.Banner;
+                blogExist.UnsignTitle = StringUtils.ConvertToUnSign(blog.Title);
 
                 var updateBlog = _mapper.Map<Post>(blogExist);
                 var result = await _blogRepository.UpdateBlogAsync(updateBlog);

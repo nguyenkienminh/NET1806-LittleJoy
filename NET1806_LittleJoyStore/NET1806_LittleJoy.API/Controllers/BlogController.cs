@@ -192,5 +192,46 @@ namespace NET1806_LittleJoy.API.Controllers
                 });
             }
         }
+
+        [HttpGet("filter")]
+        public async Task<IActionResult> GetListBlogFilter([FromQuery] BlogFilterModel filter, [FromQuery] PaginationParameter paging)
+        {
+            try
+            {
+                var result = await _blogService.GetListBlogFilterAsync(paging, filter);
+                if (result != null)
+                {
+                    var metadata = new
+                    {
+                        result.TotalCount,
+                        result.PageSize,
+                        result.CurrentPage,
+                        result.TotalPages,
+                        result.HasNext,
+                        result.HasPrevious
+                    };
+                    Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+                    return Ok(result);
+                }
+                else
+                {
+                    return NotFound(new ResponseModels
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "Blog is empty"
+                    });
+                }
+            }
+            catch(Exception ex)
+            {
+                var responseModel = new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(responseModel);
+            }
+            return Ok();
+        }
     }
 }

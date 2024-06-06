@@ -205,6 +205,7 @@ public partial class LittleJoyContext : DbContext
 
             entity.Property(e => e.Date).HasColumnType("datetime");
             entity.Property(e => e.Title).HasMaxLength(500);
+            entity.Property(e => e.UnsignTitle).HasMaxLength(500);
 
             entity.HasOne(d => d.User).WithMany(p => p.Posts)
                 .HasForeignKey(d => d.UserId)

@@ -20,5 +20,7 @@ namespace NET1806_LittleJoy.Service.BusinessModels
         public string? Content { get; set; }
 
         public DateTime? Date { get; set; }
+
+        public string? UnsignTitle { get; set; }
     }
 }

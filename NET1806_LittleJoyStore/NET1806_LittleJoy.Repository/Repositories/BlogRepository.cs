@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.IdentityModel.Tokens;
 using NET1806_LittleJoy.Repository.Commons;
 using NET1806_LittleJoy.Repository.Entities;
 using NET1806_LittleJoy.Repository.Repositories.Interface;
@@ -22,7 +23,6 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
         public async Task<Post> CreateNewBlogAsync(Post blog)
         {
-            blog.Date = DateTime.UtcNow.AddHours(7);
             _context.Posts.Add(blog);
             await _context.SaveChangesAsync();
             return blog;
@@ -36,7 +36,7 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
         public async Task<Post?> GetBlogByIdAsync(int id)
         {
-            return await _context.Posts.FirstOrDefaultAsync(x =>  x.Id == id);
+            return await _context.Posts.FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<Pagination<Post>> GetListBlogAsync(PaginationParameter paginationParameter)
@@ -46,6 +46,41 @@ namespace NET1806_LittleJoy.Repository.Repositories
                 .Take(paginationParameter.PageSize)
                 .AsNoTracking().ToListAsync();
             var result = new Pagination<Post>(items, itemCount, paginationParameter.PageIndex, paginationParameter.PageSize);
+
+            return result;
+        }
+
+        public async Task<Pagination<Post>> GetListBlogFilterAsync(PaginationParameter paging, BlogFilterModel filter)
+        {
+            var query = _context.Posts.AsQueryable();
+
+            if (!string.IsNullOrEmpty(filter.search))
+            {
+                query = query.Where(x => x.UnsignTitle.Contains(filter.search));
+            }
+
+            if (filter.UserId != null)
+            {
+                query = query.Where(x => x.UserId == filter.UserId);
+            }
+
+            if (filter.sortDate.HasValue)
+            {
+                if (filter.sortDate == 1)
+                {
+                    query = query.OrderBy(x => x.Date);
+                }
+                else
+                {
+                    query = query.OrderByDescending(x => x.Date);
+                }
+            }
+
+            var itemCount = await query.CountAsync();
+            var items = await query.Skip((paging.PageIndex - 1) * paging.PageSize)
+                .Take(paging.PageSize)
+                .AsNoTracking().ToListAsync();
+            var result = new Pagination<Post>(items, itemCount, paging.PageIndex, paging.PageSize);
 
             return result;
         }
