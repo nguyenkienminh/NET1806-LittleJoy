@@ -88,7 +88,7 @@ namespace NET1806_LittleJoy.Repository.Repositories
             return productPlace;
         }
 
-        public async Task<Pagination<Product>> FilterProductPagingAsync(ProductFilterModel model)
+        public async Task<Pagination<Product>> FilterProductPagingAsync(PaginationParameter paging, ProductFilterModel model)
         {
             var products = _context.Products.AsQueryable();
 
@@ -138,12 +138,12 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
             var itemCount = await products.CountAsync();
 
-            var item = await products.Skip((model.paging.PageIndex - 1) * model.paging.PageSize)
-                                     .Take(model.paging.PageSize)
+            var item = await products.Skip((paging.PageIndex - 1) * paging.PageSize)
+                                     .Take(paging.PageSize)
                                      .AsNoTracking()
                                      .ToListAsync();
 
-            var result = new Pagination<Product>(item, itemCount, model.paging.PageIndex, model.paging.PageSize);
+            var result = new Pagination<Product>(item, itemCount, paging.PageIndex, paging.PageSize);
 
             return result;
         }

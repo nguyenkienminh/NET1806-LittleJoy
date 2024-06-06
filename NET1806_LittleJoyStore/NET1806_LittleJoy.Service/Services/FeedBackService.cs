@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace NET1806_LittleJoy.Service.Services
 {
-    public class FeedBackService: IFeedBackService
+    public class FeedBackService : IFeedBackService
     {
         private readonly IFeedBackRepository _feedBackRepo;
         private readonly IMapper _mapper;
@@ -39,8 +39,8 @@ namespace NET1806_LittleJoy.Service.Services
                 UserId = f.UserId,
                 ProductId = f.ProductId,
                 Comment = f.Comment,
-                Rating = f.Rating,  
-                Date = f.Date   
+                Rating = f.Rating,
+                Date = f.Date
             }).ToList();
 
 
@@ -135,15 +135,35 @@ namespace NET1806_LittleJoy.Service.Services
             return null;
         }
 
-        public async Task<double> AverageFeedBackInProductAsync(int productId)
+        public async Task<ProductAverageRating> AverageFeedBackInProduct(int productId)
         {
-            var items = _feedBackRepo.FeedBackInProductAsync(productId);
+            return new ProductAverageRating()
+            {
+                ProductId = productId,
+                RatingAver = _feedBackRepo.AverageRatingAsync(productId).Result
+            };
+        }
 
-            double total = (double) items.Result.Sum(f => f.Rating);
+        public async Task<List<FeedBackModel>> GetFeedBackByProductIdAsync(int productId)
+        {
+            var list = await _feedBackRepo.FeedBackInProductAsync(productId);
 
-            int count = items.Result.Count();
+            if (list == null)
+            {
+                return null;
+            }
 
-            return  Math.Round((double) (total /count), 1);
+            var listModel = list.Select(f => new FeedBackModel
+            {
+                Id = f.Id,
+                UserId = f.UserId,
+                ProductId = f.ProductId,
+                Comment = f.Comment,
+                Rating = f.Rating,
+                Date = f.Date
+            }).ToList();
+
+            return listModel;
         }
     }
 }

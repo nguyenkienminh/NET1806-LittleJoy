@@ -231,18 +231,19 @@ namespace NET1806_LittleJoy.API.Controllers
             }
         }
 
+
         /// <summary>
         /// Sort Order:
         ///     1 - Hàng mới |
-        ///     2 - Cao đến thấp |
-        ///     3 - Thấp đến cao
+        ///     2 - Giá tiền Cao đến thấp |
+        ///     3 - Giá tiền Thấp đến cao
         /// </summary>
         [HttpGet("filter")]
-        public async Task<IActionResult> FilterProductPagingAsync([FromQuery] ProductFilterModel model)
+        public async Task<IActionResult> FilterProductPagingAsync([FromQuery] PaginationParameter paging, [FromQuery] ProductFilterModel model)
         {
             try
             {
-                var result = await _productService.FilterProductPagingAsync(model);
+                var result = await _productService.FilterProductPagingAsync(paging,model);
 
                 if (result != null)
                 {

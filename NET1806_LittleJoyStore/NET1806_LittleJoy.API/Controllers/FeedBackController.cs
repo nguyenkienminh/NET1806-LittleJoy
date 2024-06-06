@@ -223,26 +223,54 @@ namespace NET1806_LittleJoy.API.Controllers
         }
 
 
-        [HttpGet("average-product-id")]
-        //[Authorize(Roles = "STAFF,ADMIN,USER")]
-        public async Task<IActionResult> AverageFeedBackInProductAsync(int productId)
+        [HttpGet("product-average-point/{Id}")]
+        //[Authorize(Roles = "STAFF,ADMIN")]
+        public async Task<IActionResult> GetProductAveragePoint(int Id)
         {
             try
             {
-                var aver = _service.AverageFeedBackInProductAsync(productId);
+                var pointModel = await _service.AverageFeedBackInProduct(Id);
 
-                if (aver == null)
+                if (pointModel == null)
                 {
                     return NotFound(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "FeedBack does not exist"
+                        Message = "Feedback does not exist"
                     });
                 }
-
-                return Ok(aver.Result);
+                return Ok(pointModel);
             }
+            catch (Exception ex)
+            {
 
+                return BadRequest(new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                });
+            }
+        }
+
+
+        [HttpGet("feed-back-by-product/{Id}")]
+        //[Authorize(Roles = "STAFF,ADMIN")]
+        public async Task<IActionResult> GetFeedBackByProductId(int Id)
+        {
+            try
+            {
+                var pointModel = await _service.GetFeedBackByProductIdAsync(Id);
+
+                if (pointModel == null)
+                {
+                    return NotFound(new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "Feedback does not exist"
+                    });
+                }
+                return Ok(pointModel);
+            }
             catch (Exception ex)
             {
 

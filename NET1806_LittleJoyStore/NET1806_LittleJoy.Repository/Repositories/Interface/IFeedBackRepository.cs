@@ -22,5 +22,7 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
         public Task<Feedback> UpdateFeedBackAsync(Feedback feedbackModify, Feedback feedbackPlace);
 
         public Task<List<Feedback>> FeedBackInProductAsync(int productId);
+
+        public Task<double> AverageRatingAsync(int productId);
     }
 }

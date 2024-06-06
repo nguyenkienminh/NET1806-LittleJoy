@@ -20,4 +20,12 @@ namespace NET1806_LittleJoy.Service.BusinessModels
 
         public DateTime? Date { get; set; }
     }
+
+
+    public class ProductAverageRating
+    {
+        public int ProductId { get; set; }
+
+        public double? RatingAver { get; set; }
+    }
 }

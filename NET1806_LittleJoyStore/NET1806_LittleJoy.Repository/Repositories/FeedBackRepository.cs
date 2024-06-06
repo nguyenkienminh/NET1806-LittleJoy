@@ -73,5 +73,21 @@ namespace NET1806_LittleJoy.Repository.Repositories
         { 
             return await _context.Feedbacks.Where(f => f.ProductId == productId).AsNoTracking().ToListAsync();
         }
+
+        public async Task<double> AverageRatingAsync(int productId)
+        {
+            var item =  _context.Feedbacks.Where(f => f.ProductId == productId).AsQueryable();
+
+            var count = await item.CountAsync();
+
+            if(count == 0)
+            {
+                return 0.0;
+            }
+
+            var total = (double) await item.SumAsync(f => f.Rating);
+
+            return Math.Round( (double) total/count, 1);
+        }
     }
 }

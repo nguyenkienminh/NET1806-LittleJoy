@@ -18,22 +18,25 @@ namespace NET1806_LittleJoy.Service.Services
 {
     public class ProductService : IProductService
     {
-        private readonly IProductRepositoty _productRepositoty;
+        private readonly IProductRepositoty _productRepository;
         private readonly IMapper _mapper;
+        private readonly IFeedBackService _feedBack;
 
-        public ProductService(IProductRepositoty productRepositoty, IMapper mapper)
+        public ProductService(IProductRepositoty productRepository, IMapper mapper, IFeedBackService feedBack)
         {
-            _productRepositoty = productRepositoty;
+            _productRepository = productRepository;
             _mapper = mapper;
+            _feedBack = feedBack;
         }
 
         public async Task<Pagination<ProductModel>> GetAllProductPagingAsync(PaginationParameter paginationParameter)
         {
-            var listProduct = await _productRepositoty.GetAllProductPagingAsync(paginationParameter);
+            var listProduct = await _productRepository.GetAllProductPagingAsync(paginationParameter);
             if (!listProduct.Any())
             {
                 return null;
             }
+
 
             var listProductModels = listProduct.Select(p => new ProductModel
             {
@@ -49,7 +52,7 @@ namespace NET1806_LittleJoy.Service.Services
                 AgeId = p.AgeId,
                 OriginId = p.OriginId,
                 BrandId = p.BrandId,
-                UnsignProductName = p.UnsignProductName,
+                UnsignProductName = p.UnsignProductName, 
             }).ToList();
 
 
@@ -61,14 +64,16 @@ namespace NET1806_LittleJoy.Service.Services
 
         public async Task<ProductModel?> GetProductByIdAsync(int productId)
         {
-            var productDetail = await _productRepositoty.GetProductByIdAsync(productId);
+            var productDetail = await _productRepository.GetProductByIdAsync(productId);
 
             if (productDetail == null)
             {
                 return null;
             }
 
-            return _mapper.Map<ProductModel>(productDetail);
+            var productModelInfo = _mapper.Map<ProductModel>(productDetail);
+
+            return productModelInfo;
            
         }
 
@@ -82,7 +87,7 @@ namespace NET1806_LittleJoy.Service.Services
 
                 productInfo.UnsignProductName = StringUtils.ConvertToUnSign(productInfo.ProductName);
 
-                await _productRepositoty.AddNewProductAsync(productInfo);
+                await _productRepository.AddNewProductAsync(productInfo);
                 return true; 
             }
             catch (Exception ex)
@@ -96,14 +101,14 @@ namespace NET1806_LittleJoy.Service.Services
         public async Task<bool> DeleteProductByIdAsync(int productId)
         {
 
-            var removeProduct = await _productRepositoty.GetProductByIdAsync(productId);
+            var removeProduct = await _productRepository.GetProductByIdAsync(productId);
 
             if (removeProduct == null)
             {
                 return false;
             }
 
-            return await _productRepositoty.DeleteProductAsync(removeProduct);
+            return await _productRepository.DeleteProductAsync(removeProduct);
         }
 
         public async Task<ProductModel> UpdateProductAsync(ProductModel productModel)
@@ -112,9 +117,9 @@ namespace NET1806_LittleJoy.Service.Services
 
             var productModify = _mapper.Map<Product>(productModel);
 
-            var productPlace = await _productRepositoty.GetProductByIdAsync(productModel.Id);
+            var productPlace = await _productRepository.GetProductByIdAsync(productModel.Id);
 
-            var updateProduct = await _productRepositoty.UpdateProductAsync(productModify, productPlace);
+            var updateProduct = await _productRepository.UpdateProductAsync(productModify, productPlace);
 
             if (updateProduct != null)
             {
@@ -123,9 +128,9 @@ namespace NET1806_LittleJoy.Service.Services
             return null;
         }
 
-        public async Task<Pagination<ProductModel>> FilterProductPagingAsync(ProductFilterModel model)
+        public async Task<Pagination<ProductModel>> FilterProductPagingAsync(PaginationParameter paging, ProductFilterModel model)
         {
-            var listProduct =  await _productRepositoty.FilterProductPagingAsync(model);
+            var listProduct =  await _productRepository.FilterProductPagingAsync(paging,model);
 
             if (!listProduct.Any())
             {

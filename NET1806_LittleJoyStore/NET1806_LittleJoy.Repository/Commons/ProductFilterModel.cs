@@ -27,7 +27,5 @@ namespace NET1806_LittleJoy.Repository.Commons
         public int? originId { get; set; }
 
         public int? brandId { get; set; }
-
-        public PaginationParameter paging { get; set; }
     }
 }
