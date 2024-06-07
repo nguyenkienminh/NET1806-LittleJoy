@@ -196,6 +196,9 @@ namespace NET1806_LittleJoy.API.Controllers
             }
         }
 
+        /// <summary>
+        /// SortDate (1 - Ascending, 2 - Descending)
+        /// </summary>
         [HttpGet("filter")]
         [Authorize(Roles = "STAFF, ADMIN")]
         public async Task<IActionResult> GetListBlogFilter([FromQuery] BlogFilterModel filter, [FromQuery] PaginationParameter paging)

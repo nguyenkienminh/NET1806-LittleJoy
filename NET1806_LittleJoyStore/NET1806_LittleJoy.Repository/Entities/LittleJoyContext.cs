@@ -70,6 +70,7 @@ public partial class LittleJoyContext : DbContext
             entity.ToTable("AgeGroupProduct");
 
             entity.Property(e => e.AgeRange).HasMaxLength(250);
+            
         });
 
         modelBuilder.Entity<Brand>(entity =>
