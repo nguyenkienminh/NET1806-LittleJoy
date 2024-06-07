@@ -33,7 +33,6 @@ namespace NET1806_LittleJoy.Repository.Repositories
             return result;
         }
 
-
         public async Task<Address?> GetAddressByIdAsync(int id)
         {
             return await _context.Addresses.SingleOrDefaultAsync(x => x.Id == id);
@@ -65,6 +64,33 @@ namespace NET1806_LittleJoy.Repository.Repositories
             await _context.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<Address> UpdateAddressAsync(Address addressModify, Address addressPlace)
+        {
+            addressPlace.Id = addressModify.Id;
+            addressPlace.Address1 = addressModify.Address1;
+            addressPlace.IsMainAddress = addressModify.IsMainAddress;
+            addressPlace.UserId = addressModify.UserId;
+            
+            await _context.SaveChangesAsync();
+
+            return addressPlace;
+        }
+
+        public async Task<Pagination<Address>> GetAddressListPagingByUserIdAsync(PaginationParameter paging, int id)
+        {
+            var itemCount = await _context.Addresses.CountAsync(a => a.UserId == id);
+
+            var item = await _context.Addresses.Where(a => a.UserId == id)
+                                                .Skip((paging.PageIndex - 1) * paging.PageSize)
+                                                .Take(paging.PageSize)
+                                                .AsNoTracking()
+                                                .ToListAsync();
+
+            var result = new Pagination<Address>(item, itemCount, paging.PageIndex, paging.PageSize);
+
+            return result;
         }
     }
 }

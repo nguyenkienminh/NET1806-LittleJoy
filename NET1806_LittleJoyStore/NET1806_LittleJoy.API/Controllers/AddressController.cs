@@ -100,7 +100,7 @@ namespace NET1806_LittleJoy.API.Controllers
 
 
         [HttpPost]
-        //[Authorize(Roles = "STAFF,ADMIN")]
+        //[Authorize(Roles = "STAFF,ADMIN, USER")]
         public async Task<IActionResult> AddAddressAsync([FromBody] AddressRequestModel request)
         {
             try
@@ -141,7 +141,9 @@ namespace NET1806_LittleJoy.API.Controllers
             }
         }
 
+
         [HttpDelete]
+        //[Authorize(Roles = "STAFF,ADMIN, USER")]
         public async Task<IActionResult> DeleteAddressAsyncById(int Id)
         {
             try
@@ -173,6 +175,94 @@ namespace NET1806_LittleJoy.API.Controllers
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()
                 });
+            }
+        }
+
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateAddressAsync([FromBody] AddressUpdateRequestModel request)
+        {
+            try
+            {
+                AddressModel modelAdd = new AddressModel()
+                {
+                    Id = request.Id,
+                    Address1 = request.NewAddress,
+                    IsMainAddress = request.IsMainAddress,
+                };
+
+                var result = await _service.UpdateAddressAsync(modelAdd);
+
+                if (result == null)
+                {
+                    return NotFound(new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "Can not update this Address"
+                    });
+                }
+
+                return Ok(new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status200OK,
+                    Message = "Update Address success"
+                });
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                });
+            }
+        }
+
+
+        [HttpGet("user-id/{Id}")]
+        //[Authorize(Roles = "STAFF,ADMIN")]
+        public async Task<IActionResult> GetAddressListPagingByUserIdAsync([FromQuery] PaginationParameter paging, int Id)
+        {
+            try
+            {
+                var result = await _service.GetAddressListPagingByUserIdAsync(paging, Id);
+
+                if (result != null)
+                {
+                    var metadata = new
+                    {
+                        result.TotalCount,
+                        result.PageSize,
+                        result.CurrentPage,
+                        result.TotalPages,
+                        result.HasNext,
+                        result.HasPrevious
+                    };
+
+                    Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+
+                    return Ok(result);
+
+                }
+
+                else
+                {
+                    return NotFound(new ResponseModels
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "Address is empty"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                var responseModel = new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(responseModel);
             }
         }
     }
