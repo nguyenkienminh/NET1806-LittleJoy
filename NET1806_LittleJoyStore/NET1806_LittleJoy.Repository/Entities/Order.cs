@@ -11,7 +11,7 @@ public partial class Order
 
     public int? TotalPrice { get; set; }
 
-    public string? Address { get; set; }
+    public string Address { get; set; }
 
     public string? Note { get; set; }
 
@@ -23,7 +23,7 @@ public partial class Order
 
     public int? PaymentId { get; set; }
 
-    public virtual Delivery IdNavigation { get; set; } = null!;
+    public string? DeliveryStatus { get; set; }
 
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 

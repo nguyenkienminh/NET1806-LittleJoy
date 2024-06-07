@@ -151,6 +151,9 @@ namespace NET1806_LittleJoy.API
             builder.Services.AddScoped<IFeedBackService, FeedBackService>();
 
 
+            builder.Services.AddScoped<IBlogRepository, BlogRepository>();
+            builder.Services.AddScoped<IBlogService, BlogService>();
+
             builder.Services.AddTransient<IMailService, MailService>();
 
             var app = builder.Build();
@@ -158,7 +161,6 @@ namespace NET1806_LittleJoy.API
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
