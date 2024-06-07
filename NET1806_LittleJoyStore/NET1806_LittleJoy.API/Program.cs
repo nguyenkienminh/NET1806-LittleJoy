@@ -9,6 +9,7 @@ using NET1806_LittleJoy.Service.Services.Interface;
 using NET1806_LittleJoy.Service.Services;
 using System.Text;
 using NET1806_LittleJoy.Service.Mapper;
+using Microsoft.OpenApi.Models;
 
 namespace NET1806_LittleJoy.API
 {
@@ -23,7 +24,35 @@ namespace NET1806_LittleJoy.API
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Little Joy API", Version = "v.1.0" });
+
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Please enter a valid token",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    BearerFormat = "JWT",
+                    Scheme = "Bearer"
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type=ReferenceType.SecurityScheme,
+                                Id="Bearer"
+                            }
+                        },
+                        new string[]{}
+                    }
+                });
+            });
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("app-cors",
@@ -93,6 +122,9 @@ namespace NET1806_LittleJoy.API
 
             builder.Services.AddScoped<IOtpRepository, OtpRepository>();
             builder.Services.AddScoped<IOtpService, OtpService>();
+
+            builder.Services.AddScoped<IBlogRepository, BlogRepository>();
+            builder.Services.AddScoped<IBlogService, BlogService>();
 
             builder.Services.AddTransient<IMailService, MailService>();
 
