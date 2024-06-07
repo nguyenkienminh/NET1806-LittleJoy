@@ -191,7 +191,7 @@ namespace NET1806_LittleJoy.API.Controllers
                 {
                     Id = model.Id,
                     Comment = model.Comment,
-                    Rating = model.Rating,
+                    Rating = model.Rating,  
                 };
 
                 var result = await _service.UpdateFeedBackAsync(feedBackModel);

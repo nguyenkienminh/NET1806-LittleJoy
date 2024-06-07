@@ -137,10 +137,13 @@ namespace NET1806_LittleJoy.Service.Services
 
         public async Task<ProductAverageRating> AverageFeedBackInProduct(int productId)
         {
+
+            var rating = await _feedBackRepo.AverageRatingAsync(productId);
+
             return new ProductAverageRating()
             {
                 ProductId = productId,
-                RatingAver = _feedBackRepo.AverageRatingAsync(productId).Result
+                RatingAver = rating
             };
         }
 
