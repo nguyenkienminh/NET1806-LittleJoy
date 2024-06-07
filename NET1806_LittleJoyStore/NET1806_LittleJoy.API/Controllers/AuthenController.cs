@@ -7,7 +7,7 @@ using NET1806_LittleJoy.Service.Services.Interface;
 
 namespace NET1806_LittleJoy.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/authen")]
     [ApiController]
     public class AuthenController : ControllerBase
     {
@@ -20,7 +20,7 @@ namespace NET1806_LittleJoy.API.Controllers
             _otpService = otpService;
         }
 
-        [HttpPost("Login")]
+        [HttpPost("login")]
         public async Task<IActionResult> LoginWithUsername(LoginRequestModel model)
         {
             try
@@ -45,7 +45,7 @@ namespace NET1806_LittleJoy.API.Controllers
             }
         }
 
-        [HttpPost("Register")]
+        [HttpPost("register")]
         public async Task<IActionResult> RegisterAccount(RegisterModel model)
         {
             try
@@ -69,7 +69,7 @@ namespace NET1806_LittleJoy.API.Controllers
             }
         }
 
-        [HttpPost("SendOTP")]
+        [HttpPost("send-otp")]
         public async Task<IActionResult> SendOTP([FromBody] string email)
         {
             try
@@ -93,7 +93,7 @@ namespace NET1806_LittleJoy.API.Controllers
             }
         }
 
-        [HttpPost("VerifyOTP")]
+        [HttpPost("verify-otp")]
         public async Task<IActionResult> VerifyOTP(OtpRequestModel model)
         {
             try
@@ -126,7 +126,7 @@ namespace NET1806_LittleJoy.API.Controllers
             }
         }
 
-        [HttpPost("AddNewPassword")]
+        [HttpPost("forgot-password")]
         public async Task<IActionResult> AddNewPassword(AddPasswordModel model)
         {
             if (ModelState.IsValid)
@@ -150,7 +150,7 @@ namespace NET1806_LittleJoy.API.Controllers
             return ValidationProblem(ModelState);
         }
 
-        [HttpPost("Refresh-Token")]
+        [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] string jwtToken)
         {
             try

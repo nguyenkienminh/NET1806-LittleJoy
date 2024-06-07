@@ -157,8 +157,7 @@ namespace NET1806_LittleJoy.API
             builder.Services.AddTransient<IMailService, MailService>();
 
             var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
+          
             app.UseSwagger();
             app.UseSwaggerUI();
 
