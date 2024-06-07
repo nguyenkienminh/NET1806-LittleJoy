@@ -17,5 +17,7 @@ public partial class Post
 
     public DateTime? Date { get; set; }
 
+    public string? UnsignTitle { get; set; }
+
     public virtual User User { get; set; } = null!;
 }
