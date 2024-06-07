@@ -95,7 +95,7 @@ namespace NET1806_LittleJoy.API.Controllers
 
 
         [HttpPost]
-        //[Authorize(Roles = "STAFF,ADMIN")]
+        [Authorize(Roles = "STAFF,ADMIN")]
         public async Task<IActionResult> AddNewProductAsync([FromBody] ProductRequestModel productRequestModel)
         {
             try
@@ -145,7 +145,7 @@ namespace NET1806_LittleJoy.API.Controllers
 
 
         [HttpDelete]
-        //[Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> RemoveProductByIdAsync(int Id)
         {
             try
@@ -181,7 +181,7 @@ namespace NET1806_LittleJoy.API.Controllers
 
 
         [HttpPut]
-        //[Authorize(Roles = "STAFF,ADMIN")]
+        [Authorize(Roles = "STAFF,ADMIN")]
         public async Task<IActionResult> UpdateProductAsync([FromBody] ProductModel productModel)
         {
             try
