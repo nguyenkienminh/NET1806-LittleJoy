@@ -16,5 +16,7 @@ namespace NET1806_LittleJoy.Service.Services.Interface
         public Task<AddressModel?> GetAddressByIdAsync(int id);
 
         public Task<bool?> AddAddressAsync(AddressModel model);
+
+        public Task<bool> DeleteAddressByIdAsync(int id);
     }
 }

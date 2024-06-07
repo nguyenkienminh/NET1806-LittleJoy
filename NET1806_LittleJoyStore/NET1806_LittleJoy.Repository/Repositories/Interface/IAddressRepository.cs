@@ -16,7 +16,11 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
 
         public Task<bool?> AddAddressAsync(Address address);
 
-        public Task<int> CountAddressAsyncByUserId(int id);
+        public Task<int> CountAddressByUserIdAsync(int id);
+
+        public Task<ICollection<Address>> GetAddressByUserIdAsync(int id);
+
+        public Task<bool> DeleteAddressAsync(Address address);
 
     }
 }

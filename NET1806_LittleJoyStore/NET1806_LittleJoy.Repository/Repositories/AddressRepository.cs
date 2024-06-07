@@ -48,9 +48,23 @@ namespace NET1806_LittleJoy.Repository.Repositories
             return true;
         }
 
-        public async Task<int> CountAddressAsyncByUserId(int id)
+        public async Task<int> CountAddressByUserIdAsync(int id)
         {
             return await _context.Addresses.CountAsync(x => x.UserId == id);
+        }
+
+        public async Task<ICollection<Address>> GetAddressByUserIdAsync(int id)
+        {
+            return await _context.Addresses.Where(x => x.UserId == id).ToListAsync();
+        }
+
+        public async Task<bool> DeleteAddressAsync(Address address)
+        {
+            _context.Addresses.Remove(address);
+
+            await _context.SaveChangesAsync();
+
+            return true;
         }
     }
 }

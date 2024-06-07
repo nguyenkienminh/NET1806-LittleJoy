@@ -140,5 +140,40 @@ namespace NET1806_LittleJoy.API.Controllers
                 });
             }
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteAddressAsyncById(int Id)
+        {
+            try
+            {
+                var result = await _service.DeleteAddressByIdAsync(Id);
+
+                if (result)
+                {
+                    return Ok(new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status200OK,
+                        Message = "Remove Address success"
+                    });
+                }
+                else
+                {
+                    return NotFound(new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "The address can not remove"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                });
+            }
+        }
     }
 }

@@ -70,7 +70,7 @@ namespace NET1806_LittleJoy.Service.Services
             {
                 var addressInfo = _mapper.Map<Address>(model);
 
-                var countAddress = await _repo.CountAddressAsyncByUserId(model.UserId);
+                var countAddress = await _repo.CountAddressByUserIdAsync(model.UserId);
 
                 if(countAddress == 0)
                 {
@@ -95,6 +95,20 @@ namespace NET1806_LittleJoy.Service.Services
                 Console.WriteLine($"Fail to add Address {ex.Message}");
                 return false;
             }
+        }
+
+        public async Task<bool> DeleteAddressByIdAsync(int id)
+        {
+
+            var item = await _repo.GetAddressByIdAsync(id);
+
+            if (item == null || item.IsMainAddress == true)
+            {
+                return false;
+            }
+
+            return await _repo.DeleteAddressAsync(item);
+
         }
     }
 }
