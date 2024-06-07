@@ -126,6 +126,9 @@ namespace NET1806_LittleJoy.API
             builder.Services.AddScoped<IBlogRepository, BlogRepository>();
             builder.Services.AddScoped<IBlogService, BlogService>();
 
+            builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+            builder.Services.AddScoped<IAddressService, AddressService>();
+
             builder.Services.AddTransient<IMailService, MailService>();
 
             var app = builder.Build();
