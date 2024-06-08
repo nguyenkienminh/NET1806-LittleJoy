@@ -78,5 +78,14 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
             return true;
         }
+
+        public async Task<bool> DeleteUserAsync(User user)
+        {
+            user.Status = false;
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

@@ -184,5 +184,42 @@ namespace NET1806_LittleJoy.API.Controllers
                 });
             }
         }
+
+
+        [HttpDelete]
+        //[Authorize(Roles = "STAFF,ADMIN, USER")]
+        public async Task<IActionResult> DeleteUserAsyncById(int Id)
+        {
+            try
+            {
+                var result = await _service.DeleteUserByIdAsync(Id);
+
+                if (result)
+                {
+                    return Ok(new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status200OK,
+                        Message = "Remove User success"
+                    });
+                }
+                else
+                {
+                    return NotFound(new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "The user can not remove"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                });
+            }
+        }
     }
 }

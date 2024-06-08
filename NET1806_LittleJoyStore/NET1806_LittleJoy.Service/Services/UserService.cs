@@ -317,5 +317,17 @@ namespace NET1806_LittleJoy.Service.Services
                 return false;
             }
         }
+
+        public async Task<bool> DeleteUserByIdAsync(int id)
+        {
+            var removeUser = await _userRepository.GetUserByIdAsync(id);
+
+            if (removeUser == null)
+            {
+                return false;
+            }
+
+            return await _userRepository.DeleteUserAsync(removeUser);
+        }
     }
 }
