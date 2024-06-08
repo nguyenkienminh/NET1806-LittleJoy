@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
+using NET1806_LittleJoy.Repository.Commons;
 using NET1806_LittleJoy.Repository.Entities;
 using System;
 using System.Collections.Generic;
@@ -15,5 +16,11 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
         public Task<User?> GetUserByUserNameAsync(string userName);
         public Task<User?> GetUserByEmailAsync(string email);
         Task<IDbContextTransaction> BeginTransactionAsync();
+
+        /***************************************************/
+
+        public Task<Pagination<User>> GetAllPagingUserByRoleIdAsync(PaginationParameter paging, int roleId);
+
+        public Task<User?> GetUserByIdAsync(int id);
     }
 }

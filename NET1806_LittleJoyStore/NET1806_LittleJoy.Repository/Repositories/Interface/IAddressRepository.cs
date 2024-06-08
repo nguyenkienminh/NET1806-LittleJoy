@@ -24,7 +24,6 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
 
         public Task<Address> UpdateAddressAsync(Address addressModify, Address addressPlace);
 
-
         public Task<Pagination<Address>> GetAddressListPagingByUserIdAsync(PaginationParameter paging, int id);
 
     }

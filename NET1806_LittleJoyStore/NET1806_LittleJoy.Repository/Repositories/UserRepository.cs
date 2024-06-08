@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using NET1806_LittleJoy.Repository.Commons;
 using NET1806_LittleJoy.Repository.Entities;
 using NET1806_LittleJoy.Repository.Repositories.Interface;
 using System;
@@ -45,6 +46,28 @@ namespace NET1806_LittleJoy.Repository.Repositories
              _context.Users.Update(user);
             await _context.SaveChangesAsync();
             return user;
+        }
+
+        /*****************************************************************/
+
+        public async Task<Pagination<User>> GetAllPagingUserByRoleIdAsync(PaginationParameter paging, int roleId)
+        {
+            var itemCount = await _context.Users.CountAsync(u => u.RoleId == roleId);
+
+            var item = await _context.Users .Where(u => u.RoleId == roleId)
+                                            .Skip((paging.PageIndex - 1) * paging.PageSize)
+                                            .Take(paging.PageSize)
+                                            .AsNoTracking()
+                                            .ToListAsync();
+
+            var result = new Pagination<User>(item, itemCount, paging.PageIndex, paging.PageSize);
+
+            return result;
+        }
+
+        public async Task<User?> GetUserByIdAsync(int id)
+        {
+            return await _context.Users.SingleOrDefaultAsync(u => u.Id == id);
         }
     }
 }

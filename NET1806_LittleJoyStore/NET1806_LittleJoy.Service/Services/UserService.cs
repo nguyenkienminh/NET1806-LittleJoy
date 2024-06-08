@@ -165,7 +165,8 @@ namespace NET1806_LittleJoy.Service.Services
                     var role = await _roleRepository.GetRoleByNameAsync("USER");
                     newUser.RoleId = role.Id;
 
-                    newUser.Status = false;
+                    newUser.Status = true;
+                    newUser.ConfirmEmail = false;
 
                     await _userRepository.AddNewUserAsync(newUser);
 
@@ -232,6 +233,55 @@ namespace NET1806_LittleJoy.Service.Services
             };
             var refreshToken = GenerateJWTToken.CreateRefreshToken(claims, _configuration, DateTime.UtcNow);
             return new JwtSecurityTokenHandler().WriteToken(refreshToken).ToString();
+        }
+
+
+        /**************************************************************/
+
+        public async Task<Pagination<UserModel>> GetAllPagingUserByRoleIdAsync(PaginationParameter paging, int roleId)
+        {
+            var listUser = await _userRepository.GetAllPagingUserByRoleIdAsync(paging, roleId);
+
+            if (!listUser.Any())
+            {
+                return null;
+            }
+
+            var listUserModel = listUser.Select(a => new UserModel
+            {
+                Id = a.Id,
+                UserName = a.UserName,
+                Fullname = a.Fullname,
+                RoleId = a.RoleId,
+                Avatar = a.Avatar,
+                Email = a.Email,
+                GoogleId = a.GoogleId,
+                PhoneNumber = a.PhoneNumber,
+                Points = a.Points,
+                Status = a.Status,
+                UnsignName = a.UnsignName,
+                ConfirmEmail = a.ConfirmEmail,
+            }).ToList();
+
+
+            return new Pagination<UserModel>(listUserModel,
+                listUser.TotalCount,
+                listUser.CurrentPage,
+                listUser.PageSize);
+        }
+
+        public async Task<UserModel?> GetUserByIdAsync(int id)
+        {
+            var userDetail = await _userRepository.GetUserByIdAsync(id);
+
+            if (userDetail == null)
+            {
+                return null;
+            }
+
+            var userDetailModel = _mapper.Map<UserModel>(userDetail);
+
+            return userDetailModel;
         }
     }
 }
