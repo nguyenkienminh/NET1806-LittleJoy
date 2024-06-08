@@ -260,7 +260,7 @@ namespace NET1806_LittleJoy.Service.Services
                 Status = a.Status,
                 UnsignName = a.UnsignName,
                 ConfirmEmail = a.ConfirmEmail,
-                
+
             }).ToList();
 
 
@@ -288,6 +288,22 @@ namespace NET1806_LittleJoy.Service.Services
         {
             try
             {
+                if (model.PhoneNumber != null)
+                {
+                    if (StringUtils.IsValidPhoneNumber(model.PhoneNumber) == false)
+                    {
+                        return false;
+                    }
+                }
+
+                if (model.Email != null)
+                {
+                    if (StringUtils.IsValidEmail(model.Email) == false)
+                    {
+                        return false;
+                    }
+                }
+
                 var userInfo = _mapper.Map<User>(model);
 
                 if (model.Password != null)
@@ -303,11 +319,11 @@ namespace NET1806_LittleJoy.Service.Services
                 userInfo.ConfirmEmail = false;
                 userInfo.Points = 0;
 
-                if(userInfo.Fullname != null)
+                if (userInfo.Fullname != null)
                 {
                     userInfo.UnsignName = StringUtils.ConvertToUnSign(userInfo.Fullname);
                 }
-                
+
                 await _userRepository.AddUserAsync(userInfo);
                 return true;
             }
