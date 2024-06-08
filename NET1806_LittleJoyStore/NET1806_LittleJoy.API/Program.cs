@@ -117,6 +117,7 @@ namespace NET1806_LittleJoy.API
             builder.Services.AddScoped<IUserService, UserService>();
 
             builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+            builder.Services.AddScoped<IRoleService, RoleService>();
 
             builder.Services.AddScoped<IMailService, MailService>();
 
