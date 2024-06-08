@@ -255,12 +255,12 @@ namespace NET1806_LittleJoy.Service.Services
                 RoleId = a.RoleId,
                 Avatar = a.Avatar,
                 Email = a.Email,
-                GoogleId = a.GoogleId,
                 PhoneNumber = a.PhoneNumber,
                 Points = a.Points,
                 Status = a.Status,
                 UnsignName = a.UnsignName,
                 ConfirmEmail = a.ConfirmEmail,
+                
             }).ToList();
 
 
@@ -282,6 +282,40 @@ namespace NET1806_LittleJoy.Service.Services
             var userDetailModel = _mapper.Map<UserModel>(userDetail);
 
             return userDetailModel;
+        }
+
+        public async Task<bool?> AddUserAsync(UserModel model)
+        {
+            try
+            {
+                var userInfo = _mapper.Map<User>(model);
+
+                if (model.Password != null)
+                {
+                    userInfo.PasswordHash = PasswordUtils.HashPassword(model.Password);
+                }
+                else
+                {
+                    return null;
+                }
+
+                userInfo.Status = true;
+                userInfo.ConfirmEmail = false;
+                userInfo.Points = 0;
+
+                if(userInfo.Fullname != null)
+                {
+                    userInfo.UnsignName = StringUtils.ConvertToUnSign(userInfo.Fullname);
+                }
+                
+                await _userRepository.AddUserAsync(userInfo);
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                return false;
+            }
         }
     }
 }

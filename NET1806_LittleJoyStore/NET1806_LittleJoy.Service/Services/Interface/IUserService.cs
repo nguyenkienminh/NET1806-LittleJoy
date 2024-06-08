@@ -21,5 +21,7 @@ namespace NET1806_LittleJoy.Service.Services.Interface
 
         public Task<UserModel?> GetUserByIdAsync(int id);
 
+        public Task<bool?> AddUserAsync(UserModel model);
+
     }
 }

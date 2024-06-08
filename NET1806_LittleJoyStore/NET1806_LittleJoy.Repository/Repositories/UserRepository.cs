@@ -69,5 +69,14 @@ namespace NET1806_LittleJoy.Repository.Repositories
         {
             return await _context.Users.SingleOrDefaultAsync(u => u.Id == id);
         }
+
+        public async Task<bool?> AddUserAsync(User user)
+        {
+            _context.Users.Add(user);
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }
