@@ -5,6 +5,7 @@ using NET1806_LittleJoy.API.ViewModels.RequestModels;
 using NET1806_LittleJoy.API.ViewModels.ResponeModels;
 using NET1806_LittleJoy.Repository.Commons;
 using NET1806_LittleJoy.Service.BusinessModels;
+using NET1806_LittleJoy.Service.Services;
 using NET1806_LittleJoy.Service.Services.Interface;
 using Newtonsoft.Json;
 
@@ -312,7 +313,50 @@ namespace NET1806_LittleJoy.API.Controllers
         [HttpPut("change-password")]
         public async Task<IActionResult> ChangePasswordUserRoleAsync([FromBody] UpdatePasswordUserRequestModel request)
         {
-            throw new NotImplementedException();
+            if (ModelState.IsValid)
+            {
+
+                ChangePasswordModel model = new ChangePasswordModel()
+                {
+                    Id = request.Id,
+                    OldPassword = request.OldPassword,
+                    NewPassword = request.NewPassword,
+                    ConfirmPassword = request.ConfirmPassword
+                };
+
+                var result = await _service.ChangePasswordUserRoleAsync(model);
+
+                if (result == "Add Password Success")
+                {
+                    var resp = new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status200OK,
+                        Message = "Đổi mật khẩu thành công",
+                    };
+                    return Ok(resp);
+                }
+
+                else if(result == "Password Incorrect")
+                {
+                    var resp = new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status400BadRequest,
+                        Message = "Mật khẩu không đúng",
+                    };
+                    return BadRequest(resp);
+                }
+
+                else if (result == "Add Failed")
+                {
+                    var resp = new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status400BadRequest,
+                        Message = "Đổi mật khẩu thất bại",
+                    };
+                    return BadRequest(resp);
+                }
+            }
+            return ValidationProblem(ModelState);
         }
     }
 }

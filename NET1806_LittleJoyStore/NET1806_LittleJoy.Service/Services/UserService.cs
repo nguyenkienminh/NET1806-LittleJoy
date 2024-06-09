@@ -443,5 +443,42 @@ namespace NET1806_LittleJoy.Service.Services
             }
             return null;
         }
+
+        public async Task<string> ChangePasswordUserRoleAsync(ChangePasswordModel model)
+        {
+
+            var user = await _userRepository.GetUserByIdAsync(model.Id);
+
+            if(user == null)
+            {
+                return null;
+            }
+
+            var checkPassword = PasswordUtils.VerifyPassword(model.OldPassword, user.PasswordHash);
+
+            if (checkPassword)
+            {
+                AddPasswordModel addPassword = new AddPasswordModel() 
+                { 
+                    Email = user.Email,
+                    Password = model.NewPassword,
+                    ConfirmPassword = model.ConfirmPassword,
+                };
+
+                var result = await AddNewPassword(addPassword);
+
+                if (result == true) 
+                {
+                    return "Add Password Success";
+                } 
+                else
+                {
+                    return "Add Failed";
+                }
+            }
+            
+            return "Password Incorrect";
+            
+        }
     }
 }

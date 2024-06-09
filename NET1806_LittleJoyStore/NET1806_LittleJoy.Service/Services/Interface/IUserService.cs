@@ -29,5 +29,7 @@ namespace NET1806_LittleJoy.Service.Services.Interface
 
         public Task<UserModel> UpdateUserRoleAsync(UserModel model);
 
+        public Task<string> ChangePasswordUserRoleAsync(ChangePasswordModel model);
+
     }
 }
