@@ -96,27 +96,27 @@ namespace NET1806_LittleJoy.API
 
             // ===================== FOR LOCAL DB =======================
 
-            builder.Services.AddDbContext<LittleJoyContext>(options =>
-            {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("LittleJoyLocal"));
-            });
+            //builder.Services.AddDbContext<LittleJoyContext>(options =>
+            //{
+            //    options.UseSqlServer(builder.Configuration.GetConnectionString("LittleJoyLocal"));
+            //});
 
             // ==========================================================
 
             // ===================== FOR AZURE DB =======================
 
-            //var connection = String.Empty;
-            //if (builder.Environment.IsDevelopment())
-            //{
-            //    connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
-            //}
-            //else
-            //{
-            //    connection = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
-            //}
+            var connection = String.Empty;
+            if (builder.Environment.IsDevelopment())
+            {
+                connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
+            }
+            else
+            {
+                connection = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
+            }
 
-            //builder.Services.AddDbContext<LittleJoyContext>(options =>
-            //        options.UseSqlServer(connection));
+            builder.Services.AddDbContext<LittleJoyContext>(options =>
+                    options.UseSqlServer(connection));
 
 
             // ==================== NO EDIT OR REMOVE COMMENT =======================
@@ -151,17 +151,15 @@ namespace NET1806_LittleJoy.API
             builder.Services.AddScoped<IFeedBackService, FeedBackService>();
 
 
+            builder.Services.AddScoped<IBlogRepository, BlogRepository>();
+            builder.Services.AddScoped<IBlogService, BlogService>();
+
             builder.Services.AddTransient<IMailService, MailService>();
 
             var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+          
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
 

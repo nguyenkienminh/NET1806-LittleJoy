@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NET1806_LittleJoy.Repository.Entities;
 
@@ -11,9 +12,11 @@ using NET1806_LittleJoy.Repository.Entities;
 namespace NET1806_LittleJoy.Repository.Migrations
 {
     [DbContext(typeof(LittleJoyContext))]
-    partial class LittleJoyContextModelSnapshot : ModelSnapshot
+    [Migration("20240606060636_UnsignTitleBlog")]
+    partial class UnsignTitleBlog
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -108,6 +111,24 @@ namespace NET1806_LittleJoy.Repository.Migrations
                     b.ToTable("Category", (string)null);
                 });
 
+            modelBuilder.Entity("NET1806_LittleJoy.Repository.Entities.Delivery", b =>
+                {
+                    b.Property<int>("OrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"));
+
+                    b.Property<string>("Status")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("OrderId")
+                        .HasName("PK__Delivery__C3905BCFBC21537C");
+
+                    b.ToTable("Delivery", (string)null);
+                });
+
             modelBuilder.Entity("NET1806_LittleJoy.Repository.Entities.Feedback", b =>
                 {
                     b.Property<int>("Id")
@@ -148,10 +169,7 @@ namespace NET1806_LittleJoy.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<string>("Address")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -160,10 +178,6 @@ namespace NET1806_LittleJoy.Repository.Migrations
 
                     b.Property<DateTime?>("Date")
                         .HasColumnType("datetime");
-
-                    b.Property<string>("DeliveryStatus")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
 
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
@@ -544,6 +558,12 @@ namespace NET1806_LittleJoy.Repository.Migrations
 
             modelBuilder.Entity("NET1806_LittleJoy.Repository.Entities.Order", b =>
                 {
+                    b.HasOne("NET1806_LittleJoy.Repository.Entities.Delivery", "IdNavigation")
+                        .WithOne("Order")
+                        .HasForeignKey("NET1806_LittleJoy.Repository.Entities.Order", "Id")
+                        .IsRequired()
+                        .HasConstraintName("FK__Order__Id__693CA210");
+
                     b.HasOne("NET1806_LittleJoy.Repository.Entities.Payment", "Payment")
                         .WithMany("Orders")
                         .HasForeignKey("PaymentId")
@@ -554,6 +574,8 @@ namespace NET1806_LittleJoy.Repository.Migrations
                         .HasForeignKey("UserId")
                         .IsRequired()
                         .HasConstraintName("FK__Order__UserId__6B24EA82");
+
+                    b.Navigation("IdNavigation");
 
                     b.Navigation("Payment");
 
@@ -653,6 +675,11 @@ namespace NET1806_LittleJoy.Repository.Migrations
             modelBuilder.Entity("NET1806_LittleJoy.Repository.Entities.Category", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("NET1806_LittleJoy.Repository.Entities.Delivery", b =>
+                {
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("NET1806_LittleJoy.Repository.Entities.Order", b =>
