@@ -26,5 +26,7 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
         public Task<bool?> AddUserAsync(User user);
 
         public Task<bool> DeleteUserAsync(User user);
+
+        public Task<User> UpdateUserAsync(User userModify, User userPlace);
     }
 }

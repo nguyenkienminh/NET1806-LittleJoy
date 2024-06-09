@@ -199,5 +199,19 @@ namespace NET1806_LittleJoy.Service.Services
                 listAddress.CurrentPage,
                 listAddress.PageSize);
         }
+
+        public async Task<AddressModel> GetMainAddressByUserIdAsync(int userId)
+        {
+            var addressMain = await _repo.GetMainAddressByUserIdAsync(userId);
+
+            if (addressMain == null)
+            {
+                return null;
+            }
+
+            var addressMainModel = _mapper.Map<AddressModel>(addressMain);
+
+            return addressMainModel;
+        }
     }
 }

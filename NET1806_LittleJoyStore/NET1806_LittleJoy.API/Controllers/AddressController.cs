@@ -265,5 +265,35 @@ namespace NET1806_LittleJoy.API.Controllers
                 return BadRequest(responseModel);
             }
         }
+
+
+        [HttpGet("main-address-by-user-id/{Id}")]
+        //[Authorize(Roles = "STAFF,ADMIN")]
+        public async Task<IActionResult> GetMainAddressByUserIdAsync(int Id)
+        {
+            try
+            {
+                var addressMainModel = await _service.GetMainAddressByUserIdAsync(Id);
+
+                if (addressMainModel == null)
+                {
+                    return NotFound(new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "Address does not exist"
+                    });
+                }
+                return Ok(addressMainModel);
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                });
+            }
+        }
     }
 }

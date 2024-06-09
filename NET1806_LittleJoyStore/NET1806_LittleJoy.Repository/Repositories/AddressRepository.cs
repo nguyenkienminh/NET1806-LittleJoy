@@ -92,5 +92,10 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
             return result;
         }
+
+        public async Task<Address?> GetMainAddressByUserIdAsync(int id)
+        {
+            return await _context.Addresses.SingleOrDefaultAsync(x => x.IsMainAddress == true && x.UserId == id);
+        }
     }
 }

@@ -345,5 +345,103 @@ namespace NET1806_LittleJoy.Service.Services
 
             return await _userRepository.DeleteUserAsync(removeUser);
         }
+
+        public async Task<UserModel> UpdateUserAsync(UserModel model)
+        {
+            var userModify = _mapper.Map<User>(model);
+
+            var userPlace = await _userRepository.GetUserByIdAsync(userModify.Id);
+
+            if (userPlace == null)
+            {
+                return null;
+            }
+
+            if (userModify.Fullname != "".Trim() && userModify.Fullname != null)
+            {
+                userModify.UnsignName = StringUtils.ConvertToUnSign(userModify.Fullname);
+            }
+            else
+            {
+                userModify.Fullname = userPlace.Fullname;
+                userModify.UnsignName = StringUtils.ConvertToUnSign(userPlace.Fullname);
+            }
+
+            if (userModify.PhoneNumber != null && userModify.PhoneNumber != "".Trim())
+            {
+                if (StringUtils.IsValidPhoneNumber(userModify.PhoneNumber) == false)
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                userModify.PhoneNumber = userPlace.PhoneNumber;
+            }
+
+            if (userModify.Status == null)
+            {
+                userModify.Status = userPlace.Status;
+            }
+
+            userModify.Avatar = userPlace.Avatar;
+
+            var updateUser = await _userRepository.UpdateUserAsync(userModify, userPlace);
+
+            if (updateUser != null)
+            {
+                return _mapper.Map<UserModel>(updateUser);
+            }
+            return null;
+        }
+
+        public async Task<UserModel> UpdateUserRoleAsync(UserModel model)
+        {
+            var userModify = _mapper.Map<User>(model);
+
+            var userPlace = await _userRepository.GetUserByIdAsync(userModify.Id);
+
+            if (userPlace == null)
+            {
+                return null;
+            }
+
+            if (userModify.Fullname != "".Trim() && userModify.Fullname != null)
+            {
+                userModify.UnsignName = StringUtils.ConvertToUnSign(userModify.Fullname);
+            }
+            else
+            {
+                userModify.Fullname = userPlace.Fullname;
+                userModify.UnsignName = StringUtils.ConvertToUnSign(userPlace.Fullname);
+            }
+
+            if (userModify.PhoneNumber != null && userModify.PhoneNumber != "".Trim())
+            {
+                if (StringUtils.IsValidPhoneNumber(userModify.PhoneNumber) == false)
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                userModify.PhoneNumber = userPlace.PhoneNumber;
+            }
+
+            if (userModify.Avatar == null || userModify.Avatar == "".Trim())
+            {
+                userModify.Avatar = userPlace.Avatar;
+            }
+
+            userModify.Status = userPlace.Status;
+
+            var updateUser = await _userRepository.UpdateUserAsync(userModify, userPlace);
+
+            if (updateUser != null)
+            {
+                return _mapper.Map<UserModel>(updateUser);
+            }
+            return null;
+        }
     }
 }

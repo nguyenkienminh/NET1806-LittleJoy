@@ -87,5 +87,18 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
             return true;
         }
+
+        public async Task<User> UpdateUserAsync(User userModify, User userPlace)
+        {
+            userPlace.Fullname = userModify.Fullname;
+            userPlace.PhoneNumber = userModify.PhoneNumber;
+            userPlace.Status = userModify.Status;
+            userPlace.Avatar = userModify.Avatar;
+            userPlace.UnsignName = userModify.UnsignName;
+
+            await _context.SaveChangesAsync();
+
+            return userPlace;
+        }
     }
 }

@@ -25,5 +25,9 @@ namespace NET1806_LittleJoy.Service.Services.Interface
 
         public Task<bool> DeleteUserByIdAsync(int id);
 
+        public Task<UserModel> UpdateUserAsync(UserModel model);
+
+        public Task<UserModel> UpdateUserRoleAsync(UserModel model);
+
     }
 }

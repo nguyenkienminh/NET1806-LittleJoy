@@ -23,6 +23,8 @@ namespace NET1806_LittleJoy.Service.Services.Interface
 
         public Task<Pagination<AddressModel>> GetAddressListPagingByUserIdAsync(PaginationParameter paging, int id);
 
+        public Task<AddressModel> GetMainAddressByUserIdAsync(int userId);
+
 
     }
 }

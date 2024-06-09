@@ -221,5 +221,98 @@ namespace NET1806_LittleJoy.API.Controllers
                 });
             }
         }
+
+
+        [HttpPut]
+        //[Authorize(Roles = "STAFF,ADMIN")]
+        public async Task<IActionResult> UpdateUserAsync([FromBody] UpdateUserRequestModel request)
+        {
+            try
+            {
+                UserModel modelChange = new UserModel()
+                {
+                    Id = request.Id,
+                    PhoneNumber = request.PhoneNumber,
+                    Status = request.Status,
+                    Fullname = request.Fullname,
+                };
+
+                var result = await _service.UpdateUserAsync(modelChange);
+
+                if (result == null)
+                {
+                    return NotFound(new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "Can not update this User"
+                    });
+                }
+
+                return Ok(new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status200OK,
+                    Message = "Update User success"
+                });
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                });
+            }
+        }
+
+
+        [HttpPut("user-role")]
+        //[Authorize(Roles = "USER")]
+        public async Task<IActionResult> UpdateInformationForUserRoleAsync([FromBody] UpdateUserRoleRequestModel request)
+        {
+            try
+            {
+                UserModel modelChange = new UserModel()
+                {
+                    Id = request.Id,
+                    PhoneNumber = request.PhoneNumber,
+                    Avatar = request.Avatar,
+                    Fullname = request.Fullname,
+                };
+
+                var result = await _service.UpdateUserRoleAsync(modelChange);
+
+                if (result == null)
+                {
+                    return NotFound(new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "Can not update this User"
+                    });
+                }
+
+                return Ok(new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status200OK,
+                    Message = "Update User success"
+                });
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                });
+            }
+        }
+
+
+        [HttpPut("change-password")]
+        public async Task<IActionResult> ChangePasswordUserRoleAsync([FromBody] UpdatePasswordUserRequestModel request)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
