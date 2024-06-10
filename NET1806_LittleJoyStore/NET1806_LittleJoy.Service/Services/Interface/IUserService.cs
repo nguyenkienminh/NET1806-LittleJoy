@@ -31,5 +31,7 @@ namespace NET1806_LittleJoy.Service.Services.Interface
 
         public Task<string> ChangePasswordUserRoleAsync(ChangePasswordModel model);
 
+        public Task<ICollection<UserModel>> GetUserListHighestScoreAsync();
+
     }
 }

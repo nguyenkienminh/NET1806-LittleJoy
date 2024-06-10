@@ -23,10 +23,10 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
 
         public Task<User?> GetUserByIdAsync(int id);
 
-        public Task<bool?> AddUserAsync(User user);
-
         public Task<bool> DeleteUserAsync(User user);
 
         public Task<User> UpdateUserAsync(User userModify, User userPlace);
+
+        public Task<ICollection<User>> GetUserListHighestScoreAsync(Role role);
     }
 }

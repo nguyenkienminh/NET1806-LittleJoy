@@ -8,6 +8,7 @@ using NET1806_LittleJoy.Service.BusinessModels;
 using NET1806_LittleJoy.Service.Services;
 using NET1806_LittleJoy.Service.Services.Interface;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace NET1806_LittleJoy.API.Controllers
 {
@@ -357,6 +358,54 @@ namespace NET1806_LittleJoy.API.Controllers
                 }
             }
             return ValidationProblem(ModelState);
+        }
+
+
+        [HttpGet("highest-score")]
+        //[Authorize(Roles = "STAFF,ADMIN")]
+        public async Task<IActionResult> GetAllUserHighestScoreAsync()
+        {
+            try
+            {
+                var model = await _service.GetUserListHighestScoreAsync();
+
+                var result = model.Select(a => new UserResponseModel
+                {
+                    Id = a.Id,
+                    UserName = a.UserName,
+                    Fullname = a.Fullname,
+                    RoleId = a.RoleId,
+                    Avatar = a.Avatar,
+                    Email = a.Email,
+                    PhoneNumber = a.PhoneNumber,
+                    Points = a.Points,
+                    Status = a.Status,
+                    UnsignName = a.UnsignName,
+                    ConfirmEmail = a.ConfirmEmail,
+                }).ToList();
+
+                if (result != null)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return NotFound(new ResponseModels
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "User is empty"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                var responseModel = new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(responseModel);
+            }
         }
     }
 }

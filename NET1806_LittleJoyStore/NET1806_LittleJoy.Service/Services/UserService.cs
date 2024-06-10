@@ -5,6 +5,7 @@ using NET1806_LittleJoy.Repository.Commons;
 using NET1806_LittleJoy.Repository.Entities;
 using NET1806_LittleJoy.Repository.Repositories.Interface;
 using NET1806_LittleJoy.Service.BusinessModels;
+using NET1806_LittleJoy.Service.Enums;
 using NET1806_LittleJoy.Service.Helpers;
 using NET1806_LittleJoy.Service.Services.Interface;
 using NET1806_LittleJoy.Service.Ultils;
@@ -167,6 +168,7 @@ namespace NET1806_LittleJoy.Service.Services
 
                     newUser.Status = true;
                     newUser.ConfirmEmail = false;
+                    newUser.Points = 0;
 
                     await _userRepository.AddNewUserAsync(newUser);
 
@@ -324,7 +326,7 @@ namespace NET1806_LittleJoy.Service.Services
                     userInfo.UnsignName = StringUtils.ConvertToUnSign(userInfo.Fullname);
                 }
 
-                await _userRepository.AddUserAsync(userInfo);
+                await _userRepository.AddNewUserAsync(userInfo);
                 return true;
             }
             catch (Exception ex)
@@ -479,6 +481,32 @@ namespace NET1806_LittleJoy.Service.Services
             
             return "Password Incorrect";
             
+        }
+
+        public async Task<ICollection<UserModel>> GetUserListHighestScoreAsync()
+        {
+
+            var roleUser = await _roleRepository.GetRoleByNameAsync("USER");
+
+            var list = await _userRepository.GetUserListHighestScoreAsync(roleUser);
+
+            var listUserModel = list.Select(a => new UserModel
+            {
+                Id = a.Id,
+                UserName = a.UserName,
+                Fullname = a.Fullname,
+                RoleId = a.RoleId,
+                Avatar = a.Avatar,
+                Email = a.Email,
+                PhoneNumber = a.PhoneNumber,
+                Points = a.Points,
+                Status = a.Status,
+                UnsignName = a.UnsignName,
+                ConfirmEmail = a.ConfirmEmail,
+
+            }).ToList();
+
+            return listUserModel;
         }
     }
 }

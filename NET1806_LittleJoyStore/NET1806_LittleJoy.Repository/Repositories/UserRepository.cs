@@ -70,15 +70,6 @@ namespace NET1806_LittleJoy.Repository.Repositories
             return await _context.Users.SingleOrDefaultAsync(u => u.Id == id);
         }
 
-        public async Task<bool?> AddUserAsync(User user)
-        {
-            _context.Users.Add(user);
-
-            await _context.SaveChangesAsync();
-
-            return true;
-        }
-
         public async Task<bool> DeleteUserAsync(User user)
         {
             user.Status = false;
@@ -99,6 +90,14 @@ namespace NET1806_LittleJoy.Repository.Repositories
             await _context.SaveChangesAsync();
 
             return userPlace;
+        }
+
+        public async Task<ICollection<User>> GetUserListHighestScoreAsync(Role role)
+        {
+
+            var result = await _context.Users.Where(u => u.RoleId == role.Id).OrderByDescending(u => u.Points).Take(5).ToListAsync();
+
+            return result;
         }
     }
 }
