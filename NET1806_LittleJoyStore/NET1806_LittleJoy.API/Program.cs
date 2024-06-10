@@ -163,8 +163,11 @@ namespace NET1806_LittleJoy.API
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
+            app.UseCors("app-cors");
 
+            app.UseAuthentication();
+
+            app.UseAuthorization();
 
             app.MapControllers();
 
