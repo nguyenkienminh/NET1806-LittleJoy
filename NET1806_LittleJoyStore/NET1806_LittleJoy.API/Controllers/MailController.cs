@@ -6,7 +6,7 @@ using NET1806_LittleJoy.Service.Services.Interface;
 
 namespace NET1806_LittleJoy.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/mail")]
     [ApiController]
     public class MailController : ControllerBase
     {

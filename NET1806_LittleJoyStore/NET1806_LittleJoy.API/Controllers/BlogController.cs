@@ -90,6 +90,7 @@ namespace NET1806_LittleJoy.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "STAFF, ADMIN")]
         public async Task<IActionResult> CreateNewBlog(BlogRequestModel blog)
         {
             try
@@ -126,6 +127,7 @@ namespace NET1806_LittleJoy.API.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "STAFF, ADMIN")]
         public async Task<IActionResult> UpdateBlog(BlogRequestUpdateModel blog)
         {
             try
@@ -164,6 +166,7 @@ namespace NET1806_LittleJoy.API.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Roles = "STAFF, ADMIN")]
         public async Task<IActionResult> RemoveBlog(int id)
         {
             try
@@ -193,7 +196,11 @@ namespace NET1806_LittleJoy.API.Controllers
             }
         }
 
+        /// <summary>
+        /// SortDate (1 - Ascending, 2 - Descending)
+        /// </summary>
         [HttpGet("filter")]
+        [Authorize(Roles = "STAFF, ADMIN")]
         public async Task<IActionResult> GetListBlogFilter([FromQuery] BlogFilterModel filter, [FromQuery] PaginationParameter paging)
         {
             try
@@ -231,7 +238,6 @@ namespace NET1806_LittleJoy.API.Controllers
                 };
                 return BadRequest(responseModel);
             }
-            return Ok();
         }
     }
 }
