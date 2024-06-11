@@ -160,5 +160,38 @@ namespace NET1806_LittleJoy.Service.Services
                 listProduct.CurrentPage,
                 listProduct.PageSize);
         }
+
+        public async Task<Pagination<ProductModel>> GetAllProductOutOfStockPagingAsync(PaginationParameter paginationParameter)
+        {
+            var listProduct = await _productRepository.GetAllProductOutOfStockPagingAsync(paginationParameter);
+            if (!listProduct.Any())
+            {
+                return null;
+            }
+
+
+            var listProductModels = listProduct.Select(p => new ProductModel
+            {
+                Id = p.Id,
+                CateId = p.CateId,
+                ProductName = p.ProductName,
+                Price = p.Price,
+                Description = p.Description,
+                Weight = p.Weight,
+                IsActive = p.IsActive,
+                Quantity = p.Quantity,
+                Image = p.Image,
+                AgeId = p.AgeId,
+                OriginId = p.OriginId,
+                BrandId = p.BrandId,
+                UnsignProductName = p.UnsignProductName,
+            }).ToList();
+
+
+            return new Pagination<ProductModel>(listProductModels,
+                listProduct.TotalCount,
+                listProduct.CurrentPage,
+                listProduct.PageSize);
+        }
     }
 }
