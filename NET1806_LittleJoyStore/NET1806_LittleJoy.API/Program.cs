@@ -98,7 +98,7 @@ namespace NET1806_LittleJoy.API
 
             //builder.Services.AddDbContext<LittleJoyContext>(options =>
             //{
-            //    options.UseSqlServer(builder.Configuration.GetConnectionString("LittleJoyLocal"));
+            //   options.UseSqlServer(builder.Configuration.GetConnectionString("LittleJoyLocal"));
             //});
 
             // ==========================================================
@@ -157,7 +157,7 @@ namespace NET1806_LittleJoy.API
             builder.Services.AddTransient<IMailService, MailService>();
 
             var app = builder.Build();
-          
+
             app.UseSwagger();
             app.UseSwaggerUI();
 

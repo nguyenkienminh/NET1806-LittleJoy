@@ -69,9 +69,19 @@ namespace NET1806_LittleJoy.Repository.Repositories
             return feedbackPlace;
         }
 
-        public async Task<List<Feedback>> FeedBackInProductAsync(int productId)
-        { 
-            return await _context.Feedbacks.Where(f => f.ProductId == productId).AsNoTracking().ToListAsync();
+        public async Task<Pagination<Feedback>> FeedBackInProductAsync(int productId, PaginationParameter paginationParameter)
+        {
+            var itemCount = await _context.Feedbacks.CountAsync(f => f.ProductId == productId);
+
+            var item = await _context.Feedbacks.Where(f => f.ProductId == productId)
+                                            .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
+                                            .Take(paginationParameter.PageSize)
+                                            .AsNoTracking()
+                                            .ToListAsync();
+
+            var result = new Pagination<Feedback>(item, itemCount, paginationParameter.PageIndex, paginationParameter.PageSize);
+
+            return result;
         }
 
         public async Task<double> AverageRatingAsync(int productId)
