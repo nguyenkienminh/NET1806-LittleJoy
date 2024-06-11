@@ -172,7 +172,16 @@ namespace NET1806_LittleJoy.Service.Services
                     newUser.ConfirmEmail = false;
                     newUser.Points = 0;
 
+                    newUser.TokenConfirmEmail = Guid.NewGuid().ToString();
+
                     await _userRepository.AddNewUserAsync(newUser);
+
+                    await _mailService.sendEmailAsync(new MailRequest()
+                    {
+                        ToEmail = newUser.Email,
+                        Body = EmailContent.ConfirmEmail(newUser.UserName, newUser.TokenConfirmEmail),
+                        Subject = "[LittleJoy] Confirm Email"
+                    });
 
                     await transaction.CommitAsync();
                     return true;
@@ -557,6 +566,25 @@ namespace NET1806_LittleJoy.Service.Services
             }).ToList();
 
             return listUserModel;
+        }
+
+        public async Task<bool> ConfirmEmailAsync(string token)
+        {
+            var user = await _userRepository.GetUserByConfirmToken(token);
+            if(user == null)
+            {
+                return false;
+            }
+            user.ConfirmEmail = true;
+            user.TokenConfirmEmail = "";
+            await _userRepository.UpdateUserAsync(user);
+            await _mailService.sendEmailAsync(new MailRequest
+            {
+                ToEmail = user.Email,
+                Subject = "[LittleJoy] Welcome to Little Joy Store",
+                Body = EmailContent.WelcomeEmail(user.UserName)
+            });
+            return true;
         }
     }
 }
