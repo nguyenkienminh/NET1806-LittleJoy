@@ -74,6 +74,7 @@ namespace NET1806_LittleJoy.Repository.Repositories
             var itemCount = await _context.Feedbacks.CountAsync(f => f.ProductId == productId);
 
             var item = await _context.Feedbacks.Where(f => f.ProductId == productId)
+                                            .OrderByDescending(f => f.Rating)
                                             .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
                                             .Take(paginationParameter.PageSize)
                                             .AsNoTracking()
