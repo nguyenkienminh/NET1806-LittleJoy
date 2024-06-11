@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NET1806_LittleJoy.Repository.Entities;
 
@@ -11,9 +12,11 @@ using NET1806_LittleJoy.Repository.Entities;
 namespace NET1806_LittleJoy.Repository.Migrations
 {
     [DbContext(typeof(LittleJoyContext))]
-    partial class LittleJoyContextModelSnapshot : ModelSnapshot
+    [Migration("20240608140944_UserConfirmEmail")]
+    partial class UserConfirmEmail
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

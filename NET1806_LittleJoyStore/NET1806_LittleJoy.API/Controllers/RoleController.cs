@@ -1,50 +1,37 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using NET1806_LittleJoy.Service.Services.Interface;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using NET1806_LittleJoy.API.ViewModels.RequestModels;
 using NET1806_LittleJoy.API.ViewModels.ResponeModels;
 using NET1806_LittleJoy.Repository.Commons;
-using NET1806_LittleJoy.Service.Services;
-using Newtonsoft.Json;
-using NET1806_LittleJoy.API.ViewModels.RequestModels;
 using NET1806_LittleJoy.Service.BusinessModels;
+using NET1806_LittleJoy.Service.Services.Interface;
+using Newtonsoft.Json;
+
 namespace NET1806_LittleJoy.API.Controllers
 {
-    [Route("api/age-group-product")]
+    [Route("api/role")]
     [ApiController]
-    public class AgeGroupProductController : ControllerBase
+    public class RoleController : ControllerBase
     {
-        private readonly IAgeGroupProductService _ageGroupService;
+        private readonly IRoleService _service;
 
-        public AgeGroupProductController(IAgeGroupProductService ageGroupProductService)
+        public RoleController(IRoleService service)
         {
-            _ageGroupService = ageGroupProductService;
+            _service = service;
         }
 
 
         [HttpGet]
         //[Authorize(Roles = "STAFF,ADMIN")]
-        public async Task<IActionResult> GetAllAgeGroupPagingAsync([FromQuery] PaginationParameter paginationParameter)
+        public async Task<IActionResult> GetAllRoleAsync()
         {
             try
             {
-                var result = await _ageGroupService.GetAllAgeGroupPagingAsync(paginationParameter);
+                var result = await _service.GetAllRoleAsync();
 
                 if (result != null)
                 {
-                    var metadata = new
-                    {
-                        result.TotalCount,
-                        result.PageSize,
-                        result.CurrentPage,
-                        result.TotalPages,
-                        result.HasNext,
-                        result.HasPrevious
-                    };
-
-                    Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
-
                     return Ok(result);
-
                 }
 
                 else
@@ -52,7 +39,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     return NotFound(new ResponseModels
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "Age Group is empty"
+                        Message = "Role is empty"
                     });
                 }
             }
@@ -69,22 +56,21 @@ namespace NET1806_LittleJoy.API.Controllers
 
 
         [HttpGet("{Id}")]
-        //[Authorize(Roles = "STAFF,ADMIN")]
-        public async Task<IActionResult> GetAgeGroupDetailByIdAsync(int Id)
+        public async Task<IActionResult> GetRoleByIdAsync(int Id)
         {
             try
             {
-                var AgeGroupModel = await _ageGroupService.GetAgeGroupByIdAsync(Id);
+                var model = await _service.GetRoleByIdAsync(Id);
 
-                if (AgeGroupModel == null)
+                if (model == null)
                 {
                     return NotFound(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "Age does not exist"
+                        Message = "Role does not exist"
                     });
                 }
-                return Ok(AgeGroupModel);
+                return Ok(model);
             }
             catch (Exception ex)
             {
@@ -99,24 +85,23 @@ namespace NET1806_LittleJoy.API.Controllers
 
 
         [HttpPost]
-        //[Authorize(Roles = "STAFF,ADMIN")]
-        public async Task<IActionResult> AddAgeGroupAsync([FromBody] AgeGroupProductRequestModel ageGroupModel)
+        public async Task<IActionResult> AddRoleAsync(RoleRequestModel request)
         {
             try
             {
-                AgeGroupProductModel ageGroupProductModel = new AgeGroupProductModel()
+                RoleModel model = new RoleModel()
                 {
-                    AgeRange = ageGroupModel.AgeRange,
+                    RoleName = request.RoleName,
                 };
 
-                var result = await _ageGroupService.AddAgeGroupAsync(ageGroupProductModel);
+                var result = await _service.AddRoleAsync(model);
 
                 if (result == false)
                 {
                     return NotFound(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "Can not add this Age"
+                        Message = "Can not add this Role"
                     });
                 }
 
@@ -125,7 +110,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     return Ok(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status201Created,
-                        Message = "Create Age success"
+                        Message = "Create Role success"
                     });
                 }
             }
@@ -142,18 +127,18 @@ namespace NET1806_LittleJoy.API.Controllers
 
         [HttpDelete]
         //[Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> RemoveAgeGroupByIdAsync(int Id)
+        public async Task<IActionResult> RemoveRoleByIdAsync(int Id)
         {
             try
             {
-                var result = await _ageGroupService.RemoveAgeGroupByIdAsync(Id);
+                var result = await _service.RemoveRoleByIdAsync(Id);
 
                 if (result)
                 {
                     return Ok(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status200OK,
-                        Message = "Remove Age success"
+                        Message = "Remove Role success"
                     });
                 }
                 else
@@ -161,13 +146,12 @@ namespace NET1806_LittleJoy.API.Controllers
                     return NotFound(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "This Age does not exist"
+                        Message = "The Role can not remove"
                     });
                 }
             }
             catch (Exception ex)
             {
-
                 return BadRequest(new ResponseModels()
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
@@ -178,33 +162,27 @@ namespace NET1806_LittleJoy.API.Controllers
 
 
         [HttpPut]
-        //[Authorize(Roles = "STAFF,ADMIN")]
-        public async Task<IActionResult> UpdateAgeGroupAsync([FromBody] AgeGroupProductModel ageGroupModel)
+        //[Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> UpdateRoleAsync([FromBody] RoleModel model)
         {
             try
             {
-                AgeGroupProductModel AgeModelAdd = new AgeGroupProductModel()
-                {
-                    Id = ageGroupModel.Id,
-                    AgeRange = ageGroupModel.AgeRange,
-                    
-                };
 
-                var result = await _ageGroupService.UpdateAgeGroupAsync(AgeModelAdd);
+                var result = await _service.UpdateRoleAsync(model);
 
                 if (result == null)
                 {
                     return NotFound(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "Can not update this Age"
+                        Message = "Can not update this Role"
                     });
                 }
 
                 return Ok(new ResponseModels()
                 {
                     HttpCode = StatusCodes.Status200OK,
-                    Message = "Update Age success"
+                    Message = "Update Role success"
                 });
             }
             catch (Exception ex)
@@ -217,6 +195,5 @@ namespace NET1806_LittleJoy.API.Controllers
                 });
             }
         }
-
     }
 }

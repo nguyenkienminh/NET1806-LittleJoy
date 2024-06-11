@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using NET1806_LittleJoy.API.ViewModels.RequestModels;
 using NET1806_LittleJoy.API.ViewModels.ResponeModels;
 using NET1806_LittleJoy.Repository.Commons;
+using NET1806_LittleJoy.Repository.Repositories.Interface;
 using NET1806_LittleJoy.Service.BusinessModels;
 using NET1806_LittleJoy.Service.Services;
 using NET1806_LittleJoy.Service.Services.Interface;
@@ -11,24 +11,24 @@ using Newtonsoft.Json;
 
 namespace NET1806_LittleJoy.API.Controllers
 {
-    [Route("api/feedback")]
+    [Route("api/address")]
     [ApiController]
-    public class FeedBackController : ControllerBase
+    public class AddressController : ControllerBase
     {
-        private readonly IFeedBackService _service;
+        private readonly IAddressService _service;
 
-        public FeedBackController(IFeedBackService service)
+        public AddressController(IAddressService service)
         {
             _service = service;
         }
 
         [HttpGet]
         //[Authorize(Roles = "STAFF,ADMIN")]
-        public async Task<IActionResult> GetAllFeedBackPagingAsync([FromQuery] PaginationParameter paginationParameter)
+        public async Task<IActionResult> GetAllAddressAsync([FromQuery] PaginationParameter paging)
         {
             try
             {
-                var result = await _service.GetAllFeedBackPagingAsync(paginationParameter);
+                var result = await _service.GetAllPagingAddressAsync(paging);
 
                 if (result != null)
                 {
@@ -53,7 +53,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     return NotFound(new ResponseModels
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "FeedBack is empty"
+                        Message = "Address is empty"
                     });
                 }
             }
@@ -70,22 +70,22 @@ namespace NET1806_LittleJoy.API.Controllers
 
 
         [HttpGet("{Id}")]
-        //[Authorize(Roles = "STAFF,ADMIN")]
-        public async Task<IActionResult> GetFeedBackByIdAsync(int Id)
+        //[Authorize(Roles = "USER")]
+        public async Task<IActionResult> GetAddressByIdAsync(int Id)
         {
             try
             {
-                var detailModel = await _service.GetFeedBackByIdAsync(Id);
+                var addressDetailModel = await _service.GetAddressByIdAsync(Id);
 
-                if (detailModel == null)
+                if (addressDetailModel == null)
                 {
                     return NotFound(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "Feedback does not exist"
+                        Message = "Address does not exist"
                     });
                 }
-                return Ok(detailModel);
+                return Ok(addressDetailModel);
             }
             catch (Exception ex)
             {
@@ -100,27 +100,25 @@ namespace NET1806_LittleJoy.API.Controllers
 
 
         [HttpPost]
-        //[Authorize(Roles = "STAFF,ADMIN,USER")]
-        public async Task<IActionResult> AddFeedBackAsync([FromBody] FeedBackRequestModel request)
+        //[Authorize(Roles = "STAFF,ADMIN, USER")]
+        public async Task<IActionResult> AddAddressAsync([FromBody] AddressRequestModel request)
         {
             try
             {
-                FeedBackModel ModelAdd = new FeedBackModel()
+                AddressModel model = new AddressModel()
                 {
-                    ProductId = request.ProductId,
+                    Address1 = request.Address1,
                     UserId = request.UserId,
-                    Rating = request.Rating,
-                    Comment = request.Comment,
                 };
 
-                var result = await _service.AddFeedBackAsync(ModelAdd);
+                var result = await _service.AddAddressAsync(model);
 
                 if (result == false)
                 {
                     return NotFound(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "Can not create this feedback"
+                        Message = "Can not add this Address"
                     });
                 }
 
@@ -129,7 +127,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     return Ok(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status201Created,
-                        Message = "Create FeedBack success"
+                        Message = "Add Address success"
                     });
                 }
             }
@@ -145,19 +143,19 @@ namespace NET1806_LittleJoy.API.Controllers
 
 
         [HttpDelete]
-        //[Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> RemoveFeedBackByIdAsync(int Id)
+        //[Authorize(Roles = "STAFF,ADMIN, USER")]
+        public async Task<IActionResult> DeleteAddressAsyncById(int Id)
         {
             try
             {
-                var result = await _service.RemoveFeedBackByIdAsync(Id);
+                var result = await _service.DeleteAddressByIdAsync(Id);
 
                 if (result)
                 {
                     return Ok(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status200OK,
-                        Message = "Remove Feedback success"
+                        Message = "Remove Address success"
                     });
                 }
                 else
@@ -165,7 +163,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     return NotFound(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "The feedback can not remove"
+                        Message = "The address can not remove"
                     });
                 }
             }
@@ -182,33 +180,32 @@ namespace NET1806_LittleJoy.API.Controllers
 
 
         [HttpPut]
-        //[Authorize(Roles = "STAFF,ADMIN,USER")]
-        public async Task<IActionResult> UpdateFeedBackAsync([FromBody] FeedBackUpdateRequestModel model)
+        public async Task<IActionResult> UpdateAddressAsync([FromBody] AddressUpdateRequestModel request)
         {
             try
             {
-                FeedBackModel feedBackModel = new FeedBackModel()
+                AddressModel modelAdd = new AddressModel()
                 {
-                    Id = model.Id,
-                    Comment = model.Comment,
-                    Rating = model.Rating,  
+                    Id = request.Id,
+                    Address1 = request.NewAddress,
+                    IsMainAddress = request.IsMainAddress,
                 };
 
-                var result = await _service.UpdateFeedBackAsync(feedBackModel);
+                var result = await _service.UpdateAddressAsync(modelAdd);
 
                 if (result == null)
                 {
                     return NotFound(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "Can not feedback this Brand"
+                        Message = "Can not update this Address"
                     });
                 }
 
                 return Ok(new ResponseModels()
                 {
                     HttpCode = StatusCodes.Status200OK,
-                    Message = "Update feedback success"
+                    Message = "Update Address success"
                 });
             }
             catch (Exception ex)
@@ -223,43 +220,13 @@ namespace NET1806_LittleJoy.API.Controllers
         }
 
 
-        [HttpGet("product-average-point/{Id}")]
+        [HttpGet("user-id/{Id}")]
         //[Authorize(Roles = "STAFF,ADMIN")]
-        public async Task<IActionResult> GetProductAveragePoint(int Id)
+        public async Task<IActionResult> GetAddressListPagingByUserIdAsync([FromQuery] PaginationParameter paging, int Id)
         {
             try
             {
-                var pointModel = await _service.AverageFeedBackInProduct(Id);
-
-                if (pointModel == null)
-                {
-                    return NotFound(new ResponseModels()
-                    {
-                        HttpCode = StatusCodes.Status404NotFound,
-                        Message = "Feedback does not exist"
-                    });
-                }
-                return Ok(pointModel);
-            }
-            catch (Exception ex)
-            {
-
-                return BadRequest(new ResponseModels()
-                {
-                    HttpCode = StatusCodes.Status400BadRequest,
-                    Message = ex.Message.ToString()
-                });
-            }
-        }
-
-
-        [HttpGet("feed-back-by-product/{Id}")]
-        //[Authorize(Roles = "STAFF,ADMIN")]
-        public async Task<IActionResult> GetFeedBackByProductIdAsync([FromQuery] PaginationParameter paginationParameter, int Id)
-        {
-            try
-            {
-                var result = await _service.GetFeedBackByProductIdAsync(Id,paginationParameter);
+                var result = await _service.GetAddressListPagingByUserIdAsync(paging, Id);
 
                 if (result != null)
                 {
@@ -284,7 +251,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     return NotFound(new ResponseModels
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "FeedBack is empty"
+                        Message = "Address is empty"
                     });
                 }
             }
@@ -296,6 +263,36 @@ namespace NET1806_LittleJoy.API.Controllers
                     Message = ex.Message.ToString()
                 };
                 return BadRequest(responseModel);
+            }
+        }
+
+
+        [HttpGet("main-address-by-user-id/{Id}")]
+        //[Authorize(Roles = "STAFF,ADMIN")]
+        public async Task<IActionResult> GetMainAddressByUserIdAsync(int Id)
+        {
+            try
+            {
+                var addressMainModel = await _service.GetMainAddressByUserIdAsync(Id);
+
+                if (addressMainModel == null)
+                {
+                    return NotFound(new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "Address does not exist"
+                    });
+                }
+                return Ok(addressMainModel);
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                });
             }
         }
     }

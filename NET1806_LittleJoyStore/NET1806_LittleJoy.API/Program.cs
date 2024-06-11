@@ -98,7 +98,7 @@ namespace NET1806_LittleJoy.API
 
             //builder.Services.AddDbContext<LittleJoyContext>(options =>
             //{
-            //    options.UseSqlServer(builder.Configuration.GetConnectionString("LittleJoyLocal"));
+            //   options.UseSqlServer(builder.Configuration.GetConnectionString("LittleJoyLocal"));
             //});
 
             // ==========================================================
@@ -125,6 +125,7 @@ namespace NET1806_LittleJoy.API
             builder.Services.AddScoped<IUserService, UserService>();
 
             builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+            builder.Services.AddScoped<IRoleService, RoleService>();
 
             builder.Services.AddScoped<IMailService, MailService>();
 
@@ -154,10 +155,13 @@ namespace NET1806_LittleJoy.API
             builder.Services.AddScoped<IBlogRepository, BlogRepository>();
             builder.Services.AddScoped<IBlogService, BlogService>();
 
+            builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+            builder.Services.AddScoped<IAddressService, AddressService>();
+
             builder.Services.AddTransient<IMailService, MailService>();
 
             var app = builder.Build();
-          
+
             app.UseSwagger();
             app.UseSwaggerUI();
 
