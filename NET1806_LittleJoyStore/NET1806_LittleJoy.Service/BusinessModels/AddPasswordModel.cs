@@ -26,4 +26,16 @@ namespace NET1806_LittleJoy.Service.BusinessModels
         [Display(Name = "Confirm Password")]
         public string ConfirmPassword { get; set; } = "";
     }
+
+
+    public class ChangePasswordModel
+    {
+        public int Id { get; set; }
+
+        public string? OldPassword { get; set; } = "";
+
+        public string? NewPassword { get; set; } = "";
+
+        public string? ConfirmPassword { get; set; } = "";
+    }
 }

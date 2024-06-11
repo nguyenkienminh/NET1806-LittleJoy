@@ -27,6 +27,10 @@ namespace NET1806_LittleJoy.Service.Mapper
 
             CreateMap<FeedBackModel, Feedback>().ReverseMap();
             CreateMap<BlogModel, Post>().ReverseMap();
+
+            CreateMap<AddressModel, Address>().ReverseMap();
+
+            CreateMap<RoleModel, Role>().ReverseMap();
         }
     }
 }

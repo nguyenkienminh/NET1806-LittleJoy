@@ -5,6 +5,7 @@ using NET1806_LittleJoy.Repository.Commons;
 using NET1806_LittleJoy.Repository.Entities;
 using NET1806_LittleJoy.Repository.Repositories.Interface;
 using NET1806_LittleJoy.Service.BusinessModels;
+using NET1806_LittleJoy.Service.Enums;
 using NET1806_LittleJoy.Service.Helpers;
 using NET1806_LittleJoy.Service.Services.Interface;
 using NET1806_LittleJoy.Service.Ultils;
@@ -26,8 +27,9 @@ namespace NET1806_LittleJoy.Service.Services
         private readonly IMapper _mapper;
         private readonly IMailService _mailService;
         private readonly IOtpService _otpService;
+        private readonly IAddressService _address;
 
-        public UserService(IUserRepository userRepository, IRoleRepository roleRepository, IMailService mailService, IOtpService otpService, IConfiguration configuration, IMapper mapper)
+        public UserService(IUserRepository userRepository, IRoleRepository roleRepository, IMailService mailService, IOtpService otpService, IConfiguration configuration, IAddressService address, IMapper mapper)
         {
             _userRepository = userRepository;
             _roleRepository = roleRepository;
@@ -35,6 +37,7 @@ namespace NET1806_LittleJoy.Service.Services
             _mapper = mapper;
             _mailService = mailService;
             _otpService = otpService;
+            _address = address;
         }
 
         public async Task<bool> AddNewPassword(AddPasswordModel model)
@@ -165,7 +168,9 @@ namespace NET1806_LittleJoy.Service.Services
                     var role = await _roleRepository.GetRoleByNameAsync("USER");
                     newUser.RoleId = role.Id;
 
-                    newUser.Status = false;
+                    newUser.Status = true;
+                    newUser.ConfirmEmail = false;
+                    newUser.Points = 0;
 
                     await _userRepository.AddNewUserAsync(newUser);
 
@@ -232,6 +237,326 @@ namespace NET1806_LittleJoy.Service.Services
             };
             var refreshToken = GenerateJWTToken.CreateRefreshToken(claims, _configuration, DateTime.UtcNow);
             return new JwtSecurityTokenHandler().WriteToken(refreshToken).ToString();
+        }
+
+
+        /**************************************************************/
+
+        public async Task<Pagination<UserModel>> GetAllPagingUserByRoleIdAndStatusAsync(PaginationParameter paging, int roleId, bool status)
+        {
+
+            var listUser = await _userRepository.GetAllPagingUserByRoleIdAndStatusAsync(paging, roleId, status);
+
+            if (!listUser.Any())
+            {
+                return null;
+            }
+
+            var listUserModel = listUser.Select(a => new UserModel
+            {
+                Id = a.Id,
+                UserName = a.UserName,
+                Fullname = a.Fullname,
+                RoleId = a.RoleId,
+                Avatar = a.Avatar,
+                Email = a.Email,
+                PhoneNumber = a.PhoneNumber,
+                Points = a.Points,
+                Status = a.Status,
+                UnsignName = a.UnsignName,
+                ConfirmEmail = a.ConfirmEmail,
+
+            }).ToList();
+
+
+            return new Pagination<UserModel>(listUserModel,
+                listUser.TotalCount,
+                listUser.CurrentPage,
+                listUser.PageSize);
+        }
+
+        public async Task<UserModel?> GetUserByIdAsync(int id)
+        {
+            var userDetail = await _userRepository.GetUserByIdAsync(id);
+
+            if (userDetail == null)
+            {
+                return null;
+            }
+
+            var userDetailModel = _mapper.Map<UserModel>(userDetail);
+
+            return userDetailModel;
+        }
+
+        public async Task<bool?> AddUserAsync(UserModel model, string mainAddress)
+        {
+            try
+            {
+
+                if (model.PhoneNumber != null)
+                {
+                    if (StringUtils.IsValidPhoneNumber(model.PhoneNumber) == false)
+                    {
+                        return false;
+                    }
+                }
+
+                if (model.Email != null)
+                {
+                    if (StringUtils.IsValidEmail(model.Email) == false)
+                    {
+                        return false;
+                    }
+                }
+
+                var userInfo = _mapper.Map<User>(model);
+
+                if (model.Password != null)
+                {
+                    userInfo.PasswordHash = PasswordUtils.HashPassword(model.Password);
+                }
+                else
+                {
+                    return null;
+                }
+
+                userInfo.Status = true;
+                userInfo.ConfirmEmail = false;
+                userInfo.Points = 0;
+
+                if (userInfo.Fullname != null)
+                {
+                    userInfo.UnsignName = StringUtils.ConvertToUnSign(userInfo.Fullname);
+                }
+
+                var userAdded = await _userRepository.AddNewUserAsync(userInfo);
+
+
+                if (!mainAddress.Equals(""))
+                {
+                    await _address.AddAddressAsync(new AddressModel()
+                    {
+                        Address1 = mainAddress,
+                        UserId = userAdded.Id,
+                    });
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteUserByIdAsync(int id)
+        {
+            var removeUser = await _userRepository.GetUserByIdAsync(id);
+
+            if (removeUser == null)
+            {
+                return false;
+            }
+
+            return await _userRepository.DeleteUserAsync(removeUser);
+        }
+
+        public async Task<UserModel> UpdateUserAsync(UserModel model, string mainAddress)
+        {
+            var userModify = _mapper.Map<User>(model);
+
+            var userPlace = await _userRepository.GetUserByIdAsync(userModify.Id);
+
+            if (userPlace == null)
+            {
+                return null;
+            }
+
+            if (userModify.Fullname != "".Trim() && userModify.Fullname != null)
+            {
+                userModify.UnsignName = StringUtils.ConvertToUnSign(userModify.Fullname);
+            }
+            else
+            {
+                userModify.Fullname = userPlace.Fullname;
+                userModify.UnsignName = StringUtils.ConvertToUnSign(userPlace.Fullname);
+            }
+
+            if (userModify.PhoneNumber != null && userModify.PhoneNumber != "".Trim())
+            {
+                if (StringUtils.IsValidPhoneNumber(userModify.PhoneNumber) == false)
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                userModify.PhoneNumber = userPlace.PhoneNumber;
+            }
+
+            if (userModify.Status == null)
+            {
+                userModify.Status = userPlace.Status;
+            }
+
+            userModify.Avatar = userPlace.Avatar;
+
+
+            var updateUser = await _userRepository.UpdateUserAsync(userModify, userPlace);
+
+            if (updateUser != null)
+            {
+
+                if (!mainAddress.Equals(""))
+                {
+                    var addressUserMain = await _address.GetMainAddressByUserIdAsync(updateUser.Id);
+
+                    if (addressUserMain == null)
+                    {
+                        await _address.AddAddressAsync(new AddressModel()
+                        {
+                            Address1 = mainAddress,
+                            UserId = updateUser.Id,
+                        });
+
+                    }
+                    else
+                    {
+                        if (!mainAddress.Equals(addressUserMain.Address1))
+                        {
+                            var addressResponse = await _address.UpdateAddressAsync(new AddressModel()
+                            {
+                                Id = addressUserMain.Id,
+                                Address1 = mainAddress,
+                                IsMainAddress = true
+                            });
+
+                            if (addressResponse == null)
+                            {
+                                return null;
+                            }
+                        }
+                    }
+                }
+
+
+                return _mapper.Map<UserModel>(updateUser);
+            }
+            return null;
+        }
+
+        public async Task<UserModel> UpdateUserRoleAsync(UserModel model)
+        {
+            var userModify = _mapper.Map<User>(model);
+
+            var userPlace = await _userRepository.GetUserByIdAsync(userModify.Id);
+
+            if (userPlace == null)
+            {
+                return null;
+            }
+
+            if (userModify.Fullname != "".Trim() && userModify.Fullname != null)
+            {
+                userModify.UnsignName = StringUtils.ConvertToUnSign(userModify.Fullname);
+            }
+            else
+            {
+                userModify.Fullname = userPlace.Fullname;
+                userModify.UnsignName = StringUtils.ConvertToUnSign(userPlace.Fullname);
+            }
+
+            if (userModify.PhoneNumber != null && userModify.PhoneNumber != "".Trim())
+            {
+                if (StringUtils.IsValidPhoneNumber(userModify.PhoneNumber) == false)
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                userModify.PhoneNumber = userPlace.PhoneNumber;
+            }
+
+            if (userModify.Avatar == null || userModify.Avatar == "".Trim())
+            {
+                userModify.Avatar = userPlace.Avatar;
+            }
+
+            userModify.Status = userPlace.Status;
+
+            var updateUser = await _userRepository.UpdateUserAsync(userModify, userPlace);
+
+            if (updateUser != null)
+            {
+                return _mapper.Map<UserModel>(updateUser);
+            }
+            return null;
+        }
+
+        public async Task<string> ChangePasswordUserRoleAsync(ChangePasswordModel model)
+        {
+
+            var user = await _userRepository.GetUserByIdAsync(model.Id);
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            var checkPassword = PasswordUtils.VerifyPassword(model.OldPassword, user.PasswordHash);
+
+            if (checkPassword)
+            {
+                AddPasswordModel addPassword = new AddPasswordModel()
+                {
+                    Email = user.Email,
+                    Password = model.NewPassword,
+                    ConfirmPassword = model.ConfirmPassword,
+                };
+
+                var result = await AddNewPassword(addPassword);
+
+                if (result == true)
+                {
+                    return "Add Password Success";
+                }
+                else
+                {
+                    return "Add Failed";
+                }
+            }
+
+            return "Password Incorrect";
+
+        }
+
+        public async Task<ICollection<UserModel>> GetUserListHighestScoreAsync()
+        {
+
+            var roleUser = await _roleRepository.GetRoleByNameAsync("USER");
+
+            var list = await _userRepository.GetUserListHighestScoreAsync(roleUser);
+
+            var listUserModel = list.Select(a => new UserModel
+            {
+                Id = a.Id,
+                UserName = a.UserName,
+                Fullname = a.Fullname,
+                RoleId = a.RoleId,
+                Avatar = a.Avatar,
+                Email = a.Email,
+                PhoneNumber = a.PhoneNumber,
+                Points = a.Points,
+                Status = a.Status,
+                UnsignName = a.UnsignName,
+                ConfirmEmail = a.ConfirmEmail,
+
+            }).ToList();
+
+            return listUserModel;
         }
     }
 }
