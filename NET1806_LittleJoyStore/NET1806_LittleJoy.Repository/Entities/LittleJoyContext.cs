@@ -262,10 +262,11 @@ public partial class LittleJoyContext : DbContext
                 .HasMaxLength(10)
                 .IsUnicode(false);
             entity.Property(e => e.UnsignName).HasMaxLength(250);
-
+            entity.Property(e => e.ConfirmEmail);
             entity.HasOne(d => d.Role).WithMany(p => p.Users)
                 .HasForeignKey(d => d.RoleId)
                 .HasConstraintName("FK__User__RoleId__73BA3083");
+            
         });
 
         OnModelCreatingPartial(modelBuilder);
