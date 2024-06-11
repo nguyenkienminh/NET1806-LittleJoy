@@ -27,8 +27,9 @@ namespace NET1806_LittleJoy.Service.Services
         private readonly IMapper _mapper;
         private readonly IMailService _mailService;
         private readonly IOtpService _otpService;
+        private readonly IAddressService _address;
 
-        public UserService(IUserRepository userRepository, IRoleRepository roleRepository, IMailService mailService, IOtpService otpService, IConfiguration configuration, IMapper mapper)
+        public UserService(IUserRepository userRepository, IRoleRepository roleRepository, IMailService mailService, IOtpService otpService, IConfiguration configuration, IAddressService address , IMapper mapper)
         {
             _userRepository = userRepository;
             _roleRepository = roleRepository;
@@ -36,6 +37,7 @@ namespace NET1806_LittleJoy.Service.Services
             _mapper = mapper;
             _mailService = mailService;
             _otpService = otpService;
+            _address = address;
         }
 
         public async Task<bool> AddNewPassword(AddPasswordModel model)
@@ -240,9 +242,9 @@ namespace NET1806_LittleJoy.Service.Services
 
         /**************************************************************/
 
-        public async Task<Pagination<UserModel>> GetAllPagingUserByRoleIdAsync(PaginationParameter paging, int roleId)
+        public async Task<Pagination<UserModel>> GetAllPagingUserByRoleIdAndStatusAsync(PaginationParameter paging, int roleId, bool status)
         {
-            var listUser = await _userRepository.GetAllPagingUserByRoleIdAsync(paging, roleId);
+            var listUser = await _userRepository.GetAllPagingUserByRoleIdAndStatusAsync(paging, roleId, status);
 
             if (!listUser.Any())
             {
@@ -286,7 +288,7 @@ namespace NET1806_LittleJoy.Service.Services
             return userDetailModel;
         }
 
-        public async Task<bool?> AddUserAsync(UserModel model)
+        public async Task<bool?> AddUserAsync(UserModel model, string mainAddress)
         {
             try
             {
@@ -326,7 +328,18 @@ namespace NET1806_LittleJoy.Service.Services
                     userInfo.UnsignName = StringUtils.ConvertToUnSign(userInfo.Fullname);
                 }
 
-                await _userRepository.AddNewUserAsync(userInfo);
+                var userAdded = await _userRepository.AddNewUserAsync(userInfo);
+
+                
+                if (!mainAddress.Equals(""))
+                {
+                    await _address.AddAddressAsync(new AddressModel()
+                    {
+                        Address1 = mainAddress,
+                        UserId = userAdded.Id,
+                    });
+                }
+
                 return true;
             }
             catch (Exception ex)
@@ -348,7 +361,7 @@ namespace NET1806_LittleJoy.Service.Services
             return await _userRepository.DeleteUserAsync(removeUser);
         }
 
-        public async Task<UserModel> UpdateUserAsync(UserModel model)
+        public async Task<UserModel> UpdateUserAsync(UserModel model, string mainAddress)
         {
             var userModify = _mapper.Map<User>(model);
 
@@ -392,6 +405,27 @@ namespace NET1806_LittleJoy.Service.Services
 
             if (updateUser != null)
             {
+
+                if(!mainAddress.Equals(""))
+                {
+                    var addressUserMain = await _address.GetMainAddressByUserIdAsync(updateUser.Id);
+
+                    if(!mainAddress.Equals(addressUserMain.Address1))
+                    {
+                        var addressResponse = await _address.UpdateAddressAsync(new AddressModel()
+                        {
+                            Id = addressUserMain.Id,
+                            Address1 = mainAddress, 
+                            IsMainAddress = true
+                        });
+
+                        if(addressResponse == null)
+                        {
+                            return null;
+                        }
+                    }
+                }
+
                 return _mapper.Map<UserModel>(updateUser);
             }
             return null;

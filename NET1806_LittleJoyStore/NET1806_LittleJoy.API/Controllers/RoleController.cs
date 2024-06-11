@@ -163,7 +163,7 @@ namespace NET1806_LittleJoy.API.Controllers
 
         [HttpPut]
         //[Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> UpdateOriginAsync([FromBody] RoleModel model)
+        public async Task<IActionResult> UpdateRoleAsync([FromBody] RoleModel model)
         {
             try
             {

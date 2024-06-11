@@ -26,11 +26,21 @@ namespace NET1806_LittleJoy.API.Controllers
 
         [HttpGet]
         //[Authorize(Roles = "STAFF,ADMIN")]
-        public async Task<IActionResult> GetAllUserByRoleIdAsync([FromQuery] PaginationParameter paging, int roleId)
+        public async Task<IActionResult> GetAllUserByRoleIdAndStatusAsync([FromQuery] PaginationParameter paging, int roleId, bool status)
         {
             try
             {
-                var model = await _service.GetAllPagingUserByRoleIdAsync(paging, roleId);
+                var model = await _service.GetAllPagingUserByRoleIdAndStatusAsync(paging, roleId, status);
+
+
+                if(model == null)
+                {
+                    return NotFound(new ResponseModels
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "User is empty"
+                    });
+                }
 
                 var result = new Pagination<UserResponseModel>(
                     model.Select(a => new UserResponseModel
@@ -157,7 +167,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     PhoneNumber = request.PhoneNumber,
                 };
 
-                var result = await _service.AddUserAsync(model);
+                var result = await _service.AddUserAsync(model, request.MainAddress);
 
                 if (result == false)
                 {
@@ -239,7 +249,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     Fullname = request.Fullname,
                 };
 
-                var result = await _service.UpdateUserAsync(modelChange);
+                var result = await _service.UpdateUserAsync(modelChange, request.MainAddress);
 
                 if (result == null)
                 {

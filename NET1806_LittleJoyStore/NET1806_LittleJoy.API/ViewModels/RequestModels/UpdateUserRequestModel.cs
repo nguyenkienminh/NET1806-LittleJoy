@@ -9,5 +9,9 @@
         public string? PhoneNumber { get; set; }
 
         public bool? Status { get; set; }
+
+        public string? Avatar { get; set; }
+
+        public string? MainAddress { get; set; }
     }
 }

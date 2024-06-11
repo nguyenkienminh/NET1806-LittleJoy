@@ -50,11 +50,11 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
         /*****************************************************************/
 
-        public async Task<Pagination<User>> GetAllPagingUserByRoleIdAsync(PaginationParameter paging, int roleId)
+        public async Task<Pagination<User>> GetAllPagingUserByRoleIdAndStatusAsync(PaginationParameter paging, int roleId, bool status)
         {
-            var itemCount = await _context.Users.CountAsync(u => u.RoleId == roleId);
+            var itemCount = await _context.Users.CountAsync(u => u.RoleId == roleId && u.Status == status);
 
-            var item = await _context.Users .Where(u => u.RoleId == roleId)
+            var item = await _context.Users .Where(u => u.RoleId == roleId && u.Status == status)
                                             .Skip((paging.PageIndex - 1) * paging.PageSize)
                                             .Take(paging.PageSize)
                                             .AsNoTracking()
@@ -95,7 +95,7 @@ namespace NET1806_LittleJoy.Repository.Repositories
         public async Task<ICollection<User>> GetUserListHighestScoreAsync(Role role)
         {
 
-            var result = await _context.Users.Where(u => u.RoleId == role.Id).OrderByDescending(u => u.Points).Take(5).ToListAsync();
+            var result = await _context.Users.Where(u => u.RoleId == role.Id && u.Status == true).OrderByDescending(u => u.Points).Take(5).ToListAsync();
 
             return result;
         }

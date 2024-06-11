@@ -16,5 +16,7 @@
 
         public string? PhoneNumber { get; set; }
 
+        public string? MainAddress { get; set;}
+
     }
 }
