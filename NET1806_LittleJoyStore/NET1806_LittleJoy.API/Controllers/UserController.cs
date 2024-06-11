@@ -247,6 +247,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     PhoneNumber = request.PhoneNumber,
                     Status = request.Status,
                     Fullname = request.Fullname,
+                    RoleId = request.RoleId,
                 };
 
                 var result = await _service.UpdateUserAsync(modelChange, request.MainAddress);

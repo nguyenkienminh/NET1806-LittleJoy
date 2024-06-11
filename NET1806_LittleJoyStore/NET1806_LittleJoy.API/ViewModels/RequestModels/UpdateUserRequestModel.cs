@@ -13,5 +13,7 @@
         public string? Avatar { get; set; }
 
         public string? MainAddress { get; set; }
+
+        public int? RoleId { get; set; }
     }
 }

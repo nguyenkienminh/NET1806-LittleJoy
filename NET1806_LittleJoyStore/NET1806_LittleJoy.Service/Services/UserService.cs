@@ -29,7 +29,7 @@ namespace NET1806_LittleJoy.Service.Services
         private readonly IOtpService _otpService;
         private readonly IAddressService _address;
 
-        public UserService(IUserRepository userRepository, IRoleRepository roleRepository, IMailService mailService, IOtpService otpService, IConfiguration configuration, IAddressService address , IMapper mapper)
+        public UserService(IUserRepository userRepository, IRoleRepository roleRepository, IMailService mailService, IOtpService otpService, IConfiguration configuration, IAddressService address, IMapper mapper)
         {
             _userRepository = userRepository;
             _roleRepository = roleRepository;
@@ -244,6 +244,7 @@ namespace NET1806_LittleJoy.Service.Services
 
         public async Task<Pagination<UserModel>> GetAllPagingUserByRoleIdAndStatusAsync(PaginationParameter paging, int roleId, bool status)
         {
+
             var listUser = await _userRepository.GetAllPagingUserByRoleIdAndStatusAsync(paging, roleId, status);
 
             if (!listUser.Any())
@@ -292,6 +293,7 @@ namespace NET1806_LittleJoy.Service.Services
         {
             try
             {
+
                 if (model.PhoneNumber != null)
                 {
                     if (StringUtils.IsValidPhoneNumber(model.PhoneNumber) == false)
@@ -330,7 +332,7 @@ namespace NET1806_LittleJoy.Service.Services
 
                 var userAdded = await _userRepository.AddNewUserAsync(userInfo);
 
-                
+
                 if (!mainAddress.Equals(""))
                 {
                     await _address.AddAddressAsync(new AddressModel()
@@ -401,30 +403,44 @@ namespace NET1806_LittleJoy.Service.Services
 
             userModify.Avatar = userPlace.Avatar;
 
+
             var updateUser = await _userRepository.UpdateUserAsync(userModify, userPlace);
 
             if (updateUser != null)
             {
 
-                if(!mainAddress.Equals(""))
+                if (!mainAddress.Equals(""))
                 {
                     var addressUserMain = await _address.GetMainAddressByUserIdAsync(updateUser.Id);
 
-                    if(!mainAddress.Equals(addressUserMain.Address1))
+                    if (addressUserMain == null)
                     {
-                        var addressResponse = await _address.UpdateAddressAsync(new AddressModel()
+                        await _address.AddAddressAsync(new AddressModel()
                         {
-                            Id = addressUserMain.Id,
-                            Address1 = mainAddress, 
-                            IsMainAddress = true
+                            Address1 = mainAddress,
+                            UserId = updateUser.Id,
                         });
 
-                        if(addressResponse == null)
+                    }
+                    else
+                    {
+                        if (!mainAddress.Equals(addressUserMain.Address1))
                         {
-                            return null;
+                            var addressResponse = await _address.UpdateAddressAsync(new AddressModel()
+                            {
+                                Id = addressUserMain.Id,
+                                Address1 = mainAddress,
+                                IsMainAddress = true
+                            });
+
+                            if (addressResponse == null)
+                            {
+                                return null;
+                            }
                         }
                     }
                 }
+
 
                 return _mapper.Map<UserModel>(updateUser);
             }
@@ -485,7 +501,7 @@ namespace NET1806_LittleJoy.Service.Services
 
             var user = await _userRepository.GetUserByIdAsync(model.Id);
 
-            if(user == null)
+            if (user == null)
             {
                 return null;
             }
@@ -494,8 +510,8 @@ namespace NET1806_LittleJoy.Service.Services
 
             if (checkPassword)
             {
-                AddPasswordModel addPassword = new AddPasswordModel() 
-                { 
+                AddPasswordModel addPassword = new AddPasswordModel()
+                {
                     Email = user.Email,
                     Password = model.NewPassword,
                     ConfirmPassword = model.ConfirmPassword,
@@ -503,18 +519,18 @@ namespace NET1806_LittleJoy.Service.Services
 
                 var result = await AddNewPassword(addPassword);
 
-                if (result == true) 
+                if (result == true)
                 {
                     return "Add Password Success";
-                } 
+                }
                 else
                 {
                     return "Add Failed";
                 }
             }
-            
+
             return "Password Incorrect";
-            
+
         }
 
         public async Task<ICollection<UserModel>> GetUserListHighestScoreAsync()

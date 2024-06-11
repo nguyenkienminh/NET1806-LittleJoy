@@ -86,6 +86,7 @@ namespace NET1806_LittleJoy.Repository.Repositories
             userPlace.Status = userModify.Status;
             userPlace.Avatar = userModify.Avatar;
             userPlace.UnsignName = userModify.UnsignName;
+            userPlace.RoleId = userModify.RoleId;
 
             await _context.SaveChangesAsync();
 
