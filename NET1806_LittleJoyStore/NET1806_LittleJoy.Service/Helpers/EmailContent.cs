@@ -48,23 +48,28 @@ namespace NET1806_LittleJoy.Service.Helpers
 
         public static string ConfirmEmail(string username, string tokenConfirm)
         {
-            return "    <div style=\"background-color:#f8f8f8;font-family:sans-serif;padding:15px\">\n"
+            return "<div style=\"background-color:#f8f8f8;font-family:sans-serif;padding:15px\">\n"
                 + "        <div style=\"max-width:1000px ; margin:auto\">\n"
                 + "            <div class=\"adM\">\n"
                 + "                <div style=\"background-color:#fff;padding:5px 20px;color:#000;border-radius:0px 0px 2px 2px\">\n"
                 + "                    <div style=\"padding:35px 15px\">\n"
                 + "                        <p style=\"margin:0;font-size:16px\">\n"
-                + "                            <b>Xin chào, " + username + "</b>\n"
+                + "                            <b>Xin chào, "+ username +" </b>\n"
                 + "                        </p>\n"
                 + "                        <br>\n"
                 + "                        <p style=\"margin:0;font-size:16px\">\n"
                 + "                            Bạn vừa đăng kí tài khoản, vui lòng ấn vào nút dưới đây để xác nhận tài khoản tại\n"
-                + "                            <a style=\"text-decoration:none\\\" href=\"https://littlejoy.vercel.app\\\" target=\"_blank\">Little Joy Store</a>\n"
+                + "                            <a style=\"text-decoration:none\\\\\" href=\"https://littlejoy.vercel.app\\\\\"\n"
+                + "                                target=\"_blank\">Little Joy Store</a>\n"
                 + "                        </p>\n"
                 + "                        <div style=\"padding:40px;margin:auto;text-align:center\">\n"
-                + "                            <div\n"
-                + "                                style=\"width:fit-content;border:#3cc892 thin solid;color:#3cc892;font-weight:bold;text-align:center;padding:7px 12px;border-radius:2px;margin:auto;font-size:large\">\n"
-                + "                                <a href=\"https://littlejoy.vercel.app/confirm/"+ tokenConfirm +"\" style=\"color: #3cc892; text-decoration: none;\">XÁC NHẬN</a> </div>\n"
+                + "                            <a href=\"https://littlejoy.vercel.app/confirm/" + tokenConfirm +"\"\n"
+                + "                                style=\"color: #3cc892; text-decoration: none;\">\n"
+                + "                                <div\n"
+                + "                                    style=\"width:fit-content;border:#3cc892 thin solid;color:#3cc892;font-weight:bold;text-align:center;padding:7px 12px;border-radius:2px;margin:auto;font-size:large\">\n"
+                + "                                    XÁC NHẬN\n"
+                + "                                </div>\n"
+                + "                            </a>\n"
                 + "                        </div>\n"
                 + "                        <div style=\"border-top:1px solid #dcdbdb\"></div>\n"
                 + "                        <br>\n"
@@ -75,7 +80,6 @@ namespace NET1806_LittleJoy.Service.Helpers
                 + "            </div>\n"
                 + "        </div>\n"
                 + "    </div>";
-
         }
 
         public static string WelcomeEmail(string username)
