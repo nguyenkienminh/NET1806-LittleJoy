@@ -233,6 +233,7 @@ namespace NET1806_LittleJoy.Service.Services
                 authClaims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
                 authClaims.Add(new Claim(ClaimTypes.Role, role.RoleName));
                 //authClaims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+                authClaims.Add(new Claim("user_ID", user.Id.ToString()));
             }
             var accessToken = GenerateJWTToken.CreateToken(authClaims, _configuration, DateTime.UtcNow);
             return new JwtSecurityTokenHandler().WriteToken(accessToken);
