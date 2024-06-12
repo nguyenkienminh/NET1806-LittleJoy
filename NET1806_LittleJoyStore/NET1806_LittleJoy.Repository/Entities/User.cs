@@ -31,6 +31,8 @@ public partial class User
 
     public bool ConfirmEmail  { get; set; }
 
+    public string? TokenConfirmEmail { get; set; }
+
     public virtual ICollection<Address> Addresses { get; set; } = new List<Address>();
 
     public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
