@@ -172,5 +172,35 @@ namespace NET1806_LittleJoy.API.Controllers
                 return BadRequest(resp);
             }
         }
+
+        [HttpPost("confirm-email")]
+        public async Task<IActionResult> ConfirmEmail(string token)
+        {
+            try
+            {
+                var result = await _userService.ConfirmEmailAsync(token);
+                if (result)
+                {
+                    return Ok(new ResponseModels
+                    {
+                        HttpCode = StatusCodes.Status200OK,
+                        Message = "Xác minh tài khoản thành công"
+                    });
+                }
+                return NotFound(new ResponseModels
+                {
+                    HttpCode= StatusCodes.Status404NotFound,
+                    Message = "Không tìm thấy tài khoản"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseModels
+                {
+                    HttpCode= StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                });
+            }
+        }
     }
 }
