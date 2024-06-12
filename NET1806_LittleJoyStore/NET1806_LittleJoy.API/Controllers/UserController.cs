@@ -102,7 +102,6 @@ namespace NET1806_LittleJoy.API.Controllers
 
 
         [HttpGet("{Id}")]
-        [Authorize(Roles = "USER")]
         public async Task<IActionResult> GetUserByIdAsync(int Id)
         {
             try
