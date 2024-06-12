@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using NET1806_LittleJoy.API.ViewModels.RequestModels;
@@ -101,7 +102,7 @@ namespace NET1806_LittleJoy.API.Controllers
 
 
         [HttpGet("{Id}")]
-        //[Authorize(Roles = "USER")]
+        [Authorize(Roles = "USER")]
         public async Task<IActionResult> GetUserByIdAsync(int Id)
         {
             try
