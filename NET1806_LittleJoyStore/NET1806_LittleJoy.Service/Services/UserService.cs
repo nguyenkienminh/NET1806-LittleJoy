@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Google.Apis.Auth;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using NET1806_LittleJoy.Repository.Commons;
@@ -144,6 +145,10 @@ namespace NET1806_LittleJoy.Service.Services
             {
                 try
                 {
+                    if (model.UserName.StartsWith("GID_", StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new Exception("Username không được bắt đầu bằng GID_");
+                    }
                     User newUser = new User()
                     {
                         UserName = model.UserName,
@@ -586,6 +591,89 @@ namespace NET1806_LittleJoy.Service.Services
                 Body = EmailContent.WelcomeEmail(user.UserName)
             });
             return true;
+        }
+
+        public async Task<AuthenModel> LoginWithGoogle(string credental)
+        {
+            string cliendId = _configuration["GoogleCredential:ClientId"];
+            var settings = new GoogleJsonWebSignature.ValidationSettings()
+            {
+                Audience = new List<string> { cliendId }
+            };
+            var payload = await GoogleJsonWebSignature.ValidateAsync(credental, settings);
+
+            if(payload == null)
+            {
+                throw new Exception("Credental không hợp lệ");
+            }
+
+            var existUser = await _userRepository.GetUserByEmailAsync(payload.Email);
+
+            //nếu có user
+            if(existUser != null)
+            {
+                if(existUser.Status == false)
+                {
+                    throw new Exception("Tài khoản đã bị cấm");
+                }
+                var accessToken = await GenerateAccessToken(existUser.Email, existUser);
+                var refreshToken = GenerateRefreshToken(existUser.Email);
+
+                return new AuthenModel()
+                {
+                    HttpCode = 200,
+                    Message = "Login with Google sucessfully",
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken
+                };
+            } else
+            {
+                //create new user
+                using (var transaction = await _userRepository.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        User user = new User()
+                        {
+                            Email = payload.Email,
+                            Avatar = payload.Picture,
+                            Fullname = payload.Name,
+                            UserName = "GID_" + payload.Email.Split("@")[0],
+                            Status = true,
+                            ConfirmEmail = true,
+                            RoleId = 1,
+                            GoogleId = payload.JwtId,
+                            Points = 0,
+                            UnsignName = StringUtils.ConvertToUnSign(payload.Name)
+                        };
+                        await _userRepository.AddNewUserAsync(user);
+                        await transaction.CommitAsync();
+
+                        var accessToken = await GenerateAccessToken(user.Email, user);
+                        var refreshToken = GenerateRefreshToken(user.Email);
+
+                        await _mailService.sendEmailAsync(new MailRequest
+                        {
+                            ToEmail = user.Email,
+                            Subject = "[LittleJoy] Welcome to Little Joy Store",
+                            Body = EmailContent.WelcomeEmail(user.UserName)
+                        });
+
+                        return new AuthenModel()
+                        {
+                            HttpCode = 200,
+                            Message = "Login with Google sucessfully",
+                            AccessToken = accessToken,
+                            RefreshToken = refreshToken
+                        };
+                    }
+                    catch
+                    {
+                        await transaction.RollbackAsync();
+                        throw;
+                    }
+                }
+            }
         }
     }
 }
