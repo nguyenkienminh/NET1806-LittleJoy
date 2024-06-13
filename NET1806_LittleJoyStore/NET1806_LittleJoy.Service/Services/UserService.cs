@@ -70,6 +70,15 @@ namespace NET1806_LittleJoy.Service.Services
                 var checkPassword = PasswordUtils.VerifyPassword(password, user.PasswordHash);
                 if (checkPassword)
                 {
+                    if (!user.ConfirmEmail)
+                    {
+                        return new AuthenModel()
+                        {
+                            HttpCode = 401,
+                            Message = "Account chưa xác thực email"
+                        };
+                    }
+
                     var accessToken = await GenerateAccessToken(username, user);
                     var refeshToken = GenerateRefreshToken(username);
 
@@ -577,7 +586,7 @@ namespace NET1806_LittleJoy.Service.Services
         public async Task<bool> ConfirmEmailAsync(string token)
         {
             var user = await _userRepository.GetUserByConfirmToken(token);
-            if(user == null)
+            if (user == null)
             {
                 return false;
             }
@@ -602,7 +611,7 @@ namespace NET1806_LittleJoy.Service.Services
             };
             var payload = await GoogleJsonWebSignature.ValidateAsync(credental, settings);
 
-            if(payload == null)
+            if (payload == null)
             {
                 throw new Exception("Credental không hợp lệ");
             }
@@ -610,9 +619,9 @@ namespace NET1806_LittleJoy.Service.Services
             var existUser = await _userRepository.GetUserByEmailAsync(payload.Email);
 
             //nếu có user
-            if(existUser != null)
+            if (existUser != null)
             {
-                if(existUser.Status == false)
+                if (existUser.Status == false)
                 {
                     throw new Exception("Tài khoản đã bị cấm");
                 }
@@ -626,7 +635,8 @@ namespace NET1806_LittleJoy.Service.Services
                     AccessToken = accessToken,
                     RefreshToken = refreshToken
                 };
-            } else
+            }
+            else
             {
                 //create new user
                 using (var transaction = await _userRepository.BeginTransactionAsync())
