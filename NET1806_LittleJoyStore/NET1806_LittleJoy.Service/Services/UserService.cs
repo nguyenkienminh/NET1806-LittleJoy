@@ -322,7 +322,7 @@ namespace NET1806_LittleJoy.Service.Services
                 }
 
                 userInfo.Status = true;
-                userInfo.ConfirmEmail = false;
+                userInfo.ConfirmEmail = true;
                 userInfo.Points = 0;
 
                 if (userInfo.Fullname != null)
