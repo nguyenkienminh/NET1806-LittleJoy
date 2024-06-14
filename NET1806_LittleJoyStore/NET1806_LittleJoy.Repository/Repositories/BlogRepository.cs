@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace NET1806_LittleJoy.Repository.Repositories
 {
@@ -90,6 +91,12 @@ namespace NET1806_LittleJoy.Repository.Repositories
             _context.Posts.Update(blog);
             await _context.SaveChangesAsync();
             return blog;
+        }
+
+        public async Task<List<Post>> GetTopBlog()
+        {
+            var list = _context.Posts.OrderByDescending(x => x.Id).Take(3);
+            return await list.ToListAsync();
         }
     }
 }

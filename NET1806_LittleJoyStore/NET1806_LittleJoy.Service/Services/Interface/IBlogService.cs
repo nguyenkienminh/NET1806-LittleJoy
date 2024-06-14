@@ -16,5 +16,7 @@ namespace NET1806_LittleJoy.Service.Services.Interface
         public Task<BlogModel> UpdateBlogAsync(BlogModel blog);
         public Task<bool> RemoveBlogAsync(int id);
         public Task<Pagination<BlogModel>> GetListBlogFilterAsync(PaginationParameter paging, BlogFilterModel filter);
+
+        public Task<List<BlogModel>> GetTopBlog();
     }
 }
