@@ -42,7 +42,7 @@ namespace NET1806_LittleJoy.Repository.Repositories
         public async Task<Pagination<Post>> GetListBlogAsync(PaginationParameter paginationParameter)
         {
             var itemCount = await _context.Posts.CountAsync();
-            var items = await _context.Posts.Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
+            var items = await _context.Posts.OrderByDescending(x => x.Id).Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
                 .Take(paginationParameter.PageSize)
                 .AsNoTracking().ToListAsync();
             var result = new Pagination<Post>(items, itemCount, paginationParameter.PageIndex, paginationParameter.PageSize);
