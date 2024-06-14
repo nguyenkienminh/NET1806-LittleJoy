@@ -79,7 +79,7 @@ namespace NET1806_LittleJoy.API.Controllers
                 var resp = new ResponseModels()
                 {
                     HttpCode = StatusCodes.Status200OK,
-                    Message = "Send OTP Successfully",
+                    Message = "Gửi OTP đến tài khoản thành công",
                 };
                 return Ok(resp);
             }
@@ -113,7 +113,7 @@ namespace NET1806_LittleJoy.API.Controllers
                 return BadRequest(new ResponseModels
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
-                    Message = "Otp is not valid"
+                    Message = "OTP không đúng"
                 });
             }
             catch (Exception ex)

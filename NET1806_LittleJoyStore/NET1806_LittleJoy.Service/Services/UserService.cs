@@ -62,7 +62,7 @@ namespace NET1806_LittleJoy.Service.Services
                 return new AuthenModel()
                 {
                     HttpCode = 401,
-                    Message = "Account does not exist"
+                    Message = "Tài khoản không tồn tại"
                 };
             }
             else
@@ -75,7 +75,7 @@ namespace NET1806_LittleJoy.Service.Services
                         return new AuthenModel()
                         {
                             HttpCode = 401,
-                            Message = "Account chưa xác thực email"
+                            Message = "Tài khoản chưa xác thực email"
                         };
                     }
 
@@ -94,7 +94,7 @@ namespace NET1806_LittleJoy.Service.Services
                     return new AuthenModel()
                     {
                         HttpCode = 400,
-                        Message = "Wrong Password"
+                        Message = "Sai mật khẩu"
                     };
                 }
             }
@@ -139,7 +139,7 @@ namespace NET1806_LittleJoy.Service.Services
                 return new AuthenModel
                 {
                     HttpCode = 401,
-                    Message = "User does not exits."
+                    Message = "Tài khoản không tồn tại"
                 };
             }
             catch (Exception ex)
@@ -171,11 +171,11 @@ namespace NET1806_LittleJoy.Service.Services
                     var checkUsername = await _userRepository.GetUserByUserNameAsync(newUser.UserName);
                     if (checkEmail != null)
                     {
-                        throw new Exception("Account already exists.");
+                        throw new Exception("Tài khoản đã tồn tại");
                     }
                     else if (checkUsername != null)
                     {
-                        throw new Exception("Username already exists.");
+                        throw new Exception("Tài khoản đã tồn tại");
                     }
 
                     newUser.PasswordHash = PasswordUtils.HashPassword(model.Password);
@@ -214,12 +214,12 @@ namespace NET1806_LittleJoy.Service.Services
 
             if (checkUser == null)
             {
-                throw new Exception("Account does not exist");
+                throw new Exception("Tài khoản không tồn tại");
             }
 
             if (checkUser.GoogleId != null)
             {
-                throw new Exception("Account cannot reset password");
+                throw new Exception("Tài khoản không thể thực hiện điều này");
             }
 
             var otp = await _otpService.AddNewOtp(email);
@@ -545,15 +545,15 @@ namespace NET1806_LittleJoy.Service.Services
 
                 if (result == true)
                 {
-                    return "Add Password Success";
+                    return "Thêm mật khẩu thành công";
                 }
                 else
                 {
-                    return "Add Failed";
+                    return "Thêm mật khẩu không thành công";
                 }
             }
 
-            return "Password Incorrect";
+            return "Mật khẩu không đúng";
 
         }
 
@@ -631,7 +631,7 @@ namespace NET1806_LittleJoy.Service.Services
                 return new AuthenModel()
                 {
                     HttpCode = 200,
-                    Message = "Login with Google sucessfully",
+                    Message = "Login Google thành công",
                     AccessToken = accessToken,
                     RefreshToken = refreshToken
                 };
