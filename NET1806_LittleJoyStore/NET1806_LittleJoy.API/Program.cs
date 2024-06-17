@@ -96,10 +96,10 @@ namespace NET1806_LittleJoy.API
 
             // ===================== FOR LOCAL DB =======================
 
-            builder.Services.AddDbContext<LittleJoyContext>(options =>
-            {
-               options.UseSqlServer(builder.Configuration.GetConnectionString("LittleJoyLocal"));
-            });
+            //builder.Services.AddDbContext<LittleJoyContext>(options =>
+            //{
+            //    options.UseSqlServer(builder.Configuration.GetConnectionString("LittleJoyLocal"));
+            //});
 
             // ==========================================================
 
@@ -166,6 +166,10 @@ namespace NET1806_LittleJoy.API
             app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
+
+            app.UseCors("app-cors");
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
