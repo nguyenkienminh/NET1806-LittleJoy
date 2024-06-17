@@ -21,7 +21,7 @@ namespace NET1806_LittleJoy.Service.Services.Interface
 
         public Task<FeedBackModel> UpdateFeedBackAsync(FeedBackModel model);
 
-        public Task<ProductAverageRating> AverageFeedBackInProduct(int productId);
+        public Task<double> AverageFeedBackInProduct(int productId);
 
         public Task<Pagination<FeedBackModel>> GetFeedBackByProductIdAsync(int productId, PaginationParameter paginationParameter);
     }
