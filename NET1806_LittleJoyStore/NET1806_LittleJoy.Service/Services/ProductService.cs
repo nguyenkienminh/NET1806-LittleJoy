@@ -53,6 +53,7 @@ namespace NET1806_LittleJoy.Service.Services
                 OriginId = p.OriginId,
                 BrandId = p.BrandId,
                 UnsignProductName = p.UnsignProductName, 
+                RatingAver = _feedBack.AverageFeedBackInProduct(p.Id).Result
             }).ToList();
 
 
@@ -72,7 +73,7 @@ namespace NET1806_LittleJoy.Service.Services
             }
 
             var productModelInfo = _mapper.Map<ProductModel>(productDetail);
-
+            productModelInfo.RatingAver = await _feedBack.AverageFeedBackInProduct(productModelInfo.Id);
             return productModelInfo;
            
         }
@@ -152,6 +153,7 @@ namespace NET1806_LittleJoy.Service.Services
                 OriginId = p.OriginId,
                 BrandId = p.BrandId,
                 UnsignProductName = p.UnsignProductName,
+                RatingAver = _feedBack.AverageFeedBackInProduct(p.Id).Result
             }).ToList();
 
 
@@ -185,6 +187,7 @@ namespace NET1806_LittleJoy.Service.Services
                 OriginId = p.OriginId,
                 BrandId = p.BrandId,
                 UnsignProductName = p.UnsignProductName,
+                RatingAver = _feedBack.AverageFeedBackInProduct(p.Id).Result
             }).ToList();
 
 
