@@ -12,17 +12,13 @@
 
         public int? AmountDiscount { get; set; }
 
-        public string? Status { get; set; }
-
-        public List<ProductOrder> productOrders { get; set; }
+        public List<ProductOrder> ProductOrders { get; set; }
     }
 
     public class ProductOrder
     {
-        public int? Id { get; set; }
+        public int Id { get; set; }
 
         public int Quantity { get; set; }
-
-        public int PricePerUnit { get; set; }
     }
 }

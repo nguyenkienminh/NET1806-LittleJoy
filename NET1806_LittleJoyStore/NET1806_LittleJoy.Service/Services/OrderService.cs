@@ -1,4 +1,9 @@
-﻿using NET1806_LittleJoy.Repository.Repositories.Interface;
+﻿using AutoMapper;
+using NET1806_LittleJoy.API.ViewModels.RequestModels;
+using NET1806_LittleJoy.Repository.Entities;
+using NET1806_LittleJoy.Repository.Repositories;
+using NET1806_LittleJoy.Repository.Repositories.Interface;
+using NET1806_LittleJoy.Service.BusinessModels;
 using NET1806_LittleJoy.Service.Services.Interface;
 using System;
 using System.Collections.Generic;
@@ -11,10 +16,60 @@ namespace NET1806_LittleJoy.Service.Services
     public class OrderService : IOrderService
     {
         private readonly IOrderRepository _orderRepository;
+        private readonly IProductRepositoty _productRepositoty;
+        private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
 
-        public OrderService(IOrderRepository orderRepository) 
+        public OrderService(IOrderRepository orderRepository, IProductRepositoty productRepositoty, IUserRepository userRepository, IMapper mapper) 
         {
             _orderRepository = orderRepository;
+            _productRepositoty = productRepositoty;
+            _userRepository = userRepository;
+            _mapper = mapper;
+        }
+
+        public async Task<bool> CreateOrder(OrderRequestModel model)
+        {
+            var user = await _userRepository.GetUserByIdAsync(model.UserId);
+            if (user == null) 
+            {
+                throw new Exception("Không tìm thấy user");
+            }
+            var orderModel = new OrderModel()
+            {
+                UserId = user.Id,
+                TotalPrice = model.TotalPrice,
+                Address = model.Address,
+                Note = model.Note,
+                AmountDiscount = model.AmountDiscount,
+                Status = "Đặt Hàng Thành Công",
+                Date = DateTime.Now.AddHours(7),
+                DeliveryStatus = "",
+            };
+            var result = await _orderRepository.AddNewOrder(_mapper.Map<Order>(orderModel));
+            if(result != null)
+            {
+                foreach (var item in model.ProductOrders) 
+                { 
+                    var product = await _productRepositoty.GetProductByIdAsync(item.Id);
+                    if (product != null)
+                    {
+                        var orderDetailModel = new OrderDetailModel()
+                        {
+                            OrderId = result.Id,
+                            Price = product.Price,
+                            ProductId = product.Id,
+                            Quantity = item.Quantity,
+                        };
+                        await _orderRepository.AddNewOrderDetails(_mapper.Map<OrderDetail>(orderDetailModel));
+                    }
+                    else 
+                    {
+                        throw new Exception("Không tìm thấy product có id: " + item.Id);
+                    }
+                }
+            }
+            return true;
         }
     }
 }
