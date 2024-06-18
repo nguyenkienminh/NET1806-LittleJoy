@@ -1,4 +1,5 @@
-﻿using NET1806_LittleJoy.API.ViewModels.RequestModels;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using NET1806_LittleJoy.API.ViewModels.RequestModels;
 using NET1806_LittleJoy.Repository.Entities;
 using NET1806_LittleJoy.Repository.Repositories.Interface;
 using System;
@@ -16,6 +17,11 @@ namespace NET1806_LittleJoy.Repository.Repositories
         public OrderRepository(LittleJoyContext context) 
         {
             _context = context;
+        }
+
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        {
+            return await _context.Database.BeginTransactionAsync();
         }
 
         public async Task<Order> AddNewOrder(Order order)

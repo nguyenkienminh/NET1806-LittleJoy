@@ -20,7 +20,7 @@ namespace NET1806_LittleJoy.Service.Services
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
 
-        public OrderService(IOrderRepository orderRepository, IProductRepositoty productRepositoty, IUserRepository userRepository, IMapper mapper) 
+        public OrderService(IOrderRepository orderRepository, IProductRepositoty productRepositoty, IUserRepository userRepository, IMapper mapper)
         {
             _orderRepository = orderRepository;
             _productRepositoty = productRepositoty;
@@ -30,46 +30,63 @@ namespace NET1806_LittleJoy.Service.Services
 
         public async Task<bool> CreateOrder(OrderRequestModel model)
         {
-            var user = await _userRepository.GetUserByIdAsync(model.UserId);
-            if (user == null) 
+            using (var transaction = await _orderRepository.BeginTransactionAsync())
             {
-                throw new Exception("Không tìm thấy user");
-            }
-            var orderModel = new OrderModel()
-            {
-                UserId = user.Id,
-                TotalPrice = model.TotalPrice,
-                Address = model.Address,
-                Note = model.Note,
-                AmountDiscount = model.AmountDiscount,
-                Status = "Đặt Hàng Thành Công",
-                Date = DateTime.Now.AddHours(7),
-                DeliveryStatus = "",
-            };
-            var result = await _orderRepository.AddNewOrder(_mapper.Map<Order>(orderModel));
-            if(result != null)
-            {
-                foreach (var item in model.ProductOrders) 
-                { 
-                    var product = await _productRepositoty.GetProductByIdAsync(item.Id);
-                    if (product != null)
+                try
+                {
+                    var user = await _userRepository.GetUserByIdAsync(model.UserId);
+                    if (user == null)
                     {
-                        var orderDetailModel = new OrderDetailModel()
+                        throw new Exception("Không tìm thấy user");
+                    }
+                    var orderModel = new OrderModel()
+                    {
+                        UserId = user.Id,
+                        TotalPrice = model.TotalPrice,
+                        Address = model.Address,
+                        Note = model.Note,
+                        AmountDiscount = model.AmountDiscount,
+                        Status = "Đặt Hàng Thành Công",
+                        Date = DateTime.UtcNow.AddHours(7),
+                        DeliveryStatus = "",
+                    };
+                    var result = await _orderRepository.AddNewOrder(_mapper.Map<Order>(orderModel));
+                    if (result != null)
+                    {
+                        foreach (var item in model.ProductOrders)
                         {
-                            OrderId = result.Id,
-                            Price = product.Price,
-                            ProductId = product.Id,
-                            Quantity = item.Quantity,
-                        };
-                        await _orderRepository.AddNewOrderDetails(_mapper.Map<OrderDetail>(orderDetailModel));
+                            var product = await _productRepositoty.GetProductByIdAsync(item.Id);
+
+                            if (product != null)
+                            {
+                                var orderDetailModel = new OrderDetailModel()
+                                {
+                                    OrderId = result.Id,
+                                    Price = product.Price,
+                                    ProductId = product.Id,
+                                    Quantity = item.Quantity,
+                                };
+                                await _orderRepository.AddNewOrderDetails(_mapper.Map<OrderDetail>(orderDetailModel));
+                            }
+                            else
+                            {
+                                throw new Exception("Không tìm thấy product có id: " + item.Id);
+                            }
+                        }
                     }
-                    else 
+                    else
                     {
-                        throw new Exception("Không tìm thấy product có id: " + item.Id);
+                        throw new Exception("Không thể tạo order");
                     }
+                    await transaction.CommitAsync();
+                    return true;
+                }
+                catch (Exception ex) 
+                {
+                    await transaction.RollbackAsync();
+                    throw ex;
                 }
             }
-            return true;
         }
     }
 }
