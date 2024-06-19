@@ -57,8 +57,14 @@ namespace NET1806_LittleJoy.Service.Services
                         {
                             var product = await _productRepositoty.GetProductByIdAsync(item.Id);
 
+                            
+
                             if (product != null)
                             {
+                                product.Quantity -= item.Quantity;
+
+                                await _productRepositoty.UpdateProductAsync();
+
                                 var orderDetailModel = new OrderDetailModel()
                                 {
                                     OrderId = result.Id,
