@@ -33,5 +33,8 @@ namespace NET1806_LittleJoy.Service.Services.Interface
 
         public Task<ICollection<UserModel>> GetUserListHighestScoreAsync();
 
+        public Task<bool> ConfirmEmailAsync(string token);
+
+        public Task<AuthenModel> LoginWithGoogle(string credental);
     }
 }

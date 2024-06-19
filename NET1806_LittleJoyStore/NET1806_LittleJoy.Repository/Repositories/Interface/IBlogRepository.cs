@@ -16,5 +16,6 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
         public Task DeleteBlogAsync(Post blog);
         public Task<Post?> GetBlogByIdAsync(int id);
         public Task<Pagination<Post>> GetListBlogFilterAsync(PaginationParameter paging, BlogFilterModel filter);
+        public Task<List<Post>> GetTopBlog();
     }
 }
