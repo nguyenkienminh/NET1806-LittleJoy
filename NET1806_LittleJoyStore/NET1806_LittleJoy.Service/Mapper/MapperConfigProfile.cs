@@ -36,6 +36,8 @@ namespace NET1806_LittleJoy.Service.Mapper
             CreateMap<OrderModel, Order>().ReverseMap();
 
             CreateMap<OrderDetailModel, OrderDetail>().ReverseMap();
+
+            CreateMap<PaymentModel, Payment>().ReverseMap();
         }
     }
 }

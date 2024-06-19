@@ -10,6 +10,8 @@ namespace NET1806_LittleJoy.Service.BusinessModels
     {
         public int Id { get; set; }
 
+        public int OrderID { get; set; }
+
         public string? Status { get; set; }
 
         public string? Method { get; set; }

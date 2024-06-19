@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NET1806_LittleJoy.Repository.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,8 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
 {
     public interface IPaymentRepository
     {
-        public Task<int> CreateNewPayment();
+        public Task<bool> CreateNewPayment(Payment payment);
+
+        public Task<Payment?> GetPaymentByOrderCode(int orderCode);
     }
 }

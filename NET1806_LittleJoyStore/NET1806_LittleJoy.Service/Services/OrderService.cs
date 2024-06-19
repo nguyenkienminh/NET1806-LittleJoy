@@ -5,6 +5,7 @@ using NET1806_LittleJoy.Repository.Repositories;
 using NET1806_LittleJoy.Repository.Repositories.Interface;
 using NET1806_LittleJoy.Service.BusinessModels;
 using NET1806_LittleJoy.Service.Services.Interface;
+using NET1806_LittleJoy.Service.Ultils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,27 +19,33 @@ namespace NET1806_LittleJoy.Service.Services
         private readonly IOrderRepository _orderRepository;
         private readonly IProductRepositoty _productRepositoty;
         private readonly IUserRepository _userRepository;
+        private readonly IPaymentRepository _paymentRepository;
         private readonly IMapper _mapper;
 
-        public OrderService(IOrderRepository orderRepository, IProductRepositoty productRepositoty, IUserRepository userRepository, IMapper mapper)
+        public OrderService(IOrderRepository orderRepository, IProductRepositoty productRepositoty, IUserRepository userRepository, IPaymentRepository paymentRepository, IMapper mapper)
         {
             _orderRepository = orderRepository;
             _productRepositoty = productRepositoty;
             _userRepository = userRepository;
+            _paymentRepository = paymentRepository;
             _mapper = mapper;
         }
 
         public async Task<bool> CreateOrder(OrderRequestModel model)
         {
+            //dùng transaction
             using (var transaction = await _orderRepository.BeginTransactionAsync())
             {
                 try
                 {
+                    //kiểm tra user
                     var user = await _userRepository.GetUserByIdAsync(model.UserId);
                     if (user == null)
                     {
                         throw new Exception("Không tìm thấy user");
                     }
+
+                    //tạo order add vào database
                     var orderModel = new OrderModel()
                     {
                         UserId = user.Id,
@@ -51,19 +58,43 @@ namespace NET1806_LittleJoy.Service.Services
                         DeliveryStatus = "",
                     };
                     var result = await _orderRepository.AddNewOrder(_mapper.Map<Order>(orderModel));
+
+                    //kiểm tra add order
                     if (result != null)
                     {
+                        //tạo orderCode để add vào payment
+                        var orderCode = 0;
+                        while (true)
+                        {
+                            orderCode = NumberUltils.GenerateNumber(6);
+                            var checkOrderCode = await _paymentRepository.GetPaymentByOrderCode(orderCode);
+                            if (checkOrderCode == null)
+                            {
+                                break;
+                            }
+                        }
+
+                        //add orderCode
+                        var payment = new PaymentModel()
+                        {
+                            OrderID = result.Id,
+                            Code = orderCode,
+                            Method = model.PaymentMethod,
+                            Status = "Đang chờ",
+                        };
+                        await _paymentRepository.CreateNewPayment(_mapper.Map<Payment>(payment));
+
+                        //add orderdetails
                         foreach (var item in model.ProductOrders)
                         {
                             var product = await _productRepositoty.GetProductByIdAsync(item.Id);
 
-                            
-
+                            //kiểm tra product
                             if (product != null)
                             {
                                 product.Quantity -= item.Quantity;
 
-                                await _productRepositoty.UpdateProductAsync();
+                                await _productRepositoty.UpdateProductAsync(product);
 
                                 var orderDetailModel = new OrderDetailModel()
                                 {
