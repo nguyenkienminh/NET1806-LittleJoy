@@ -1,4 +1,5 @@
-﻿using NET1806_LittleJoy.API.ViewModels.RequestModels;
+﻿using Microsoft.AspNetCore.Http;
+using NET1806_LittleJoy.API.ViewModels.RequestModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace NET1806_LittleJoy.Service.Services.Interface
 {
     public interface IOrderService
     {
-        public Task<bool> CreateOrder(OrderRequestModel model);
+        public Task<string> CreateOrder(OrderRequestModel model, HttpContext context);
     }
 }

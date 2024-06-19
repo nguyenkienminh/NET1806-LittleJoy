@@ -163,6 +163,8 @@ namespace NET1806_LittleJoy.API
 
             builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
+            builder.Services.AddScoped<IVNPayService, VNPayService>();
+
             builder.Services.AddTransient<IMailService, MailService>();
 
             var app = builder.Build();

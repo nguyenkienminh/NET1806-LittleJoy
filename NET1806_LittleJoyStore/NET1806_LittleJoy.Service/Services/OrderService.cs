@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using NET1806_LittleJoy.API.ViewModels.RequestModels;
 using NET1806_LittleJoy.Repository.Entities;
 using NET1806_LittleJoy.Repository.Repositories;
@@ -20,18 +21,20 @@ namespace NET1806_LittleJoy.Service.Services
         private readonly IProductRepositoty _productRepositoty;
         private readonly IUserRepository _userRepository;
         private readonly IPaymentRepository _paymentRepository;
+        private readonly IVNPayService _vnpayservice;
         private readonly IMapper _mapper;
 
-        public OrderService(IOrderRepository orderRepository, IProductRepositoty productRepositoty, IUserRepository userRepository, IPaymentRepository paymentRepository, IMapper mapper)
+        public OrderService(IOrderRepository orderRepository, IProductRepositoty productRepositoty, IUserRepository userRepository, IPaymentRepository paymentRepository, IVNPayService vnpayservice, IMapper mapper)
         {
             _orderRepository = orderRepository;
             _productRepositoty = productRepositoty;
             _userRepository = userRepository;
             _paymentRepository = paymentRepository;
+            _vnpayservice = vnpayservice;
             _mapper = mapper;
         }
 
-        public async Task<bool> CreateOrder(OrderRequestModel model)
+        public async Task<string> CreateOrder(OrderRequestModel model, HttpContext context)
         {
             //dùng transaction
             using (var transaction = await _orderRepository.BeginTransactionAsync())
@@ -110,13 +113,14 @@ namespace NET1806_LittleJoy.Service.Services
                                 throw new Exception("Không tìm thấy product có id: " + item.Id);
                             }
                         }
+                        string urlPayment = _vnpayservice.RequestVNPay(orderCode, model.TotalPrice, context);
+                        await transaction.CommitAsync();
+                        return urlPayment;
                     }
                     else
                     {
                         throw new Exception("Không thể tạo order");
                     }
-                    await transaction.CommitAsync();
-                    return true;
                 }
                 catch (Exception ex) 
                 {

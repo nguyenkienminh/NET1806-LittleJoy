@@ -24,7 +24,7 @@ namespace NET1806_LittleJoy.API.Controllers
         {
             try
             {
-                var result = await _orderService.CreateOrder(request);
+                var result = await _orderService.CreateOrder(request, HttpContext);
                 return Ok(result);
             }
             catch (Exception ex)

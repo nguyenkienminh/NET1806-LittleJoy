@@ -4,7 +4,7 @@
     {
         public int UserId { get; set; }
 
-        public int? TotalPrice { get; set; }
+        public int TotalPrice { get; set; }
 
         public string Address { get; set; }
 
