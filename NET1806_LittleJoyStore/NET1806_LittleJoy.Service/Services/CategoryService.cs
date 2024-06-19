@@ -111,12 +111,15 @@ namespace NET1806_LittleJoy.Service.Services
             {
                 return null;
             }
-
-            var updateCate = await _categoryRepo.UpdateCategoryAsync(cateModify, catePlace);
-
-            if (updateCate != null)
+            else
             {
-                return _mapper.Map<CategoryModel>(updateCate);
+                catePlace.CategoryName = cateModify.CategoryName;
+                var updateCate = await _categoryRepo.UpdateCategoryAsync(catePlace);
+
+                if (updateCate != null)
+                {
+                    return _mapper.Map<CategoryModel>(updateCate);
+                }
             }
             return null;
         }

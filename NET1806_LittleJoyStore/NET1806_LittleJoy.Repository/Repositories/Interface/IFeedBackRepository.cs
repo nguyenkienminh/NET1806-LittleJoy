@@ -19,7 +19,7 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
 
         public Task<bool> RemoveFeedBackAsync(Feedback feedback);
 
-        public Task<Feedback> UpdateFeedBackAsync(Feedback feedbackModify, Feedback feedbackPlace);
+        public Task<Feedback> UpdateFeedBackAsync(Feedback feedbackModify);
 
         public Task<Pagination<Feedback>> FeedBackInProductAsync(int productId, PaginationParameter paginationParameter);
 

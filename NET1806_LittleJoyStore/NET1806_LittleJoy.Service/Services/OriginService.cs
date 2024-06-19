@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace NET1806_LittleJoy.Service.Services
 {
-    public  class OriginService : IOriginService
+    public class OriginService : IOriginService
     {
         private readonly IOriginRepository _originRepo;
         private readonly IMapper _mapper;
@@ -56,7 +56,7 @@ namespace NET1806_LittleJoy.Service.Services
 
             return _mapper.Map<OriginModel>(origin);
 
-            
+
         }
 
         public async Task<bool?> AddOriginAsync(OriginModel originModel)
@@ -109,14 +109,16 @@ namespace NET1806_LittleJoy.Service.Services
             {
                 return null;
             }
-
-            var updateOrigin = await _originRepo.UpdateOriginAsync(originModify, originPlace);
-
-            if (updateOrigin != null)
+            else
             {
-                return _mapper.Map<OriginModel>(updateOrigin);
-            }
+                originPlace.OriginName = originModify.OriginName;
+                var updateOrigin = await _originRepo.UpdateOriginAsync(originPlace);
 
+                if (updateOrigin != null)
+                {
+                    return _mapper.Map<OriginModel>(updateOrigin);
+                }
+            }
             return null;
         }
     }

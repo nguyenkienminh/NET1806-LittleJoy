@@ -67,13 +67,12 @@ namespace NET1806_LittleJoy.Repository.Repositories
             return await _context.Products.Where(a => a.AgeId == ageId).ToListAsync();
         }
 
-        public async Task<AgeGroupProduct> UpdateAgeGroupAsync(AgeGroupProduct ageModify, AgeGroupProduct agePlace)
+        public async Task<AgeGroupProduct> UpdateAgeGroupAsync(AgeGroupProduct ageModify)
         {
-            agePlace.Id = ageModify.Id;
-            agePlace.AgeRange = ageModify.AgeRange;
 
+            _context.AgeGroupProducts.Update(ageModify);
             await _context.SaveChangesAsync();
-            return agePlace;
+            return ageModify;
         }
     }
 }

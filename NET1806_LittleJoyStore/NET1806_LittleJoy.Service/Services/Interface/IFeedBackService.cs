@@ -17,7 +17,7 @@ namespace NET1806_LittleJoy.Service.Services.Interface
 
         public Task<bool?> AddFeedBackAsync(FeedBackModel model);
 
-        public Task<bool> RemoveFeedBackByIdAsync(int id);
+        public Task<bool> RemoveFeedBackByIdAsync(int id, int userId);
 
         public Task<FeedBackModel> UpdateFeedBackAsync(FeedBackModel model);
 

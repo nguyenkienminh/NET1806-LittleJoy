@@ -71,19 +71,6 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
         public async Task<Product> UpdateProductAsync(Product productModify)
         {
-            //productPlace.ProductName = productModify.ProductName;
-            //productPlace.Price = productModify.Price;
-            //productPlace.Description = productModify.Description;
-            //productPlace.Weight = productModify.Weight;
-            //productPlace.Quantity = productModify.Quantity;
-            //productPlace.Image = productModify.Image;
-            //productPlace.IsActive = productModify.IsActive;
-            //productPlace.AgeId = productModify.AgeId;
-            //productPlace.OriginId = productModify.OriginId;
-            //productPlace.BrandId = productModify.BrandId;
-            //productPlace.CateId = productModify.CateId;
-            //productPlace.UnsignProductName = productModify.UnsignProductName;
-
             _context.Products.Update(productModify);
 
             await _context.SaveChangesAsync();

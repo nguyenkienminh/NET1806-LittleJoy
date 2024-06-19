@@ -146,11 +146,11 @@ namespace NET1806_LittleJoy.API.Controllers
 
         [HttpDelete]
         //[Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> RemoveFeedBackByIdAsync(int Id)
+        public async Task<IActionResult> RemoveFeedBackByIdAsync(int Id, int UserId)
         {
             try
             {
-                var result = await _service.RemoveFeedBackByIdAsync(Id);
+                var result = await _service.RemoveFeedBackByIdAsync(Id, UserId);
 
                 if (result)
                 {
@@ -189,7 +189,9 @@ namespace NET1806_LittleJoy.API.Controllers
             {
                 FeedBackModel feedBackModel = new FeedBackModel()
                 {
+
                     Id = model.Id,
+                    UserId = model.UserId,
                     Comment = model.Comment,
                     Rating = model.Rating,  
                 };
@@ -201,7 +203,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     return NotFound(new ResponseModels()
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "Can not feedback this Brand"
+                        Message = "Can not update this feedback"
                     });
                 }
 

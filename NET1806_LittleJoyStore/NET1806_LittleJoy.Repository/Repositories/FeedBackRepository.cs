@@ -56,17 +56,12 @@ namespace NET1806_LittleJoy.Repository.Repositories
             return true;
         }
 
-        public async Task<Feedback> UpdateFeedBackAsync(Feedback feedbackModify, Feedback feedbackPlace)
+        public async Task<Feedback> UpdateFeedBackAsync(Feedback feedbackModify)
         {
-            feedbackPlace.Id = feedbackModify.Id;
-            feedbackPlace.UserId = feedbackModify.UserId;
-            feedbackPlace.ProductId = feedbackModify.ProductId;
-            feedbackPlace.Comment = feedbackModify.Comment;
-            feedbackPlace.Rating = feedbackModify.Rating;
-            feedbackPlace.Date =feedbackModify.Date;
-
+            
+            _context.Feedbacks.Update(feedbackModify);
             await _context.SaveChangesAsync();
-            return feedbackPlace;
+            return feedbackModify;
         }
 
         public async Task<Pagination<Feedback>> FeedBackInProductAsync(int productId, PaginationParameter paginationParameter)

@@ -21,6 +21,6 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
 
         public Task<ICollection<Product>> GetProductsByBrandIdAsync(int brandId);
 
-        public Task<Brand> UpdateBrandAsync(Brand brandModify, Brand brandPlace);
+        public Task<Brand> UpdateBrandAsync(Brand brandModify);
     }
 }

@@ -39,7 +39,7 @@ namespace NET1806_LittleJoy.Service.Services
                 Id = b.Id,
                 BrandName = b.BrandName,
                 Logo = b.Logo,
-                BrandDescription = b.BrandDescription,  
+                BrandDescription = b.BrandDescription,
             }).ToList();
 
 
@@ -70,9 +70,9 @@ namespace NET1806_LittleJoy.Service.Services
             try
             {
                 var brandInfo = _mapper.Map<Brand>(brandModel);
-                var item =  await _brandRepository.AddBrandAsync(brandInfo);
-                
-                if(item == null)
+                var item = await _brandRepository.AddBrandAsync(brandInfo);
+
+                if (item == null)
                 {
                     return false;
                 }
@@ -117,13 +117,20 @@ namespace NET1806_LittleJoy.Service.Services
             {
                 return null;
             }
-
-            var updateBrand = await _brandRepository.UpdateBrandAsync(brandModify, brandPlace);
-
-            if (updateBrand != null)
+            else
             {
-                return _mapper.Map<BrandModel>(updateBrand);
+                brandPlace.Id = brandModify.Id;
+                brandPlace.BrandName = brandModify.BrandName;
+                brandPlace.BrandDescription = brandModify.BrandDescription;
+                brandPlace.Logo = brandModify.Logo;
+                var updateBrand = await _brandRepository.UpdateBrandAsync(brandPlace);
+
+                if (updateBrand != null)
+                {
+                    return _mapper.Map<BrandModel>(updateBrand);
+                }
             }
+
             return null;
         }
     }

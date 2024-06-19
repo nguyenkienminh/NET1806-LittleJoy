@@ -112,7 +112,8 @@ namespace NET1806_LittleJoy.Service.Services
 
             else
             {
-                var updateAge = await _ageGroupRepo.UpdateAgeGroupAsync(ageModify, agePlace);
+                agePlace.AgeRange = ageModify.AgeRange;
+                var updateAge = await _ageGroupRepo.UpdateAgeGroupAsync(agePlace);
 
                 if (updateAge != null)
                 {
