@@ -18,11 +18,13 @@ namespace NET1806_LittleJoy.Service.Services
     {
         private readonly IBlogRepository _blogRepository;
         private readonly IMapper _mapper;
+        private readonly IUserRepository _userRepository;
 
-        public BlogService(IBlogRepository blogRepository, IMapper mapper) 
+        public BlogService(IBlogRepository blogRepository, IMapper mapper, IUserRepository userRepository) 
         {
             _blogRepository = blogRepository;
             _mapper = mapper;
+            _userRepository = userRepository;
         }
 
         public async Task<BlogModel> CreateNewBlogAsync(BlogModel model)
@@ -48,7 +50,26 @@ namespace NET1806_LittleJoy.Service.Services
 
         public async Task<Pagination<BlogModel>> GetListBlogFilterAsync(PaginationParameter paging, BlogFilterModel filter)
         {
-            var list = await _blogRepository.GetListBlogFilterAsync(paging, filter);
+            #region
+            var posts = await _blogRepository.GetListPostsAsync();
+            var users = await _userRepository.GetListUserAsync();
+
+            var join = posts.Join(users, p => p.UserId, u => u.Id,
+                (posts, users) => new
+                {
+                    UserId = posts.UserId,
+                    UserName = users.UserName,
+                }).ToList();
+
+            List<UserJoinPost> joinPosts = new List<UserJoinPost>
+                (join.Select(x => new UserJoinPost
+            {
+                    UserId = x.UserId,
+                    UserName = x.UserName,
+            })).ToList();
+            #endregion
+
+            var list = await _blogRepository.GetListBlogFilterAsync(paging, filter, joinPosts);
             if (list == null)
             {
                 return null;

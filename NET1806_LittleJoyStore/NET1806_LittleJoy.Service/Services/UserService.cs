@@ -300,6 +300,18 @@ namespace NET1806_LittleJoy.Service.Services
                     {
                         return false;
                     }
+                    else
+                    {
+                        var listUser = await _userRepository.GetListUserAsync();
+
+                        foreach (var item in listUser)
+                        {
+                            if (item.PhoneNumber.Equals(model.PhoneNumber))
+                            {
+                                return false;
+                            }
+                        }
+                    }
                 }
 
                 if (model.Email != null)
@@ -389,6 +401,18 @@ namespace NET1806_LittleJoy.Service.Services
                 if (StringUtils.IsValidPhoneNumber(userModify.PhoneNumber) == false)
                 {
                     return null;
+                }
+                else
+                {
+                    var listUser = await _userRepository.GetListUserAsync();
+
+                    foreach (var item in listUser)
+                    {
+                        if (item.PhoneNumber.Equals(model.PhoneNumber))
+                        {
+                            return null;
+                        }
+                    }
                 }
             }
             else

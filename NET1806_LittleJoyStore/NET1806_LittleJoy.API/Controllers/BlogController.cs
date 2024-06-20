@@ -16,10 +16,12 @@ namespace NET1806_LittleJoy.API.Controllers
     public class BlogController : ControllerBase
     {
         private readonly IBlogService _blogService;
+        private readonly IUserService _userService;
 
-        public BlogController(IBlogService blogService) 
+        public BlogController(IBlogService blogService, IUserService userService) 
         {
             _blogService = blogService;
+            _userService = userService;
         }
 
         [HttpGet]
@@ -189,7 +191,7 @@ namespace NET1806_LittleJoy.API.Controllers
             }catch(Exception ex)
             {
                 return BadRequest(new ResponseModels
-                {
+                {   
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message,
                 });
@@ -205,7 +207,24 @@ namespace NET1806_LittleJoy.API.Controllers
         {
             try
             {
-                var result = await _blogService.GetListBlogFilterAsync(paging, filter);
+                var model = await _blogService.GetListBlogFilterAsync(paging, filter);
+
+                var result = new Pagination<FilterBlogResponseModel>(
+                    model.Select(a => new FilterBlogResponseModel
+                    {
+                        Id = a.Id,
+                        UserId = a.UserId,
+                        Banner = a.Banner,
+                        Content = a.Content,
+                        Date = a.Date,
+                        Title = a.Title,
+                        UnsignTitle = a.UnsignTitle,
+                        UserName = _userService.GetUserByIdAsync(a.UserId).Result.UserName,
+                    }).ToList(),
+                    model.TotalCount,
+                    model.CurrentPage,
+                    model.PageSize);
+
                 if (result != null)
                 {
                     var metadata = new

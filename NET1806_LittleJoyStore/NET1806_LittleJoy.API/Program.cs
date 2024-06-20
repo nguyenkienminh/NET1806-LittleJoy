@@ -96,27 +96,27 @@ namespace NET1806_LittleJoy.API
 
             // ===================== FOR LOCAL DB =======================
 
-            //builder.Services.AddDbContext<LittleJoyContext>(options =>
-            //{
-            //    options.UseSqlServer(builder.Configuration.GetConnectionString("LittleJoyLocal"));
-            //});
+            builder.Services.AddDbContext<LittleJoyContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("LittleJoyLocal"));
+            });
 
             // ==========================================================
 
             // ===================== FOR AZURE DB =======================
 
-            var connection = String.Empty;
-            if (builder.Environment.IsDevelopment())
-            {
-                connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
-            }
-            else
-            {
-                connection = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
-            }
+            //var connection = String.Empty;
+            //if (builder.Environment.IsDevelopment())
+            //{
+            //    connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
+            //}
+            //else
+            //{
+            //    connection = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
+            //}
 
-            builder.Services.AddDbContext<LittleJoyContext>(options =>
-                    options.UseSqlServer(connection));
+            //builder.Services.AddDbContext<LittleJoyContext>(options =>
+            //        options.UseSqlServer(connection));
 
 
             // ==================== NO EDIT OR REMOVE COMMENT =======================

@@ -10,6 +10,13 @@ namespace NET1806_LittleJoy.Repository.Commons
     {
         public string? search { get; set; }
         public int? sortDate { get; set; }
-        public int? UserId { get; set; }
+        public string? UserName { get; set; }
+    }
+
+    public class UserJoinPost
+    {
+        public int UserId { get; set; }
+
+        public string? UserName { get; set; }
     }
 }
