@@ -12,5 +12,7 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
         public Task<bool> CreateNewPayment(Payment payment);
 
         public Task<Payment?> GetPaymentByOrderCode(int orderCode);
+
+        public Task<Payment> UpdatePayment(Payment payment);
     }
 }

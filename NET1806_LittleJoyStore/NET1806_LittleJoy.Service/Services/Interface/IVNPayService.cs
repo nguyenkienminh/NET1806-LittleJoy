@@ -12,6 +12,6 @@ namespace NET1806_LittleJoy.Service.Services.Interface
     {
         public string RequestVNPay(int orderCode, int price, HttpContext context);
 
-        public Task<bool> ReturnFromVNPay(VNPayModel model);
+        public Task<PaymentModel> ReturnFromVNPay(VNPayModel vnPayResponse);
     }
 }

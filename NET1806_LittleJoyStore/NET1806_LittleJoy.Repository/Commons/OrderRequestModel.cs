@@ -12,7 +12,7 @@
 
         public int? AmountDiscount { get; set; }
 
-        public string PaymentMethod { get; set; }
+        public int PaymentMethod { get; set; }
 
         public List<ProductOrder> ProductOrders { get; set; }
     }

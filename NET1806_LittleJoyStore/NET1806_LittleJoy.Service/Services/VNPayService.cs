@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using NET1806_LittleJoy.Repository.Repositories;
 using NET1806_LittleJoy.Repository.Repositories.Interface;
 using NET1806_LittleJoy.Service.BusinessModels;
 using NET1806_LittleJoy.Service.Services.Interface;
@@ -16,10 +18,16 @@ namespace NET1806_LittleJoy.Service.Services
     public class VNPayService : IVNPayService
     {
         private readonly IOrderRepository _orderRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IPaymentRepository _paymentRepository;
+        private readonly IMapper _mapper;
 
-        public VNPayService(IOrderRepository orderRepository) 
+        public VNPayService(IOrderRepository orderRepository, IUserRepository userRepository ,IPaymentRepository paymentRepository, IMapper mapper) 
         {
             _orderRepository = orderRepository;
+            _userRepository = userRepository;
+            _paymentRepository = paymentRepository;
+            _mapper = mapper;
         }
         public string RequestVNPay(int orderCode, int price, HttpContext context)
         {
@@ -53,7 +61,7 @@ namespace NET1806_LittleJoy.Service.Services
             return paymentUrl;
         }
 
-        public async Task<bool> ReturnFromVNPay(VNPayModel vnPayResponse)
+        public async Task<PaymentModel> ReturnFromVNPay(VNPayModel vnPayResponse)
         {
             IConfiguration _configuration = new ConfigurationBuilder()
                         .SetBasePath(Directory.GetCurrentDirectory())
@@ -77,19 +85,54 @@ namespace NET1806_LittleJoy.Service.Services
 
                 if (validateSignature)
                 {
-                    if(vnPayResponse.vnp_TransactionStatus == "00")
+                    //lấy ordercode từ vnpay respone
+                    int orderCode = 0;
+                    _ = int.TryParse(vnPayResponse.vnp_TxnRef, out orderCode);
+
+                    //lấy payment từ ordercode
+                    var payment = await _paymentRepository.GetPaymentByOrderCode(orderCode);
+
+                    if (vnPayResponse.vnp_TransactionStatus == "00")
                     {
-                        //làm gì đó đúng trong đây
-                        return true;
+                        //cập nhật tình trạng thanh toán
+                        payment.Status = "Thành Công";
+                        var result = await _paymentRepository.UpdatePayment(payment);
+
+                        //lấy order, user
+                        var order = await _orderRepository.GetOrderById(payment.OrderID);
+                        var user = await _userRepository.GetUserByIdAsync(order.UserId);
+                        
+                        if(order.AmountDiscount != 0)
+                        {
+                            //nếu có dùng điểm thì trừ điểm
+                            user.Points -= order.TotalPrice / 1000;
+                        }
+                        else
+                        {
+                            //không dùng thì tích điểm
+                            user.Points += order.TotalPrice / 1000;
+                        }
+                        
+                        await _userRepository.UpdateUserAsync(user);
+
+                        return _mapper.Map<PaymentModel>(result);
                     }
                     else
                     {
-                        //làm gì đó sai trong đây
-                        return false;
+                        payment.Status = "Thất Bại";
+                        var result = await _paymentRepository.UpdatePayment(payment);
+                        return _mapper.Map<PaymentModel>(result);
                     }
                 }
+                else
+                {
+                    throw new Exception("Không đúng signature");
+                }
             }
-            return false;
+            else
+            {
+                throw new Exception("Có lỗi trong quá trình return");
+            }
         }
     }
 }

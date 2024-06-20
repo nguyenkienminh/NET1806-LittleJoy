@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using NET1806_LittleJoy.API.ViewModels.RequestModels;
+using NET1806_LittleJoy.Repository.Commons;
 using NET1806_LittleJoy.Repository.Entities;
 using NET1806_LittleJoy.Repository.Repositories;
 using NET1806_LittleJoy.Repository.Repositories.Interface;
@@ -34,7 +35,7 @@ namespace NET1806_LittleJoy.Service.Services
             _mapper = mapper;
         }
 
-        public async Task<string> CreateOrder(OrderRequestModel model, HttpContext context)
+        public async Task<OrderResponseModel> CreateOrder(OrderRequestModel model, HttpContext context)
         {
             //dùng transaction
             using (var transaction = await _orderRepository.BeginTransactionAsync())
@@ -78,11 +79,26 @@ namespace NET1806_LittleJoy.Service.Services
                         }
 
                         //add orderCode
+                        string method = "";
+                        string urlPayment = "";
+                        if (model.PaymentMethod == 1)
+                        {
+                            method = "COD";
+                        } else if (model.PaymentMethod == 2)
+                        {
+                            method = "VNPAY";
+                            urlPayment = _vnpayservice.RequestVNPay(orderCode, model.TotalPrice, context);
+                        }
+                        else
+                        {
+                            throw new Exception("Vui lòng chọn đúng payment method");
+                        }
+
                         var payment = new PaymentModel()
                         {
                             OrderID = result.Id,
                             Code = orderCode,
-                            Method = model.PaymentMethod,
+                            Method = method,
                             Status = "Đang chờ",
                         };
                         await _paymentRepository.CreateNewPayment(_mapper.Map<Payment>(payment));
@@ -113,9 +129,15 @@ namespace NET1806_LittleJoy.Service.Services
                                 throw new Exception("Không tìm thấy product có id: " + item.Id);
                             }
                         }
-                        string urlPayment = _vnpayservice.RequestVNPay(orderCode, model.TotalPrice, context);
                         await transaction.CommitAsync();
-                        return urlPayment;
+
+                        var response = new OrderResponseModel()
+                        {
+                            OrderCode = orderCode,
+                            UrlPayment = urlPayment,
+                            Message = "Đơn hàng được tạo thành công",
+                        };
+                        return response;
                     }
                     else
                     {

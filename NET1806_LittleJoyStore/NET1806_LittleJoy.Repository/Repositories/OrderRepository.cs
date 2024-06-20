@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using NET1806_LittleJoy.API.ViewModels.RequestModels;
 using NET1806_LittleJoy.Repository.Entities;
 using NET1806_LittleJoy.Repository.Repositories.Interface;
@@ -36,6 +37,11 @@ namespace NET1806_LittleJoy.Repository.Repositories
             _context.OrderDetails.Add(orderDetails);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<Order> GetOrderById(int id)
+        {
+            return await _context.Orders.Where(x => x.Id == id).FirstOrDefaultAsync();
         }
     }
 }

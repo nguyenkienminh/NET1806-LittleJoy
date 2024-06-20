@@ -16,5 +16,7 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
         public Task<bool> AddNewOrderDetails(OrderDetail orderDetails);
 
         public Task<IDbContextTransaction> BeginTransactionAsync();
+
+        public Task<Order> GetOrderById(int id);
     }
 }

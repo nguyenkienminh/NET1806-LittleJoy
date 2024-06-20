@@ -37,7 +37,19 @@ namespace NET1806_LittleJoy.API.Controllers
         [HttpGet("return")]
         public async Task<IActionResult> VNPayReturn([FromQuery] VNPayModel model)
         {
-            return Ok(model);
+            try
+            {
+                var result = await _vnpayservice.ReturnFromVNPay(model);
+                return Ok(result);
+            }
+            catch (Exception ex) 
+            {
+                return BadRequest(new ResponseModels
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message
+                });
+            }
         }
     }
 }

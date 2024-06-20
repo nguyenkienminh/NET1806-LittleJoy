@@ -19,6 +19,9 @@ namespace NET1806_LittleJoy.API.Controllers
             _userService = userService;
         }
 
+        /// <summary>
+        /// Payment Method (1 - COD, 2 - VNPAY)
+        /// </summary>
         [HttpPost]
         public async Task<IActionResult> CreateNewOrder([FromBody] OrderRequestModel request)
         {
