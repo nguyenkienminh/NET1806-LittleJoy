@@ -16,10 +16,12 @@ namespace NET1806_LittleJoy.API.Controllers
     public class FeedBackController : ControllerBase
     {
         private readonly IFeedBackService _service;
+        private readonly IUserService _userService;
 
-        public FeedBackController(IFeedBackService service)
+        public FeedBackController(IFeedBackService service, IUserService userService)
         {
             _service = service;
+            _userService = userService;
         }
 
         [HttpGet]
@@ -28,7 +30,33 @@ namespace NET1806_LittleJoy.API.Controllers
         {
             try
             {
-                var result = await _service.GetAllFeedBackPagingAsync(paginationParameter);
+                var model = await _service.GetAllFeedBackPagingAsync(paginationParameter);
+
+
+                if (model == null)
+                {
+                    return NotFound(new ResponseModels
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "FeedBack is empty"
+                    });
+                }
+
+                var result = new Pagination<FeedBackResponseModel>(
+                    model.Select(f => new FeedBackResponseModel
+                    {
+                        Id = f.Id,
+                        ProductId = f.ProductId,
+                        Comment = f.Comment,
+                        Date = f.Date,
+                        Rating = f.Rating,
+                        UserId = f.UserId,
+                        UserName = _userService.GetUserByIdAsync(f.UserId).Result.Fullname,
+
+                    }).ToList(),
+                    model.TotalCount,
+                    model.CurrentPage,
+                    model.PageSize);
 
                 if (result != null)
                 {
@@ -45,9 +73,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
 
                     return Ok(result);
-
                 }
-
                 else
                 {
                     return NotFound(new ResponseModels
@@ -77,6 +103,8 @@ namespace NET1806_LittleJoy.API.Controllers
             {
                 var detailModel = await _service.GetFeedBackByIdAsync(Id);
 
+
+
                 if (detailModel == null)
                 {
                     return NotFound(new ResponseModels()
@@ -85,7 +113,22 @@ namespace NET1806_LittleJoy.API.Controllers
                         Message = "Feedback does not exist"
                     });
                 }
-                return Ok(detailModel);
+                else
+                {
+                    FeedBackResponseModel result = new FeedBackResponseModel()
+                    {
+                        Id = detailModel.Id,
+                        ProductId = detailModel.ProductId,
+                        Comment = detailModel.Comment,
+                        Date = detailModel.Date,
+                        Rating = detailModel.Rating,
+                        UserId = detailModel.UserId,
+                        UserName = _userService.GetUserByIdAsync(detailModel.UserId).Result.Fullname,
+
+                    };
+                    return Ok(result);
+                }
+
             }
             catch (Exception ex)
             {
@@ -193,7 +236,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     Id = model.Id,
                     UserId = model.UserId,
                     Comment = model.Comment,
-                    Rating = model.Rating,  
+                    Rating = model.Rating,
                 };
 
                 var result = await _service.UpdateFeedBackAsync(feedBackModel);
@@ -261,7 +304,33 @@ namespace NET1806_LittleJoy.API.Controllers
         {
             try
             {
-                var result = await _service.GetFeedBackByProductIdAsync(Id,paginationParameter);
+                var model = await _service.GetFeedBackByProductIdAsync(Id, paginationParameter);
+
+
+                if (model == null)
+                {
+                    return NotFound(new ResponseModels
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "FeedBack is empty"
+                    });
+                }
+
+                var result = new Pagination<FeedBackResponseModel>(
+                    model.Select(f => new FeedBackResponseModel
+                    {
+                        Id = f.Id,
+                        ProductId = f.ProductId,
+                        Comment = f.Comment,
+                        Date = f.Date,
+                        Rating = f.Rating,
+                        UserId = f.UserId,
+                        UserName = _userService.GetUserByIdAsync(f.UserId).Result.Fullname,
+
+                    }).ToList(),
+                    model.TotalCount,
+                    model.CurrentPage,
+                    model.PageSize);
 
                 if (result != null)
                 {
@@ -278,9 +347,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
 
                     return Ok(result);
-
                 }
-
                 else
                 {
                     return NotFound(new ResponseModels

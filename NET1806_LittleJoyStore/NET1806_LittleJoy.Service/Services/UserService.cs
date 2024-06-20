@@ -313,6 +313,19 @@ namespace NET1806_LittleJoy.Service.Services
             return userDetailModel;
         }
 
+        public async Task<UserModel?> GetUserByNameAsync(string name)
+        {
+            var userDetail = await _userRepository.GetUserByUserNameAsync(name);
+            if (userDetail == null)
+            {
+                return null;
+            }
+
+            var userDetailModel = _mapper.Map<UserModel>(userDetail);
+
+            return userDetailModel;
+        }
+
         public async Task<bool?> AddUserAsync(UserModel model, string mainAddress)
         {
             try
