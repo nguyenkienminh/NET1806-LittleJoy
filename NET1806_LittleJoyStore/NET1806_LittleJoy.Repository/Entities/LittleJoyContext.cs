@@ -263,6 +263,7 @@ public partial class LittleJoyContext : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.UnsignName).HasMaxLength(250);
             entity.Property(e => e.ConfirmEmail);
+            entity.Property(e => e.TokenConfirmEmail).HasMaxLength(250);
             entity.HasOne(d => d.Role).WithMany(p => p.Users)
                 .HasForeignKey(d => d.RoleId)
                 .HasConstraintName("FK__User__RoleId__73BA3083");

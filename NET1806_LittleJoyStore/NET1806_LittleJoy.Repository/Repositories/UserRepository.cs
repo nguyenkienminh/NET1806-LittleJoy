@@ -101,6 +101,11 @@ namespace NET1806_LittleJoy.Repository.Repositories
             return result;
         }
 
+        public async Task<User?> GetUserByConfirmToken(string token)
+        {
+            return await _context.Users.SingleOrDefaultAsync(x => x.TokenConfirmEmail == token);
+        }
+
         public async Task<ICollection<User>> GetListUserAsync()
         {
             return await _context.Users.ToListAsync();

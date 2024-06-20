@@ -70,7 +70,7 @@ namespace NET1806_LittleJoy.API.Controllers
 
         [HttpGet("{Id}")]
         //[Authorize(Roles = "STAFF,ADMIN")]
-        public async Task<IActionResult> GetBrandDetailByIdAsync(int Id)
+        public async Task<IActionResult> GetAgeGroupDetailByIdAsync(int Id)
         {
             try
             {

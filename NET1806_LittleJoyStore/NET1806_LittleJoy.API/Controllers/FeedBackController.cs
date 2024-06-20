@@ -255,30 +255,47 @@ namespace NET1806_LittleJoy.API.Controllers
 
         [HttpGet("feed-back-by-product/{Id}")]
         //[Authorize(Roles = "STAFF,ADMIN")]
-        public async Task<IActionResult> GetFeedBackByProductId(int Id)
+        public async Task<IActionResult> GetFeedBackByProductIdAsync([FromQuery] PaginationParameter paginationParameter, int Id)
         {
             try
             {
-                var pointModel = await _service.GetFeedBackByProductIdAsync(Id);
+                var result = await _service.GetFeedBackByProductIdAsync(Id,paginationParameter);
 
-                if (pointModel == null)
+                if (result != null)
                 {
-                    return NotFound(new ResponseModels()
+                    var metadata = new
+                    {
+                        result.TotalCount,
+                        result.PageSize,
+                        result.CurrentPage,
+                        result.TotalPages,
+                        result.HasNext,
+                        result.HasPrevious
+                    };
+
+                    Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+
+                    return Ok(result);
+
+                }
+
+                else
+                {
+                    return NotFound(new ResponseModels
                     {
                         HttpCode = StatusCodes.Status404NotFound,
-                        Message = "Feedback does not exist"
+                        Message = "FeedBack is empty"
                     });
                 }
-                return Ok(pointModel);
             }
             catch (Exception ex)
             {
-
-                return BadRequest(new ResponseModels()
+                var responseModel = new ResponseModels()
                 {
                     HttpCode = StatusCodes.Status400BadRequest,
                     Message = ex.Message.ToString()
-                });
+                };
+                return BadRequest(responseModel);
             }
         }
     }

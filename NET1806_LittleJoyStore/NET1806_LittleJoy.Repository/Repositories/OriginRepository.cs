@@ -40,9 +40,9 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
         public async Task<Origin> AddOriginAsync(Origin origin)
         {
-            _context.Origins.Add(origin);
+                _context.Origins.Add(origin);
 
-            await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
 
             return origin;
         }

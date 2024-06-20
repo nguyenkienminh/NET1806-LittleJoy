@@ -147,11 +147,11 @@ namespace NET1806_LittleJoy.Service.Services
             };
         }
 
-        public async Task<List<FeedBackModel>> GetFeedBackByProductIdAsync(int productId)
+        public async Task<Pagination<FeedBackModel>> GetFeedBackByProductIdAsync(int productId, PaginationParameter paginationParameter)
         {
-            var list = await _feedBackRepo.FeedBackInProductAsync(productId);
+            var list = await _feedBackRepo.FeedBackInProductAsync(productId,paginationParameter);
 
-            if (list == null)
+            if (!list.Any())
             {
                 return null;
             }
@@ -166,7 +166,11 @@ namespace NET1806_LittleJoy.Service.Services
                 Date = f.Date
             }).ToList();
 
-            return listModel;
+
+            return new Pagination<FeedBackModel>(listModel,
+                list.TotalCount,
+                list.CurrentPage,
+                list.PageSize);
         }
     }
 }

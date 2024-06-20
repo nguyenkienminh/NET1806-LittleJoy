@@ -29,6 +29,8 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
 
         public Task<ICollection<User>> GetUserListHighestScoreAsync(Role role);
 
+        public Task<User?> GetUserByConfirmToken(string token);
+
         public Task<ICollection<User>> GetListUserAsync();
     }
 }

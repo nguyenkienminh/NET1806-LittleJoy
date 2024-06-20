@@ -258,5 +258,24 @@ namespace NET1806_LittleJoy.API.Controllers
                 return BadRequest(responseModel);
             }
         }
+
+        [HttpGet("related")]
+        public async Task<IActionResult> GetTopBlog()
+        {
+            try
+            {
+                var result = await _blogService.GetTopBlog();
+                return Ok(result);
+            }
+            catch(Exception ex)
+            {
+                var responseModel = new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(responseModel);
+            }
+        }
     }
 }
