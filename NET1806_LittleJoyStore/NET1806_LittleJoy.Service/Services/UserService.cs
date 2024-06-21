@@ -318,6 +318,16 @@ namespace NET1806_LittleJoy.Service.Services
             try
             {
 
+                if(model.UserName != null)
+                {
+                    var checkUsername = await _userRepository.GetUserByUserNameAsync(model.UserName);
+
+                    if (checkUsername != null)
+                    {
+                        throw new Exception("Tài khoản đã tồn tại");
+                    }
+                }
+                
                 if (model.PhoneNumber != null)
                 {
                     if (StringUtils.IsValidPhoneNumber(model.PhoneNumber) == false)
