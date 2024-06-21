@@ -298,7 +298,7 @@ namespace NET1806_LittleJoy.Service.Services
                 {
                     if (StringUtils.IsValidPhoneNumber(model.PhoneNumber) == false)
                     {
-                        return false;
+                        throw new Exception("Wrong Phone Number Format");
                     }
                     else
                     {
@@ -308,7 +308,7 @@ namespace NET1806_LittleJoy.Service.Services
                         {
                             if (item.PhoneNumber.Equals(model.PhoneNumber))
                             {
-                                return false;
+                                throw new Exception("Phone Number is exist");
                             }
                         }
                     }
@@ -318,7 +318,16 @@ namespace NET1806_LittleJoy.Service.Services
                 {
                     if (StringUtils.IsValidEmail(model.Email) == false)
                     {
-                        return false;
+                        throw new Exception("Wrong Email Format");
+                    }
+                    else
+                    {
+                        var checkEmail = await _userRepository.GetUserByEmailAsync(model.Email);
+                        
+                        if (checkEmail != null)
+                        {
+                            throw new Exception("Account already exists.");
+                        }
                     }
                 }
 
@@ -358,8 +367,8 @@ namespace NET1806_LittleJoy.Service.Services
             }
             catch (Exception ex)
             {
-
-                return false;
+                throw;
+                
             }
         }
 
@@ -400,7 +409,7 @@ namespace NET1806_LittleJoy.Service.Services
             {
                 if (StringUtils.IsValidPhoneNumber(userModify.PhoneNumber) == false)
                 {
-                    return null;
+                    throw new Exception("Wrong Phone Number Format");
                 }
                 else
                 {
@@ -410,7 +419,7 @@ namespace NET1806_LittleJoy.Service.Services
                     {
                         if (item.PhoneNumber.Equals(model.PhoneNumber))
                         {
-                            return null;
+                            throw new Exception("Phone Number is exist");
                         }
                     }
                 }
@@ -496,7 +505,19 @@ namespace NET1806_LittleJoy.Service.Services
             {
                 if (StringUtils.IsValidPhoneNumber(userModify.PhoneNumber) == false)
                 {
-                    return null;
+                    throw new Exception("Wrong Phone Number Format");
+                }
+                else
+                {
+                    var listUser = await _userRepository.GetListUserAsync();
+
+                    foreach (var item in listUser)
+                    {
+                        if (item.PhoneNumber.Equals(model.PhoneNumber))
+                        {
+                            throw new Exception("Phone Number is exist");
+                        }
+                    }
                 }
             }
             else
