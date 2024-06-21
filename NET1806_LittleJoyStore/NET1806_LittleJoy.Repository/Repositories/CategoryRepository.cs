@@ -68,5 +68,10 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
             return cateModify;
         }
+
+        public async Task<ICollection<Category>> GetAllCateAsync()
+        {
+            return await _context.Categories.ToListAsync();
+        }
     }
 }

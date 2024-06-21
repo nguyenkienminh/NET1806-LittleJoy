@@ -69,5 +69,10 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
             return originModify;
         }
+
+        public async Task<ICollection<Origin>> GetAllOriginAsync()
+        {
+            return await _context.Origins.ToListAsync();
+        }
     }
 }

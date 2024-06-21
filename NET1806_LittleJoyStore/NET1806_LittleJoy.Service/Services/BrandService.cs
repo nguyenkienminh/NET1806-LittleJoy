@@ -69,20 +69,38 @@ namespace NET1806_LittleJoy.Service.Services
         {
             try
             {
-                var brandInfo = _mapper.Map<Brand>(brandModel);
-                var item = await _brandRepository.AddBrandAsync(brandInfo);
-
-                if (item == null)
+                if (brandModel.BrandName != null)
                 {
-                    return false;
+
+                    if (brandModel.BrandName.Equals(""))
+                    {
+                        throw new Exception("Không được tạo BrandName trống");
+                    }
+
+                    var listBrand = await _brandRepository.GetAllBrandAsync();
+
+                    foreach (var brand in listBrand)
+                    {
+                        if (brand.BrandName.Equals(brandModel.BrandName))
+                        {
+                            throw new Exception("Không được tạo BrandName trùng lặp");
+                        }
+                    }
+
+                    var brandInfo = _mapper.Map<Brand>(brandModel);
+                    var item = await _brandRepository.AddBrandAsync(brandInfo);
+
+                    if (item == null)
+                    {
+                        return false;
+                    }
                 }
                 return true;
-
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Fail to add Brand {ex.Message}");
-                return false;
+                
+                throw;
             }
         }
 
@@ -109,28 +127,47 @@ namespace NET1806_LittleJoy.Service.Services
 
         public async Task<BrandModel> UpdateBrandAsync(BrandModel brandModel)
         {
-            var brandModify = _mapper.Map<Brand>(brandModel);
 
-            var brandPlace = await _brandRepository.GetBrandByIdAsync(brandModel.Id);
-
-            if (brandPlace == null)
+            if (brandModel.BrandName != null)
             {
-                return null;
-            }
-            else
-            {
-                brandPlace.Id = brandModify.Id;
-                brandPlace.BrandName = brandModify.BrandName;
-                brandPlace.BrandDescription = brandModify.BrandDescription;
-                brandPlace.Logo = brandModify.Logo;
-                var updateBrand = await _brandRepository.UpdateBrandAsync(brandPlace);
 
-                if (updateBrand != null)
+                if (brandModel.BrandName.Equals(""))
                 {
-                    return _mapper.Map<BrandModel>(updateBrand);
+                    throw new Exception("Không được tạo BrandName trống");
+                }
+
+                var listBrand = await _brandRepository.GetAllBrandAsync();
+
+                foreach (var brand in listBrand)
+                {
+                    if (brand.BrandName.Equals(brandModel.BrandName) && brand.Id != brandModel.Id)
+                    {
+                        throw new Exception("Không được thay đổi BrandName trùng lặp");
+                    }
+                }
+
+                var brandModify = _mapper.Map<Brand>(brandModel);
+
+                var brandPlace = await _brandRepository.GetBrandByIdAsync(brandModel.Id);
+
+                if (brandPlace == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    brandPlace.Id = brandModify.Id;
+                    brandPlace.BrandName = brandModify.BrandName;
+                    brandPlace.BrandDescription = brandModify.BrandDescription;
+                    brandPlace.Logo = brandModify.Logo;
+                    var updateBrand = await _brandRepository.UpdateBrandAsync(brandPlace);
+
+                    if (updateBrand != null)
+                    {
+                        return _mapper.Map<BrandModel>(updateBrand);
+                    }
                 }
             }
-
             return null;
         }
     }

@@ -74,5 +74,10 @@ namespace NET1806_LittleJoy.Repository.Repositories
             await _context.SaveChangesAsync();
             return brandModify;
         }
+
+        public async Task<ICollection<Brand>> GetAllBrandAsync()
+        {
+            return await _context.Brands.ToListAsync();
+        }
     }
 }

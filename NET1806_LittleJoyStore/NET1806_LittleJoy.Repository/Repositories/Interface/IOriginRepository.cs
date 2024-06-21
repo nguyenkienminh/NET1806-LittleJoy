@@ -21,5 +21,7 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
         public Task<ICollection<Product>> GetProductsByOriginIdAsync(int originId);
 
         public Task<Origin> UpdateOriginAsync(Origin originModify);
+
+        public Task<ICollection<Origin>> GetAllOriginAsync();
     }
 }

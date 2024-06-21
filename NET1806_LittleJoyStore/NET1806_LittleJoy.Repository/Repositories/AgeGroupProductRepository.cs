@@ -74,5 +74,10 @@ namespace NET1806_LittleJoy.Repository.Repositories
             await _context.SaveChangesAsync();
             return ageModify;
         }
+
+        public async Task<ICollection<AgeGroupProduct>> GetAllAgeGroupAsync()
+        {
+            return await _context.AgeGroupProducts.ToListAsync();
+        }
     }
 }
