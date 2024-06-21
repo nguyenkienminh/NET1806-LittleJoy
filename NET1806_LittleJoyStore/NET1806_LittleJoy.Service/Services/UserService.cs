@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Google.Apis.Auth;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using NET1806_LittleJoy.Repository.Commons;
@@ -61,7 +62,7 @@ namespace NET1806_LittleJoy.Service.Services
                 return new AuthenModel()
                 {
                     HttpCode = 401,
-                    Message = "Account does not exist"
+                    Message = "Tài khoản không tồn tại"
                 };
             }
             else
@@ -69,6 +70,15 @@ namespace NET1806_LittleJoy.Service.Services
                 var checkPassword = PasswordUtils.VerifyPassword(password, user.PasswordHash);
                 if (checkPassword)
                 {
+                    if (!user.ConfirmEmail)
+                    {
+                        return new AuthenModel()
+                        {
+                            HttpCode = 401,
+                            Message = "Tài khoản chưa xác thực email"
+                        };
+                    }
+
                     var accessToken = await GenerateAccessToken(username, user);
                     var refeshToken = GenerateRefreshToken(username);
 
@@ -84,7 +94,7 @@ namespace NET1806_LittleJoy.Service.Services
                     return new AuthenModel()
                     {
                         HttpCode = 400,
-                        Message = "Wrong Password"
+                        Message = "Sai mật khẩu"
                     };
                 }
             }
@@ -129,7 +139,7 @@ namespace NET1806_LittleJoy.Service.Services
                 return new AuthenModel
                 {
                     HttpCode = 401,
-                    Message = "User does not exits."
+                    Message = "Tài khoản không tồn tại"
                 };
             }
             catch (Exception ex)
@@ -144,6 +154,10 @@ namespace NET1806_LittleJoy.Service.Services
             {
                 try
                 {
+                    if (model.UserName.StartsWith("GID_", StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new Exception("Username không được bắt đầu bằng GID_");
+                    }
                     User newUser = new User()
                     {
                         UserName = model.UserName,
@@ -157,11 +171,11 @@ namespace NET1806_LittleJoy.Service.Services
                     var checkUsername = await _userRepository.GetUserByUserNameAsync(newUser.UserName);
                     if (checkEmail != null)
                     {
-                        throw new Exception("Account already exists.");
+                        throw new Exception("Tài khoản đã tồn tại");
                     }
                     else if (checkUsername != null)
                     {
-                        throw new Exception("Username already exists.");
+                        throw new Exception("Tài khoản đã tồn tại");
                     }
 
                     newUser.PasswordHash = PasswordUtils.HashPassword(model.Password);
@@ -172,7 +186,16 @@ namespace NET1806_LittleJoy.Service.Services
                     newUser.ConfirmEmail = false;
                     newUser.Points = 0;
 
+                    newUser.TokenConfirmEmail = Guid.NewGuid().ToString();
+
                     await _userRepository.AddNewUserAsync(newUser);
+
+                    await _mailService.sendEmailAsync(new MailRequest()
+                    {
+                        ToEmail = newUser.Email,
+                        Body = EmailContent.ConfirmEmail(newUser.UserName, newUser.TokenConfirmEmail),
+                        Subject = "[LittleJoy] Confirm Email"
+                    });
 
                     await transaction.CommitAsync();
                     return true;
@@ -191,12 +214,12 @@ namespace NET1806_LittleJoy.Service.Services
 
             if (checkUser == null)
             {
-                throw new Exception("Account does not exist");
+                throw new Exception("Tài khoản không tồn tại");
             }
 
             if (checkUser.GoogleId != null)
             {
-                throw new Exception("Account cannot reset password");
+                throw new Exception("Tài khoản không thể thực hiện điều này");
             }
 
             var otp = await _otpService.AddNewOtp(email);
@@ -224,6 +247,7 @@ namespace NET1806_LittleJoy.Service.Services
                 authClaims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
                 authClaims.Add(new Claim(ClaimTypes.Role, role.RoleName));
                 //authClaims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+                authClaims.Add(new Claim("user_ID", user.Id.ToString()));
             }
             var accessToken = GenerateJWTToken.CreateToken(authClaims, _configuration, DateTime.UtcNow);
             return new JwtSecurityTokenHandler().WriteToken(accessToken);
@@ -566,15 +590,15 @@ namespace NET1806_LittleJoy.Service.Services
 
                 if (result == true)
                 {
-                    return "Add Password Success";
+                    return "Thêm mật khẩu thành công";
                 }
                 else
                 {
-                    return "Add Failed";
+                    return "Thêm mật khẩu không thành công";
                 }
             }
 
-            return "Password Incorrect";
+            return "Mật khẩu không đúng";
 
         }
 
@@ -602,6 +626,109 @@ namespace NET1806_LittleJoy.Service.Services
             }).ToList();
 
             return listUserModel;
+        }
+
+        public async Task<bool> ConfirmEmailAsync(string token)
+        {
+            var user = await _userRepository.GetUserByConfirmToken(token);
+            if (user == null)
+            {
+                return false;
+            }
+            user.ConfirmEmail = true;
+            user.TokenConfirmEmail = "";
+            await _userRepository.UpdateUserAsync(user);
+            await _mailService.sendEmailAsync(new MailRequest
+            {
+                ToEmail = user.Email,
+                Subject = "[LittleJoy] Welcome to Little Joy Store",
+                Body = EmailContent.WelcomeEmail(user.UserName)
+            });
+            return true;
+        }
+
+        public async Task<AuthenModel> LoginWithGoogle(string credental)
+        {
+            string cliendId = _configuration["GoogleCredential:ClientId"];
+            var settings = new GoogleJsonWebSignature.ValidationSettings()
+            {
+                Audience = new List<string> { cliendId }
+            };
+            var payload = await GoogleJsonWebSignature.ValidateAsync(credental, settings);
+
+            if (payload == null)
+            {
+                throw new Exception("Credental không hợp lệ");
+            }
+
+            var existUser = await _userRepository.GetUserByEmailAsync(payload.Email);
+
+            //nếu có user
+            if (existUser != null)
+            {
+                if (existUser.Status == false)
+                {
+                    throw new Exception("Tài khoản đã bị cấm");
+                }
+                var accessToken = await GenerateAccessToken(existUser.Email, existUser);
+                var refreshToken = GenerateRefreshToken(existUser.Email);
+
+                return new AuthenModel()
+                {
+                    HttpCode = 200,
+                    Message = "Login Google thành công",
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken
+                };
+            }
+            else
+            {
+                //create new user
+                using (var transaction = await _userRepository.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        User user = new User()
+                        {
+                            Email = payload.Email,
+                            Avatar = payload.Picture,
+                            Fullname = payload.Name,
+                            UserName = "GID_" + payload.Email.Split("@")[0],
+                            Status = true,
+                            ConfirmEmail = true,
+                            RoleId = 1,
+                            GoogleId = payload.JwtId,
+                            Points = 0,
+                            UnsignName = StringUtils.ConvertToUnSign(payload.Name)
+                        };
+                        await _userRepository.AddNewUserAsync(user);
+                        await transaction.CommitAsync();
+
+                        var accessToken = await GenerateAccessToken(user.Email, user);
+                        var refreshToken = GenerateRefreshToken(user.Email);
+
+                        await _mailService.sendEmailAsync(new MailRequest
+                        {
+                            ToEmail = user.Email,
+                            Subject = "[LittleJoy] Welcome to Little Joy Store",
+                            Body = EmailContent.WelcomeEmail(user.UserName)
+                        });
+
+                        return new AuthenModel()
+                        {
+                            HttpCode = 200,
+                            Message = "Login with Google sucessfully",
+                            AccessToken = accessToken,
+                            RefreshToken = refreshToken
+                        };
+                    }
+                    catch
+                    {
+                        await transaction.RollbackAsync();
+                        throw;
+                    }
+                }
+            }
         }
     }
 }

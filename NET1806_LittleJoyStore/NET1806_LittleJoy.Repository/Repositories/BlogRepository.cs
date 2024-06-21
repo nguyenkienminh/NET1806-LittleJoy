@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace NET1806_LittleJoy.Repository.Repositories
 {
@@ -42,7 +43,7 @@ namespace NET1806_LittleJoy.Repository.Repositories
         public async Task<Pagination<Post>> GetListBlogAsync(PaginationParameter paginationParameter)
         {
             var itemCount = await _context.Posts.CountAsync();
-            var items = await _context.Posts.Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
+            var items = await _context.Posts.OrderByDescending(x => x.Id).Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
                 .Take(paginationParameter.PageSize)
                 .AsNoTracking().ToListAsync();
             var result = new Pagination<Post>(items, itemCount, paginationParameter.PageIndex, paginationParameter.PageSize);
@@ -121,6 +122,12 @@ namespace NET1806_LittleJoy.Repository.Repositories
             _context.Posts.Update(blog);
             await _context.SaveChangesAsync();
             return blog;
+        }
+
+        public async Task<List<Post>> GetTopBlog()
+        {
+            var list = _context.Posts.OrderByDescending(x => x.Id).Take(3);
+            return await list.ToListAsync();
         }
 
         public async Task<ICollection<Post>> GetListPostsAsync()

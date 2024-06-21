@@ -139,5 +139,11 @@ namespace NET1806_LittleJoy.Service.Services
                 return _mapper.Map<BlogModel>(result);
             }
         }
+
+        public async Task<List<BlogModel>> GetTopBlog()
+        {
+            var result = await _blogRepository.GetTopBlog();
+            return _mapper.Map<List<BlogModel>>(result);
+        }
     }
 }
