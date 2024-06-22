@@ -20,9 +20,9 @@ namespace NET1806_LittleJoy.Service.Services
     {
         private readonly IProductRepositoty _productRepository;
         private readonly IMapper _mapper;
-        private readonly IFeedBackService _feedBack;
+        private readonly IFeedBackRepository _feedBack;
 
-        public ProductService(IProductRepositoty productRepository, IMapper mapper, IFeedBackService feedBack)
+        public ProductService(IProductRepositoty productRepository, IMapper mapper, IFeedBackRepository feedBack)
         {
             _productRepository = productRepository;
             _mapper = mapper;
@@ -53,7 +53,7 @@ namespace NET1806_LittleJoy.Service.Services
                 OriginId = p.OriginId,
                 BrandId = p.BrandId,
                 UnsignProductName = p.UnsignProductName, 
-                RatingAver = _feedBack.AverageFeedBackInProduct(p.Id).Result
+                RatingAver = _feedBack.AverageRatingAsync(p.Id).Result
             }).ToList();
 
 
@@ -73,7 +73,7 @@ namespace NET1806_LittleJoy.Service.Services
             }
 
             var productModelInfo = _mapper.Map<ProductModel>(productDetail);
-            productModelInfo.RatingAver = await _feedBack.AverageFeedBackInProduct(productModelInfo.Id);
+            productModelInfo.RatingAver = await _feedBack.AverageRatingAsync(productModelInfo.Id);
             return productModelInfo;
            
         }
@@ -174,7 +174,7 @@ namespace NET1806_LittleJoy.Service.Services
                 OriginId = p.OriginId,
                 BrandId = p.BrandId,
                 UnsignProductName = p.UnsignProductName,
-                RatingAver = _feedBack.AverageFeedBackInProduct(p.Id).Result
+                RatingAver = _feedBack.AverageRatingAsync(p.Id).Result
             }).ToList();
 
 

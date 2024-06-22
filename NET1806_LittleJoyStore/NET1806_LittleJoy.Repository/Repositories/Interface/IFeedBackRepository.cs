@@ -24,5 +24,7 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
         public Task<Pagination<Feedback>> FeedBackInProductAsync(int productId, PaginationParameter paginationParameter);
 
         public Task<double> AverageRatingAsync(int productId);
+
+        public Task<int> CountFeedBackByProductAsync(int Id);
     }
 }

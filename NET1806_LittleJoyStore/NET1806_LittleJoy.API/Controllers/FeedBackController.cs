@@ -367,5 +367,35 @@ namespace NET1806_LittleJoy.API.Controllers
                 return BadRequest(responseModel);
             }
         }
+
+
+        [HttpGet("count-feedback-by-product/{Id}")]
+        //[Authorize(Roles = "STAFF,ADMIN")]
+        public async Task<IActionResult> CountFeedBackByProductIdAsync(int Id)
+        {
+            try
+            {
+                var count = await _service.CountFeedBackByProductAsync(Id);
+
+                if (count == 0)
+                {
+                    return NotFound(new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "Feedback không tồn tại"
+                    });
+                }
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                });
+            }
+        }
     }
 }

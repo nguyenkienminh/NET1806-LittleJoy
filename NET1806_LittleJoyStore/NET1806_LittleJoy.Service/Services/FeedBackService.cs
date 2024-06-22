@@ -18,12 +18,14 @@ namespace NET1806_LittleJoy.Service.Services
         private readonly IFeedBackRepository _feedBackRepo;
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
+        private readonly IProductRepositoty _productRepositoty;
 
-        public FeedBackService(IFeedBackRepository feedBackRepo, IMapper mapper, IUserService userService)
+        public FeedBackService(IFeedBackRepository feedBackRepo, IMapper mapper, IUserService userService, IProductRepositoty productRepositoty)
         {
             _feedBackRepo = feedBackRepo;
             _mapper = mapper;
             _userService = userService;
+            _productRepositoty = productRepositoty;
         }
 
         public async Task<Pagination<FeedBackModel>> GetAllFeedBackPagingAsync(PaginationParameter paginationParameter)
@@ -212,6 +214,26 @@ namespace NET1806_LittleJoy.Service.Services
                 list.TotalCount,
                 list.CurrentPage,
                 list.PageSize);
+        }
+
+        public async Task<int> CountFeedBackByProductAsync(int Id)
+        {
+            try
+            {
+                var item = await _productRepositoty.GetProductByIdAsync(Id);
+
+                if (item == null)
+                {
+                    throw new Exception("Product không tồn tại");
+                }
+
+                return await _feedBackRepo.CountFeedBackByProductAsync(Id);
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }

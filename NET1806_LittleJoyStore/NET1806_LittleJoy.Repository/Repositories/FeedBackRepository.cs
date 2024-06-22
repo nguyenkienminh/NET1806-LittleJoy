@@ -95,5 +95,10 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
             return Math.Round( (double) total/count);
         }
+
+        public async Task<int> CountFeedBackByProductAsync(int Id)
+        {
+            return await _context.Feedbacks.CountAsync(p => p.ProductId == Id);
+        }
     }
 }
