@@ -35,6 +35,8 @@ namespace NET1806_LittleJoy.Service.BusinessModels
 
         public string? UnsignProductName { get; set; }
 
+        public double? RatingAver { get; set; }
+
         //public virtual AgeGroupProduct? Age { get; set; }
 
         //public virtual Brand? Brand { get; set; }
