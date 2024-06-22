@@ -22,7 +22,7 @@ namespace NET1806_LittleJoy.Service.Services
         private readonly IProductRepositoty _productRepositoty;
         private readonly IUserRepository _userRepository;
         private readonly IPaymentRepository _paymentRepository;
-        private readonly IVNPayService _vnpayservice;
+        private readonly IPointsMoneyRepository _pointsMoneyRepository;
         private readonly IMapper _mapper;
 
         public OrderService(IOrderRepository orderRepository, IProductRepositoty productRepositoty, IUserRepository userRepository, IPaymentRepository paymentRepository, IVNPayService vnpayservice, IMapper mapper)
@@ -31,7 +31,7 @@ namespace NET1806_LittleJoy.Service.Services
             _productRepositoty = productRepositoty;
             _userRepository = userRepository;
             _paymentRepository = paymentRepository;
-            _vnpayservice = vnpayservice;
+            _pointsMoneyRepository = pointsMoneyRepository;
             _mapper = mapper;
         }
 

@@ -22,7 +22,7 @@ namespace NET1806_LittleJoy.API.Controllers
         /// <summary>
         /// Payment Method (1 - COD, 2 - VNPAY)
         /// </summary>
-        [HttpPost]
+        [HttpPost("create-order")]
         public async Task<IActionResult> CreateNewOrder([FromBody] OrderRequestModel request)
         {
             try
@@ -40,5 +40,22 @@ namespace NET1806_LittleJoy.API.Controllers
                 return BadRequest(responseModel);
             }
         }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateOrder([FromBody] OrderRequestModel request)
+        {
+            try
+            {
+                return Ok();
+            }
+            catch (Exception ex) 
+            {
+                var responseModel = new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(responseModel);
+            }
     }
 }

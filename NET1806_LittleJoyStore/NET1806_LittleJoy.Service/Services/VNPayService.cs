@@ -20,13 +20,15 @@ namespace NET1806_LittleJoy.Service.Services
         private readonly IOrderRepository _orderRepository;
         private readonly IUserRepository _userRepository;
         private readonly IPaymentRepository _paymentRepository;
+        private readonly IPointsMoneyRepository _pointsMoneyRepository;
         private readonly IMapper _mapper;
 
-        public VNPayService(IOrderRepository orderRepository, IUserRepository userRepository ,IPaymentRepository paymentRepository, IMapper mapper) 
+        public VNPayService(IOrderRepository orderRepository, IUserRepository userRepository, IPointsMoneyRepository pointsMoneyRepository, IPaymentRepository paymentRepository, IMapper mapper) 
         {
             _orderRepository = orderRepository;
             _userRepository = userRepository;
             _paymentRepository = paymentRepository;
+            _pointsMoneyRepository = pointsMoneyRepository;
             _mapper = mapper;
         }
         public string RequestVNPay(int orderCode, int price, HttpContext context)
@@ -105,13 +107,11 @@ namespace NET1806_LittleJoy.Service.Services
                         if(order.AmountDiscount != 0)
                         {
                             //nếu có dùng điểm thì trừ điểm
-                            user.Points -= order.TotalPrice / 1000;
+                            var points = await _pointsMoneyRepository.GetPointsByMoneyDiscount(order.AmountDiscount);
+                            user.Points -= points.MinPoints;
                         }
-                        else
-                        {
-                            //không dùng thì tích điểm
-                            user.Points += order.TotalPrice / 1000;
-                        }
+
+                        user.Points += order.TotalPrice / 1000;
                         
                         await _userRepository.UpdateUserAsync(user);
 
