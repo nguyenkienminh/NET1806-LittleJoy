@@ -325,50 +325,50 @@ namespace NET1806_LittleJoy.API.Controllers
         [HttpPut("change-password")]
         public async Task<IActionResult> ChangePasswordUserRoleAsync([FromBody] UpdatePasswordUserRequestModel request)
         {
-            if (ModelState.IsValid)
+            try
             {
-
-                ChangePasswordModel model = new ChangePasswordModel()
+                if (ModelState.IsValid)
                 {
-                    Id = request.Id,
-                    OldPassword = request.OldPassword,
-                    NewPassword = request.NewPassword,
-                    ConfirmPassword = request.ConfirmPassword
-                };
 
-                var result = await _service.ChangePasswordUserRoleAsync(model);
-
-                if (result == "Add Password Success")
-                {
-                    var resp = new ResponseModels()
+                    ChangePasswordModel model = new ChangePasswordModel()
                     {
-                        HttpCode = StatusCodes.Status200OK,
-                        Message = "Đổi mật khẩu thành công",
+                        Id = request.Id,
+                        OldPassword = request.OldPassword,
+                        NewPassword = request.NewPassword,
+                        ConfirmPassword = request.ConfirmPassword
                     };
-                    return Ok(resp);
-                }
 
-                else if(result == "Password Incorrect")
-                {
-                    var resp = new ResponseModels()
-                    {
-                        HttpCode = StatusCodes.Status400BadRequest,
-                        Message = "Mật khẩu không đúng",
-                    };
-                    return BadRequest(resp);
-                }
+                    var result = await _service.ChangePasswordUserRoleAsync(model);
 
-                else if (result == "Add Failed")
-                {
-                    var resp = new ResponseModels()
+                    if (result == true)
                     {
-                        HttpCode = StatusCodes.Status400BadRequest,
-                        Message = "Đổi mật khẩu thất bại",
-                    };
-                    return BadRequest(resp);
+                        var resp = new ResponseModels()
+                        {
+                            HttpCode = StatusCodes.Status200OK,
+                            Message = "Đổi mật khẩu thành công",
+                        };
+                        return Ok(resp);
+                    }
+
+                    else if (result == false)
+                    {
+                        var resp = new ResponseModels()
+                        {
+                            HttpCode = StatusCodes.Status400BadRequest,
+                            Message = "Mật khẩu không đúng",
+                        };
+                        return BadRequest(resp);
+                    }
                 }
+                return ValidationProblem(ModelState);
+            } catch (Exception ex)
+            {
+                return BadRequest(new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                });
             }
-            return ValidationProblem(ModelState);
         }
 
 
