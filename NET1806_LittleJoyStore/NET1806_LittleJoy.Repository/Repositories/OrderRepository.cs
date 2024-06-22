@@ -43,5 +43,12 @@ namespace NET1806_LittleJoy.Repository.Repositories
         {
             return await _context.Orders.Where(x => x.Id == id).FirstOrDefaultAsync();
         }
+
+        public async Task<bool> UpdateOrder(Order order)
+        {
+            _context.Orders.Update(order);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

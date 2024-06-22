@@ -22,6 +22,7 @@ namespace NET1806_LittleJoy.Service.Services
         private readonly IProductRepositoty _productRepositoty;
         private readonly IUserRepository _userRepository;
         private readonly IPaymentRepository _paymentRepository;
+        private readonly IVNPayService _vnpayservice;
         private readonly IPointsMoneyRepository _pointsMoneyRepository;
         private readonly IMapper _mapper;
 
@@ -31,7 +32,7 @@ namespace NET1806_LittleJoy.Service.Services
             _productRepositoty = productRepositoty;
             _userRepository = userRepository;
             _paymentRepository = paymentRepository;
-            _pointsMoneyRepository = pointsMoneyRepository;
+            _vnpayservice = vnpayservice;
             _mapper = mapper;
         }
 
@@ -57,7 +58,7 @@ namespace NET1806_LittleJoy.Service.Services
                         Address = model.Address,
                         Note = model.Note,
                         AmountDiscount = model.AmountDiscount,
-                        Status = "Đặt Hàng Thành Công",
+                        Status = "Đang Chờ",
                         Date = DateTime.UtcNow.AddHours(7),
                         DeliveryStatus = "",
                     };

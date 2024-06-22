@@ -13,7 +13,7 @@ namespace NET1806_LittleJoy.API.Controllers
         private readonly IOrderService _orderService;
         private readonly IUserService _userService;
 
-        public OrderController(IOrderService orderService, IUserService userService) 
+        public OrderController(IOrderService orderService, IUserService userService)
         {
             _orderService = orderService;
             _userService = userService;
@@ -48,7 +48,7 @@ namespace NET1806_LittleJoy.API.Controllers
             {
                 return Ok();
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 var responseModel = new ResponseModels()
                 {
@@ -57,5 +57,6 @@ namespace NET1806_LittleJoy.API.Controllers
                 };
                 return BadRequest(responseModel);
             }
+        }
     }
 }

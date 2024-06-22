@@ -93,17 +93,21 @@ namespace NET1806_LittleJoy.Service.Services
 
                     //lấy payment từ ordercode
                     var payment = await _paymentRepository.GetPaymentByOrderCode(orderCode);
-
+                    var order = await _orderRepository.GetOrderById(payment.OrderID);
                     if (vnPayResponse.vnp_TransactionStatus == "00")
                     {
                         //cập nhật tình trạng thanh toán
                         payment.Status = "Thành Công";
                         var result = await _paymentRepository.UpdatePayment(payment);
 
-                        //lấy order, user
-                        var order = await _orderRepository.GetOrderById(payment.OrderID);
-                        var user = await _userRepository.GetUserByIdAsync(order.UserId);
+                        //update trạng thái order
                         
+                        order.Status = "Đặt Hàng Thành Công";
+                        order.DeliveryStatus = "Đang Chờ";
+                        await _orderRepository.UpdateOrder(order);
+
+                        //lấy user để cộng, trừ điểm theo order
+                        var user = await _userRepository.GetUserByIdAsync(order.UserId);
                         if(order.AmountDiscount != 0)
                         {
                             //nếu có dùng điểm thì trừ điểm
@@ -111,16 +115,22 @@ namespace NET1806_LittleJoy.Service.Services
                             user.Points -= points.MinPoints;
                         }
 
+                        //cộng điểm theo đơn hàng
                         user.Points += order.TotalPrice / 1000;
                         
+                        //update user
                         await _userRepository.UpdateUserAsync(user);
-
                         return _mapper.Map<PaymentModel>(result);
                     }
                     else
                     {
+                        //update payment
                         payment.Status = "Thất Bại";
                         var result = await _paymentRepository.UpdatePayment(payment);
+
+                        //update order
+                        order.Status = "Thất Bại";
+                        await _orderRepository.UpdateOrder(order);
                         return _mapper.Map<PaymentModel>(result);
                     }
                 }
