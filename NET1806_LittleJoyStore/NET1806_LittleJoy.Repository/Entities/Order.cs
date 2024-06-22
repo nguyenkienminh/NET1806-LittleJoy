@@ -21,8 +21,6 @@ public partial class Order
 
     public DateTime? Date { get; set; }
 
-    public int? PaymentId { get; set; }
-
     public string? DeliveryStatus { get; set; }
 
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();

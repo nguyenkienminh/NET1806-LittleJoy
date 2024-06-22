@@ -7,7 +7,7 @@ public partial class Payment
 {
     public int Id { get; set; }
 
-    public int? OrderId { get; set; }
+    public int OrderID { get; set; }
 
     public string? Status { get; set; }
 
@@ -15,5 +15,5 @@ public partial class Payment
 
     public int? Code { get; set; }
 
-    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+    public virtual Order Order { get; set; }
 }
