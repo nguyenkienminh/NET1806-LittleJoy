@@ -420,6 +420,12 @@ namespace NET1806_LittleJoy.Service.Services
 
         public async Task<UserModel> UpdateUserAsync(UserModel model, string mainAddress)
         {
+
+            if(model.RoleId == null)
+            {
+                return null;
+            }
+
             var userModify = _mapper.Map<User>(model);
 
             var userPlace = await _userRepository.GetUserByIdAsync(userModify.Id);
@@ -522,7 +528,7 @@ namespace NET1806_LittleJoy.Service.Services
 
             if (userPlace == null)
             {
-                return null;
+                throw new Exception("Tài khoản không tồn tại");
             }
 
             if (userModify.Fullname != "".Trim() && userModify.Fullname != null)
@@ -565,6 +571,8 @@ namespace NET1806_LittleJoy.Service.Services
             }
 
             userModify.Status = userPlace.Status;
+            var Role = _roleRepository.GetRoleByNameAsync("USER");
+            userModify.RoleId = Role.Id;
 
             var updateUser = await _userRepository.UpdateUserAsync(userModify, userPlace);
 
