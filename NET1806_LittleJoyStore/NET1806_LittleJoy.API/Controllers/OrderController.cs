@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using NET1806_LittleJoy.API.ViewModels.RequestModels;
 using NET1806_LittleJoy.API.ViewModels.ResponeModels;
+using NET1806_LittleJoy.Repository.Commons;
 using NET1806_LittleJoy.Service.Services.Interface;
+using Newtonsoft.Json;
 
 namespace NET1806_LittleJoy.API.Controllers
 {
@@ -41,12 +43,34 @@ namespace NET1806_LittleJoy.API.Controllers
             }
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateOrder([FromBody] OrderRequestModel request)
+        [HttpGet("get-orders/{id}")]
+        public async Task<IActionResult> GetOrderByUserId([FromQuery]PaginationParameter paginationParameter, int id)
         {
             try
             {
-                return Ok();
+                var result = await _orderService.GetOrderByUserId(paginationParameter, id);
+                if (result != null)
+                {
+                    var metadata = new
+                    {
+                        result.TotalCount,
+                        result.PageSize,
+                        result.CurrentPage,
+                        result.TotalPages,
+                        result.HasNext,
+                        result.HasPrevious
+                    };
+                    Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+                    return Ok(result);
+                }
+                else
+                {
+                    return NotFound(new ResponseModels
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "Order is empty"
+                    });
+                }
             }
             catch (Exception ex)
             {

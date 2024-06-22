@@ -31,6 +31,11 @@ namespace NET1806_LittleJoy.Repository.Repositories
             return result;
         }
 
+        public async Task<Payment> GetPaymentByOrderId(int orderId)
+        {
+            return await _context.Payments.Where(x => x.OrderID == orderId).FirstOrDefaultAsync();
+        }
+
         public async Task<Payment> UpdatePayment(Payment payment)
         {
             _context.Payments.Update(payment);

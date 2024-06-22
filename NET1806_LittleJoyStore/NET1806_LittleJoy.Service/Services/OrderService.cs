@@ -8,6 +8,7 @@ using NET1806_LittleJoy.Repository.Repositories.Interface;
 using NET1806_LittleJoy.Service.BusinessModels;
 using NET1806_LittleJoy.Service.Services.Interface;
 using NET1806_LittleJoy.Service.Ultils;
+using Org.BouncyCastle.Crypto.Engines;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -119,7 +120,7 @@ namespace NET1806_LittleJoy.Service.Services
                                 var orderDetailModel = new OrderDetailModel()
                                 {
                                     OrderId = result.Id,
-                                    Price = product.Price,
+                                    Price = product.Price * item.Quantity,
                                     ProductId = product.Id,
                                     Quantity = item.Quantity,
                                 };
@@ -151,6 +152,53 @@ namespace NET1806_LittleJoy.Service.Services
                     throw ex;
                 }
             }
+        }
+
+        public async Task<Pagination<OrderWithDetailsModel>> GetOrderByUserId(PaginationParameter parameter, int userId)
+        {
+            //lấy list order
+            var list = await _orderRepository.GetOrderByUserId(parameter, userId);
+
+            //chuyen thanh list order with details
+            var result = list.Select(x => new OrderWithDetailsModel()
+            {
+                Id = x.Id,
+                Address = x.Address,
+                AmountDiscount = x.AmountDiscount,
+                Note = x.Note,
+                TotalPrice = (int)x.TotalPrice,
+                UserId = userId,
+                DeliveryStatus = x.DeliveryStatus,
+                Status = x.Status
+            }).ToList();
+
+            //lay tung order gan them thanh phan
+            foreach (var item in result) 
+            {
+                //lay payment gan vao order
+                var payment = await _paymentRepository.GetPaymentByOrderId(item.Id);
+                item.PaymentMethod = payment.Method;
+                item.PaymentStatus = payment.Status;
+                item.OrderCode = (int)payment.Code;
+
+                //gan order details vo
+                var listDetails = await _orderRepository.GetOrderDetailsByOrderId(item.Id);
+                List<OrderProductModel> listProductDetails = new List<OrderProductModel>();
+                foreach (var item1 in listDetails)
+                {
+                    var product = await _productRepositoty.GetProductByIdAsync((int)item1.ProductId);
+                    listProductDetails.Add(new OrderProductModel()
+                    {
+                        Id = product.Id,
+                        ProductName = product.ProductName,
+                        Price = (int)item1.Price,
+                        Quantity = (int)item1.Quantity,
+                    });
+                }
+                item.ProductOrders = listProductDetails;
+            }
+
+            return new Pagination<OrderWithDetailsModel>(result, list.TotalCount, list.CurrentPage, list.PageSize);
         }
     }
 }

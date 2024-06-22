@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
 using NET1806_LittleJoy.API.ViewModels.RequestModels;
+using NET1806_LittleJoy.Repository.Commons;
 using NET1806_LittleJoy.Repository.Entities;
 using System;
 using System.Collections.Generic;
@@ -20,5 +21,9 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
         public Task<Order> GetOrderById(int id);
 
         public Task<bool> UpdateOrder(Order order);
+
+        public Task<Pagination<Order>> GetOrderByUserId(PaginationParameter parameter ,int userId);
+
+        public Task<List<OrderDetail>> GetOrderDetailsByOrderId(int orderId);
     }
 }
