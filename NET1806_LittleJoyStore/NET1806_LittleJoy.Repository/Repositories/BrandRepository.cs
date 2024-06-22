@@ -67,15 +67,17 @@ namespace NET1806_LittleJoy.Repository.Repositories
             return await _context.Products.Where(pb => pb.BrandId == id).ToListAsync();
         }
 
-        public async Task<Brand> UpdateBrandAsync(Brand brandModify, Brand brandPlace)
+        public async Task<Brand> UpdateBrandAsync(Brand brandModify)
         {
-            brandPlace.Id = brandModify.Id;
-            brandPlace.BrandName = brandModify.BrandName;
-            brandPlace.BrandDescription = brandModify.BrandDescription;
-            brandPlace.Logo = brandModify.Logo;
-
+            
+            _context.Brands.Update(brandModify);
             await _context.SaveChangesAsync();
-            return brandPlace;
+            return brandModify;
+        }
+
+        public async Task<ICollection<Brand>> GetAllBrandAsync()
+        {
+            return await _context.Brands.ToListAsync();
         }
     }
 }

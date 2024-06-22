@@ -51,38 +51,69 @@ namespace NET1806_LittleJoy.Repository.Repositories
             return result;
         }
 
-        public async Task<Pagination<Post>> GetListBlogFilterAsync(PaginationParameter paging, BlogFilterModel filter)
+        public async Task<Pagination<Post>> GetListBlogFilterAsync(PaginationParameter paging, BlogFilterModel filter, List<UserJoinPost> joinPosts)
         {
-            var query = _context.Posts.AsQueryable();
+            var query = _context.Posts.AsQueryable(); 
+            var other = query;
 
-            if (!string.IsNullOrEmpty(filter.search))
+            if (!string.IsNullOrEmpty(filter.UserName))
             {
-                query = query.Where(x => x.UnsignTitle.Contains(filter.search));
-            }
+                var filteredJoinPosts = joinPosts.Where(x => x.UserName.Contains(filter.UserName)).ToList(); 
 
-            if (filter.UserId != null)
-            {
-                query = query.Where(x => x.UserId == filter.UserId);
-            }
-
-            if (filter.sortDate.HasValue)
-            {
-                if (filter.sortDate == 1)
+                if (filteredJoinPosts.Any())
                 {
-                    query = query.OrderBy(x => x.Date);
+                    var userIds = filteredJoinPosts.Select(x => x.UserId).ToList();
+                    query = query.Where(x => userIds.Contains(x.UserId)); 
                 }
                 else
                 {
-                    query = query.OrderByDescending(x => x.Date);
+                    other = query.Where(x => x.UserId == -1); //filter UserName bị sai - 2
+                }
+                
+            }
+
+            if(other.Any()) 
+            {
+                if (!string.IsNullOrEmpty(filter.search))
+                {
+                    query = query.Where(x => x.UnsignTitle.Contains(filter.search)); 
                 }
             }
 
-            var itemCount = await query.CountAsync();
-            var items = await query.Skip((paging.PageIndex - 1) * paging.PageSize)
-                .Take(paging.PageSize)
-                .AsNoTracking().ToListAsync();
-            var result = new Pagination<Post>(items, itemCount, paging.PageIndex, paging.PageSize);
+            if(other.Any())
+            {
+                if (filter.sortDate.HasValue)
+                {
+                    if (filter.sortDate == 1)
+                    {
+                        query = query.OrderBy(x => x.Date);
+                    }
+                    else
+                    {
+                        query = query.OrderByDescending(x => x.Date);
+                    }
+                }
+            }
 
+            Pagination<Post> result = null;
+
+            if (other.Any())
+            {
+                var itemCount = await query.CountAsync();
+                var items = await query.Skip((paging.PageIndex - 1) * paging.PageSize)
+                    .Take(paging.PageSize)
+                    .AsNoTracking().ToListAsync();
+                result = new Pagination<Post>(items, itemCount, paging.PageIndex, paging.PageSize);
+            }
+            else
+            {
+                var itemCount = await other.CountAsync();
+                var items = await other.Skip((paging.PageIndex - 1) * paging.PageSize)
+                    .Take(paging.PageSize)
+                    .AsNoTracking().ToListAsync();
+                result = new Pagination<Post>(items, itemCount, paging.PageIndex, paging.PageSize);
+            }
+            
             return result;
         }
 
@@ -97,6 +128,11 @@ namespace NET1806_LittleJoy.Repository.Repositories
         {
             var list = _context.Posts.OrderByDescending(x => x.Id).Take(3);
             return await list.ToListAsync();
+        }
+
+        public async Task<ICollection<Post>> GetListPostsAsync()
+        {
+            return await _context.Posts.ToListAsync();
         }
     }
 }

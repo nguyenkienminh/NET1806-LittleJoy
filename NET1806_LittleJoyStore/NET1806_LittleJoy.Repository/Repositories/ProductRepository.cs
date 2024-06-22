@@ -69,28 +69,39 @@ namespace NET1806_LittleJoy.Repository.Repositories
             return true;
         }
 
-        public async Task<Product> UpdateProductAsync(Product productModify, Product productPlace)
+        public async Task<Product> UpdateProductAsync(Product productModify)
         {
-            productPlace.ProductName = productModify.ProductName;
-            productPlace.Price = productModify.Price;
-            productPlace.Description = productModify.Description;
-            productPlace.Weight = productModify.Weight;
-            productPlace.Quantity = productModify.Quantity;
-            productPlace.Image = productModify.Image;
-            productPlace.IsActive = productModify.IsActive;
-            productPlace.AgeId = productModify.AgeId;
-            productPlace.OriginId = productModify.OriginId;
-            productPlace.BrandId = productModify.BrandId;
-            productPlace.CateId = productModify.CateId;
-            productPlace.UnsignProductName = productModify.UnsignProductName;
+            _context.Products.Update(productModify);
 
             await _context.SaveChangesAsync();
-            return productPlace;
+            return productModify;
         }
 
         public async Task<Pagination<Product>> FilterProductPagingAsync(PaginationParameter paging, ProductFilterModel model)
         {
             var products = _context.Products.AsQueryable();
+
+            if (model.IsStock != null)
+            {
+                if (model.IsStock == true)
+                {
+                    products = products.Where(p => p.Quantity > 10);
+
+                }
+                else if (model.IsStock == false)
+                {
+                    products = products.Where(p => p.Quantity <= 10);
+                }
+            }
+
+            if(model.IsActive == true || model.IsActive.HasValue == false)
+            {
+                products = products.Where(p => p.IsActive == true);
+            }
+            else if(model.IsActive == false) 
+            {
+                products = products.Where(p => p.IsActive == false);
+            }
 
             if (!string.IsNullOrEmpty(model.keyword))
             {
@@ -144,25 +155,6 @@ namespace NET1806_LittleJoy.Repository.Repositories
                                      .ToListAsync();
 
             var result = new Pagination<Product>(item, itemCount, paging.PageIndex, paging.PageSize);
-
-            return result;
-        }
-
-        public async Task<Pagination<Product>> GetAllProductOutOfStockPagingAsync(PaginationParameter paginationParameter)
-        {
-            var itemCount = await _context.Products.CountAsync(p => p.Quantity < 10);
-
-            var item = await _context.Products.Where(p => p.Quantity < 10)
-                                              .Include(p => p.Age)
-                                              .Include(p => p.Brand)
-                                              .Include(p => p.Cate)
-                                              .Include(p => p.Origin)
-                                              .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
-                                              .Take(paginationParameter.PageSize)
-                                              .AsNoTracking()
-                                              .ToListAsync();
-
-            var result = new Pagination<Product>(item, itemCount, paginationParameter.PageIndex, paginationParameter.PageSize);
 
             return result;
         }

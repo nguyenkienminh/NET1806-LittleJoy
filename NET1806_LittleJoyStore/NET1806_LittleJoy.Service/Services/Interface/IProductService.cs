@@ -22,7 +22,6 @@ namespace NET1806_LittleJoy.Service.Services.Interface
 
         public Task<Pagination<ProductModel>> FilterProductPagingAsync(PaginationParameter paging, ProductFilterModel model);
 
-        public Task<Pagination<ProductModel>> GetAllProductOutOfStockPagingAsync(PaginationParameter paginationParameter);
 
     }
 }

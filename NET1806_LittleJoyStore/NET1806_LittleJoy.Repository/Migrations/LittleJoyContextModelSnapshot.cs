@@ -168,9 +168,6 @@ namespace NET1806_LittleJoy.Repository.Migrations
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("PaymentId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Status")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
@@ -183,8 +180,6 @@ namespace NET1806_LittleJoy.Repository.Migrations
 
                     b.HasKey("Id")
                         .HasName("PK__Order__3214EC077E9989C3");
-
-                    b.HasIndex("PaymentId");
 
                     b.HasIndex("UserId");
 
@@ -283,7 +278,7 @@ namespace NET1806_LittleJoy.Repository.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int?>("OrderId")
+                    b.Property<int>("OrderID")
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
@@ -292,6 +287,9 @@ namespace NET1806_LittleJoy.Repository.Migrations
 
                     b.HasKey("Id")
                         .HasName("PK__Payment__3214EC072E9667DA");
+
+                    b.HasIndex("OrderID")
+                        .IsUnique();
 
                     b.ToTable("Payment", (string)null);
                 });
@@ -551,18 +549,11 @@ namespace NET1806_LittleJoy.Repository.Migrations
 
             modelBuilder.Entity("NET1806_LittleJoy.Repository.Entities.Order", b =>
                 {
-                    b.HasOne("NET1806_LittleJoy.Repository.Entities.Payment", "Payment")
-                        .WithMany("Orders")
-                        .HasForeignKey("PaymentId")
-                        .HasConstraintName("FK__Order__PaymentId__6A30C649");
-
                     b.HasOne("NET1806_LittleJoy.Repository.Entities.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
                         .IsRequired()
                         .HasConstraintName("FK__Order__UserId__6B24EA82");
-
-                    b.Navigation("Payment");
 
                     b.Navigation("User");
                 });
@@ -582,6 +573,18 @@ namespace NET1806_LittleJoy.Repository.Migrations
                     b.Navigation("Order");
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("NET1806_LittleJoy.Repository.Entities.Payment", b =>
+                {
+                    b.HasOne("NET1806_LittleJoy.Repository.Entities.Order", "Order")
+                        .WithOne("Payment")
+                        .HasForeignKey("NET1806_LittleJoy.Repository.Entities.Payment", "OrderID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_Payment_Order");
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("NET1806_LittleJoy.Repository.Entities.Post", b =>
@@ -666,17 +669,14 @@ namespace NET1806_LittleJoy.Repository.Migrations
                 {
                     b.Navigation("OrderDetails");
 
+                    b.Navigation("Payment");
+
                     b.Navigation("Refund");
                 });
 
             modelBuilder.Entity("NET1806_LittleJoy.Repository.Entities.Origin", b =>
                 {
                     b.Navigation("Products");
-                });
-
-            modelBuilder.Entity("NET1806_LittleJoy.Repository.Entities.Payment", b =>
-                {
-                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("NET1806_LittleJoy.Repository.Entities.Product", b =>

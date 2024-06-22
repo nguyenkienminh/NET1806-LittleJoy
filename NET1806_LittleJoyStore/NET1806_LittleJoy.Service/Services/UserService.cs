@@ -17,6 +17,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using static Org.BouncyCastle.Asn1.Cmp.Challenge;
 
 namespace NET1806_LittleJoy.Service.Services
 {
@@ -313,16 +314,51 @@ namespace NET1806_LittleJoy.Service.Services
             return userDetailModel;
         }
 
+        public async Task<UserModel?> GetUserByNameAsync(string name)
+        {
+            var userDetail = await _userRepository.GetUserByUserNameAsync(name);
+            if (userDetail == null)
+            {
+                return null;
+            }
+
+            var userDetailModel = _mapper.Map<UserModel>(userDetail);
+
+            return userDetailModel;
+        }
+
         public async Task<bool?> AddUserAsync(UserModel model, string mainAddress)
         {
             try
             {
 
+                if(model.UserName != null)
+                {
+                    var checkUsername = await _userRepository.GetUserByUserNameAsync(model.UserName);
+
+                    if (checkUsername != null)
+                    {
+                        throw new Exception("Tài khoản đã tồn tại");
+                    }
+                }
+                
                 if (model.PhoneNumber != null)
                 {
                     if (StringUtils.IsValidPhoneNumber(model.PhoneNumber) == false)
                     {
-                        return false;
+                        throw new Exception("Wrong Phone Number Format");
+                    }
+                    else
+                    {
+                        var listUser = await _userRepository.GetListUserAsync();
+
+                        foreach (var item in listUser)
+                        {
+                            if (item.PhoneNumber.Equals(model.PhoneNumber))
+                            {
+                                throw new Exception("Phone Number is exist");
+                            }
+                        }
                     }
                 }
 
@@ -330,7 +366,16 @@ namespace NET1806_LittleJoy.Service.Services
                 {
                     if (StringUtils.IsValidEmail(model.Email) == false)
                     {
-                        return false;
+                        throw new Exception("Wrong Email Format");
+                    }
+                    else
+                    {
+                        var checkEmail = await _userRepository.GetUserByEmailAsync(model.Email);
+                        
+                        if (checkEmail != null)
+                        {
+                            throw new Exception("Account already exists.");
+                        }
                     }
                 }
 
@@ -346,7 +391,7 @@ namespace NET1806_LittleJoy.Service.Services
                 }
 
                 userInfo.Status = true;
-                userInfo.ConfirmEmail = false;
+                userInfo.ConfirmEmail = true;
                 userInfo.Points = 0;
 
                 if (userInfo.Fullname != null)
@@ -370,8 +415,8 @@ namespace NET1806_LittleJoy.Service.Services
             }
             catch (Exception ex)
             {
-
-                return false;
+                throw;
+                
             }
         }
 
@@ -389,6 +434,12 @@ namespace NET1806_LittleJoy.Service.Services
 
         public async Task<UserModel> UpdateUserAsync(UserModel model, string mainAddress)
         {
+
+            if(model.RoleId == null)
+            {
+                return null;
+            }
+
             var userModify = _mapper.Map<User>(model);
 
             var userPlace = await _userRepository.GetUserByIdAsync(userModify.Id);
@@ -412,7 +463,19 @@ namespace NET1806_LittleJoy.Service.Services
             {
                 if (StringUtils.IsValidPhoneNumber(userModify.PhoneNumber) == false)
                 {
-                    return null;
+                    throw new Exception("Wrong Phone Number Format");
+                }
+                else
+                {
+                    var listUser = await _userRepository.GetListUserAsync();
+
+                    foreach (var item in listUser)
+                    {
+                        if (item.PhoneNumber.Equals(model.PhoneNumber) && item.Id != model.Id)
+                        {
+                            throw new Exception("Phone Number is exist");
+                        }
+                    }
                 }
             }
             else
@@ -479,7 +542,7 @@ namespace NET1806_LittleJoy.Service.Services
 
             if (userPlace == null)
             {
-                return null;
+                throw new Exception("Tài khoản không tồn tại");
             }
 
             if (userModify.Fullname != "".Trim() && userModify.Fullname != null)
@@ -496,7 +559,19 @@ namespace NET1806_LittleJoy.Service.Services
             {
                 if (StringUtils.IsValidPhoneNumber(userModify.PhoneNumber) == false)
                 {
-                    return null;
+                    throw new Exception("Wrong Phone Number Format");
+                }
+                else
+                {
+                    var listUser = await _userRepository.GetListUserAsync();
+
+                    foreach (var item in listUser)
+                    {
+                        if (item.PhoneNumber.Equals(model.PhoneNumber) && item.Id != model.Id)
+                        {
+                            throw new Exception("Phone Number is exist");
+                        }
+                    }
                 }
             }
             else
@@ -510,6 +585,8 @@ namespace NET1806_LittleJoy.Service.Services
             }
 
             userModify.Status = userPlace.Status;
+            var Role = await _roleRepository.GetRoleByNameAsync("USER");
+            userModify.RoleId = Role.Id;
 
             var updateUser = await _userRepository.UpdateUserAsync(userModify, userPlace);
 
@@ -520,40 +597,53 @@ namespace NET1806_LittleJoy.Service.Services
             return null;
         }
 
-        public async Task<string> ChangePasswordUserRoleAsync(ChangePasswordModel model)
+        public async Task<bool?> ChangePasswordUserRoleAsync(ChangePasswordModel model)
         {
-
-            var user = await _userRepository.GetUserByIdAsync(model.Id);
-
-            if (user == null)
+            try
             {
-                return null;
-            }
+                var user = await _userRepository.GetUserByIdAsync(model.Id);
 
-            var checkPassword = PasswordUtils.VerifyPassword(model.OldPassword, user.PasswordHash);
+                if (user == null)
+                {
+                    throw new Exception("Tài khoản không tồn tại");
+                }
 
-            if (checkPassword)
+                var checkPassword = PasswordUtils.VerifyPassword(model.OldPassword, user.PasswordHash);
+
+                if (checkPassword)
+                {
+
+                    if (model.OldPassword.Equals(model.NewPassword))
+                    {
+                        throw new Exception("Mật khẩu mới không được giống mật khẩu cũ");
+                    }
+                    else
+                    {
+
+                        AddPasswordModel addPassword = new AddPasswordModel()
+                        {
+                            Email = user.Email,
+                            Password = model.NewPassword,
+                            ConfirmPassword = model.ConfirmPassword,
+                        };
+
+                        var result = await AddNewPassword(addPassword);
+
+                        if (result == true)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                }
+                throw new Exception( "Mật khẩu không đúng");
+            }catch (Exception ex)
             {
-                AddPasswordModel addPassword = new AddPasswordModel()
-                {
-                    Email = user.Email,
-                    Password = model.NewPassword,
-                    ConfirmPassword = model.ConfirmPassword,
-                };
-
-                var result = await AddNewPassword(addPassword);
-
-                if (result == true)
-                {
-                    return "Thêm mật khẩu thành công";
-                }
-                else
-                {
-                    return "Thêm mật khẩu không thành công";
-                }
+                throw ex;
             }
-
-            return "Mật khẩu không đúng";
 
         }
 

@@ -61,14 +61,18 @@ namespace NET1806_LittleJoy.Repository.Repositories
             return await _context.Products.Where(p => p.OriginId == originId).ToListAsync();
         }
 
-        public async Task<Origin> UpdateOriginAsync(Origin originModify, Origin originPlace)
+        public async Task<Origin> UpdateOriginAsync(Origin originModify)
         {
-            originPlace.Id = originModify.Id;
-            originPlace.OriginName = originModify.OriginName;
-
+            
+            _context.Origins.Update(originModify);  
             await _context.SaveChangesAsync();
 
-            return originPlace;
+            return originModify;
+        }
+
+        public async Task<ICollection<Origin>> GetAllOriginAsync()
+        {
+            return await _context.Origins.ToListAsync();
         }
     }
 }

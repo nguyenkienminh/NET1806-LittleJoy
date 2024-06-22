@@ -61,14 +61,17 @@ namespace NET1806_LittleJoy.Repository.Repositories
             return await _context.Products.Where(p => p.CateId == cateId).ToListAsync();    
         }
 
-        public async Task<Category> UpdateCategoryAsync(Category cateModify, Category catePlace)
+        public async Task<Category> UpdateCategoryAsync(Category cateModify)
         {
-            catePlace.Id = cateModify.Id;
-            catePlace.CategoryName = cateModify.CategoryName;   
-
+            _context.Categories.Update(cateModify);
             await _context.SaveChangesAsync();
 
-            return catePlace;
+            return cateModify;
+        }
+
+        public async Task<ICollection<Category>> GetAllCateAsync()
+        {
+            return await _context.Categories.ToListAsync();
         }
     }
 }

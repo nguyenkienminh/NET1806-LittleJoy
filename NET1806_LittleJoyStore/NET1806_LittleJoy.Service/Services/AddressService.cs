@@ -99,80 +99,99 @@ namespace NET1806_LittleJoy.Service.Services
 
         public async Task<bool> DeleteAddressByIdAsync(int id)
         {
-
-            var item = await _repo.GetAddressByIdAsync(id);
-
-            if (item == null || item.IsMainAddress == true)
+            try
             {
-                return false;
-            }
+                var item = await _repo.GetAddressByIdAsync(id);
 
-            return await _repo.DeleteAddressAsync(item);
+                if (item == null )
+                {
+                    throw new Exception("Address không tồn tại");
+                }
+                else
+                {
+                    if(item.IsMainAddress == true)
+                    {
+                        throw new Exception("Phải luôn có 1 address chính");
+                    }
+                }
+
+                return await _repo.DeleteAddressAsync(item);
+            }
+            catch (Exception ex)
+            { 
+                throw ex;
+            }
 
         }
 
         public async Task<AddressModel> UpdateAddressAsync(AddressModel model)
         {
-            Address? modifyAddress = null;
 
-            var addressDetailUpdate = _mapper.Map<Address>(model); // chuyển thành Address
-
-            var addressPlace = await _repo.GetAddressByIdAsync(addressDetailUpdate.Id); //Lấy thông tin cũ của vị trí muốn update
-
-            if (addressPlace == null) // Nếu vị trí là null
+            try
             {
-                return null;
-            }
+                Address? modifyAddress = null;
 
-            addressDetailUpdate.UserId = addressPlace.UserId; // gắn giá trị UserId cho cái update
+                var addressDetailUpdate = _mapper.Map<Address>(model); // chuyển thành Address
 
-            //check và tiến hành update
-            #region 
-            if (addressDetailUpdate.IsMainAddress == false) // Nếu cái Update là false
-            {
-                    
-                    if(addressPlace.IsMainAddress == true) 
+                var addressPlace = await _repo.GetAddressByIdAsync(addressDetailUpdate.Id); //Lấy thông tin cũ của vị trí muốn update
+
+                if (addressPlace == null) // Nếu vị trí là null
+                {
+                    throw new Exception("Address không tồn tại");
+                }
+
+                addressDetailUpdate.UserId = addressPlace.UserId; // gắn giá trị UserId cho cái update
+
+                //check và tiến hành update
+                #region Update Address
+                if (addressDetailUpdate.IsMainAddress == false) // Nếu cái Update là false
+                {
+
+                    if (addressPlace.IsMainAddress == true)
                     {
                         // Nếu thông tin ban đầu là true
-                        return null;
+                        throw new Exception("Phải luôn có 1 address chính");
                     }
-                    else 
+                    else
                     {
                         // Nếu thông tin ban đầu là false
                         modifyAddress = await _repo.UpdateAddressAsync(addressDetailUpdate, addressPlace);
                     }
-            }
-
-            else // Nếu cái update là true
-            {
-                var listAddress = await _repo.GetAddressByUserIdAsync(addressDetailUpdate.UserId);  // lấy danh sách đỉa chỉ của UserId
-
-                foreach (var item in listAddress)
+                }
+                else // Nếu cái update là true
                 {
-                    if (item.Id != addressDetailUpdate.Id)  // Nếu Cái Id của danh sách mà khác cái Id update --> Chuyển thành false và Update lại
+                    var listAddress = await _repo.GetAddressByUserIdAsync(addressDetailUpdate.UserId);  // lấy danh sách đỉa chỉ của UserId
+
+                    foreach (var item in listAddress)
                     {
-                        var change = await _repo.GetAddressByIdAsync(item.Id);
-
-                        if (change != null) 
+                        if (item.Id != addressDetailUpdate.Id)  // Nếu Cái Id của danh sách mà khác cái Id update --> Chuyển thành false và Update lại
                         {
-                            change.IsMainAddress = false;
+                            var change = await _repo.GetAddressByIdAsync(item.Id);
 
-                            await _repo.UpdateAddressAsync(item, change);
+                            if (change != null)
+                            {
+                                change.IsMainAddress = false;
+
+                                await _repo.UpdateAddressAsync(item, change);
+                            }
+
                         }
-                        
                     }
+
+                    modifyAddress = await _repo.UpdateAddressAsync(addressDetailUpdate, addressPlace); // Sau khi các thằng khác đã false thì update cái mói vào Ismain là true
+                }
+                #endregion
+
+                if (modifyAddress != null)
+                {
+                    return _mapper.Map<AddressModel>(modifyAddress);
                 }
 
-                modifyAddress = await _repo.UpdateAddressAsync(addressDetailUpdate, addressPlace); // Sau khi các thằng khác đã false thì update cái mói vào Ismain là true
-            }
-            #endregion
-
-            if(modifyAddress != null)
+                return null;
+            }catch (Exception ex)
             {
-                return _mapper.Map<AddressModel>(modifyAddress);
+                throw ex;
             }
-
-            return null;
         }
 
         public async Task<Pagination<AddressModel>> GetAddressListPagingByUserIdAsync(PaginationParameter paging, int id)

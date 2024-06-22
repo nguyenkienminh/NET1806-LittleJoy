@@ -15,9 +15,6 @@ namespace NET1806_LittleJoy.Repository.Commons
         /// <summary> GG </summary>
         public int? sortOrder { get; set; }
 
-        /// <summary>
-        /// HH
-        /// </summary>
         public string? keyword { get; set; }
 
         public int? cateId { get; set; }
@@ -27,5 +24,9 @@ namespace NET1806_LittleJoy.Repository.Commons
         public int? originId { get; set; }
 
         public int? brandId { get; set; }
+
+        public bool? IsActive { get; set; }
+
+        public bool? IsStock { get; set; }  
     }
 }

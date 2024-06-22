@@ -18,11 +18,10 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
 
         public Task<bool> DeleteProductAsync(Product productInfo);
 
-        public Task<Product> UpdateProductAsync(Product productModify, Product productPlace);
+        public Task<Product> UpdateProductAsync(Product productModify);
 
         public Task<Pagination<Product>> FilterProductPagingAsync (PaginationParameter paging, ProductFilterModel model);
 
-        public Task<Pagination<Product>> GetAllProductOutOfStockPagingAsync(PaginationParameter paginationParameter);
 
     }
 }
