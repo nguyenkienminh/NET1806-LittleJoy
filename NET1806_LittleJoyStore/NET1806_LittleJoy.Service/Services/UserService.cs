@@ -584,40 +584,53 @@ namespace NET1806_LittleJoy.Service.Services
             return null;
         }
 
-        public async Task<string> ChangePasswordUserRoleAsync(ChangePasswordModel model)
+        public async Task<bool?> ChangePasswordUserRoleAsync(ChangePasswordModel model)
         {
-
-            var user = await _userRepository.GetUserByIdAsync(model.Id);
-
-            if (user == null)
+            try
             {
-                return null;
-            }
+                var user = await _userRepository.GetUserByIdAsync(model.Id);
 
-            var checkPassword = PasswordUtils.VerifyPassword(model.OldPassword, user.PasswordHash);
+                if (user == null)
+                {
+                    throw new Exception("Tài khoản không tồn tại");
+                }
 
-            if (checkPassword)
+                var checkPassword = PasswordUtils.VerifyPassword(model.OldPassword, user.PasswordHash);
+
+                if (checkPassword)
+                {
+
+                    if (model.OldPassword.Equals(model.NewPassword))
+                    {
+                        throw new Exception("Mật khẩu mới không được giống mật khẩu cũ");
+                    }
+                    else
+                    {
+
+                        AddPasswordModel addPassword = new AddPasswordModel()
+                        {
+                            Email = user.Email,
+                            Password = model.NewPassword,
+                            ConfirmPassword = model.ConfirmPassword,
+                        };
+
+                        var result = await AddNewPassword(addPassword);
+
+                        if (result == true)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                }
+                throw new Exception( "Mật khẩu không đúng");
+            }catch (Exception ex)
             {
-                AddPasswordModel addPassword = new AddPasswordModel()
-                {
-                    Email = user.Email,
-                    Password = model.NewPassword,
-                    ConfirmPassword = model.ConfirmPassword,
-                };
-
-                var result = await AddNewPassword(addPassword);
-
-                if (result == true)
-                {
-                    return "Thêm mật khẩu thành công";
-                }
-                else
-                {
-                    return "Thêm mật khẩu không thành công";
-                }
+                throw ex;
             }
-
-            return "Mật khẩu không đúng";
 
         }
 
