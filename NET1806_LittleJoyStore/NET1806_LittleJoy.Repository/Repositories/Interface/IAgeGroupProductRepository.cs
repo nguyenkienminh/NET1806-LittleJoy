@@ -20,6 +20,8 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
 
         public Task<ICollection<Product>> GetProductsByAgeIdAsync(int ageId);
 
-        public Task<AgeGroupProduct> UpdateAgeGroupAsync(AgeGroupProduct ageModify, AgeGroupProduct agePlace);
+        public Task<AgeGroupProduct> UpdateAgeGroupAsync(AgeGroupProduct ageModify);
+
+        public Task<ICollection<AgeGroupProduct>> GetAllAgeGroupAsync();
     }
 }

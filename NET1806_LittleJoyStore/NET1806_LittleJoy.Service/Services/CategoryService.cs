@@ -64,21 +64,40 @@ namespace NET1806_LittleJoy.Service.Services
         {
             try
             {
-                var cateInfo = _mapper.Map<Category>(categoryModel);
 
-                var item = await _categoryRepo.AddCategoryAsync(cateInfo);
-
-                if (item == null)
+                if (categoryModel.CategoryName != null)
                 {
-                    return false;
+
+                    if (categoryModel.CategoryName.Equals(""))
+                    {
+                        throw new Exception("Không được tạo category trống");
+                    }
+
+                    var listCate = await _categoryRepo.GetAllCateAsync();
+
+                    foreach (var cate in listCate)
+                    {
+                        if (cate.CategoryName.Equals(categoryModel.CategoryName) && cate.Id != categoryModel.Id)
+                        {
+                            throw new Exception("Không được tạo category trùng lặp");
+                        }
+                    }
+
+                    var cateInfo = _mapper.Map<Category>(categoryModel);
+
+                    var item = await _categoryRepo.AddCategoryAsync(cateInfo);
+
+                    if (item == null)
+                    {
+                        return false;
+                    }
                 }
                 return true;
 
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Fail to add Category {ex.Message}");
-                return false;
+                throw ex;
             }
         }
 
@@ -103,20 +122,43 @@ namespace NET1806_LittleJoy.Service.Services
 
         public async Task<CategoryModel> UpdateCategoryAsync(CategoryModel cateModel)
         {
-            var cateModify = _mapper.Map<Category>(cateModel);
 
-            var catePlace = await _categoryRepo.GetCategoryByIdAsync(cateModel.Id);
-
-            if (catePlace == null)
+            if (cateModel.CategoryName != null)
             {
-                return null;
-            }
+                if (cateModel.CategoryName.Equals(""))
+                {
+                    throw new Exception("Không được tạo category trống");
+                }
 
-            var updateCate = await _categoryRepo.UpdateCategoryAsync(cateModify, catePlace);
+                var listCate = await _categoryRepo.GetAllCateAsync();
 
-            if (updateCate != null)
-            {
-                return _mapper.Map<CategoryModel>(updateCate);
+                foreach (var cate in listCate)
+                {
+                    if (cate.CategoryName.Equals(cateModel.CategoryName) && cate.Id != cateModel.Id)
+                    {
+                        throw new Exception("Không được thay đổi category trùng lặp");
+                        
+                    }
+                }
+
+                var cateModify = _mapper.Map<Category>(cateModel);
+
+                var catePlace = await _categoryRepo.GetCategoryByIdAsync(cateModel.Id);
+
+                if (catePlace == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    catePlace.CategoryName = cateModify.CategoryName;
+                    var updateCate = await _categoryRepo.UpdateCategoryAsync(catePlace);
+
+                    if (updateCate != null)
+                    {
+                        return _mapper.Map<CategoryModel>(updateCate);
+                    }
+                }
             }
             return null;
         }

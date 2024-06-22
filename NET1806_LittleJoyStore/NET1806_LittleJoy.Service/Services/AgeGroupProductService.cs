@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Org.BouncyCastle.Asn1.Cmp.Challenge;
 
 namespace NET1806_LittleJoy.Service.Services
 {
@@ -63,20 +64,40 @@ namespace NET1806_LittleJoy.Service.Services
         {
             try
             {
-                var brandInfo = _mapper.Map<AgeGroupProduct>(ageGroup);
-                var item = await _ageGroupRepo.AddAgeGroupAsync(brandInfo);
 
-                if (item == null)
+                if (ageGroup.AgeRange != null)
                 {
-                    return false;
+
+                    if (ageGroup.AgeRange.Equals(""))
+                    {
+                        throw new Exception("Không được tạo AgeRange trống");
+                    }
+
+                    var listAge = await _ageGroupRepo.GetAllAgeGroupAsync();
+
+                    foreach (var age in listAge)
+                    {
+                        if (age.AgeRange.Equals(ageGroup.AgeRange))
+                        {
+                            throw new Exception("Không được tạo AgeRange trùng lặp");
+                        }
+                    }
+
+                    var brandInfo = _mapper.Map<AgeGroupProduct>(ageGroup);
+                    var item = await _ageGroupRepo.AddAgeGroupAsync(brandInfo);
+
+                    if (item == null)
+                    {
+                        return false;
+                    }
                 }
                 return true;
 
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Fail to add Age {ex.Message}");
-                return false;
+                throw ex;
+
             }
         }
 
@@ -101,22 +122,43 @@ namespace NET1806_LittleJoy.Service.Services
 
         public async Task<AgeGroupProductModel> UpdateAgeGroupAsync(AgeGroupProductModel ageGroup)
         {
-            var ageModify = _mapper.Map<AgeGroupProduct>(ageGroup);
 
-            var agePlace = await _ageGroupRepo.GetAgeGroupByIdAsync(ageGroup.Id);
-
-            if (agePlace == null)
+            if (ageGroup.AgeRange != null)
             {
-                return null;
-            }
 
-            else
-            {
-                var updateAge = await _ageGroupRepo.UpdateAgeGroupAsync(ageModify, agePlace);
-
-                if (updateAge != null)
+                if (ageGroup.AgeRange.Equals(""))
                 {
-                    return _mapper.Map<AgeGroupProductModel>(updateAge);
+                    throw new Exception("Không được tạo AgeRange trống");
+                }
+
+                var listAge = await _ageGroupRepo.GetAllAgeGroupAsync();
+
+                foreach (var age in listAge)
+                {
+                    if (age.AgeRange.Equals(ageGroup.AgeRange) && age.Id != ageGroup.Id)
+                    {
+                        throw new Exception("Không được thay đổi AgeRange trùng lặp");
+                    }
+                }
+
+                var ageModify = _mapper.Map<AgeGroupProduct>(ageGroup);
+
+                var agePlace = await _ageGroupRepo.GetAgeGroupByIdAsync(ageGroup.Id);
+
+                if (agePlace == null)
+                {
+                    return null;
+                }
+
+                else
+                {
+                    agePlace.AgeRange = ageModify.AgeRange;
+                    var updateAge = await _ageGroupRepo.UpdateAgeGroupAsync(agePlace);
+
+                    if (updateAge != null)
+                    {
+                        return _mapper.Map<AgeGroupProductModel>(updateAge);
+                    }
                 }
             }
 
