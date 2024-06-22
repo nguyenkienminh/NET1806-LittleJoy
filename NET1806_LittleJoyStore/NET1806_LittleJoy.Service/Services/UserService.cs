@@ -17,6 +17,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using static Org.BouncyCastle.Asn1.Cmp.Challenge;
 
 namespace NET1806_LittleJoy.Service.Services
 {
@@ -457,7 +458,7 @@ namespace NET1806_LittleJoy.Service.Services
 
                     foreach (var item in listUser)
                     {
-                        if (item.PhoneNumber.Equals(model.PhoneNumber))
+                        if (item.PhoneNumber.Equals(model.PhoneNumber) && item.Id != model.Id)
                         {
                             throw new Exception("Phone Number is exist");
                         }
@@ -553,7 +554,7 @@ namespace NET1806_LittleJoy.Service.Services
 
                     foreach (var item in listUser)
                     {
-                        if (item.PhoneNumber.Equals(model.PhoneNumber))
+                        if (item.PhoneNumber.Equals(model.PhoneNumber) && item.Id != model.Id)
                         {
                             throw new Exception("Phone Number is exist");
                         }
@@ -571,7 +572,7 @@ namespace NET1806_LittleJoy.Service.Services
             }
 
             userModify.Status = userPlace.Status;
-            var Role = _roleRepository.GetRoleByNameAsync("USER");
+            var Role = await _roleRepository.GetRoleByNameAsync("USER");
             userModify.RoleId = Role.Id;
 
             var updateUser = await _userRepository.UpdateUserAsync(userModify, userPlace);
