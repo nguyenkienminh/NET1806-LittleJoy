@@ -237,13 +237,17 @@ namespace NET1806_LittleJoy.API.Controllers
         ///     1 - Hàng mới |
         ///     2 - Giá tiền Cao đến thấp |
         ///     3 - Giá tiền Thấp đến cao
+        ///  IsStock:
+        ///     true - còn hàng (>10)
+        ///     false - hết hàng (<=10)
+        ///     không nhập - lấy cả hai
         /// </summary>
         [HttpGet("filter")]
         public async Task<IActionResult> FilterProductPagingAsync([FromQuery] PaginationParameter paging, [FromQuery] ProductFilterModel model)
         {
             try
             {
-                var result = await _productService.FilterProductPagingAsync(paging,model);
+                var result = await _productService.FilterProductPagingAsync(paging, model);
 
                 if (result != null)
                 {
@@ -279,50 +283,6 @@ namespace NET1806_LittleJoy.API.Controllers
                 return BadRequest(responseModel);
             }
         }
-
-
-        [HttpGet("product-out-of-stock")]
-        public async Task<IActionResult> GetListProductOutOfStockPagingAsync([FromQuery] PaginationParameter paginationParameter)
-        {
-            try
-            {
-                var result = await _productService.GetAllProductOutOfStockPagingAsync(paginationParameter);
-
-                if (result != null)
-                {
-                    var metadata = new
-                    {
-                        result.TotalCount,
-                        result.PageSize,
-                        result.CurrentPage,
-                        result.TotalPages,
-                        result.HasNext,
-                        result.HasPrevious
-                    };
-
-                    Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
-                    return Ok(result);
-                }
-                else
-                {
-                    return NotFound(new ResponseModels
-                    {
-                        HttpCode = StatusCodes.Status404NotFound,
-                        Message = "Product is empty"
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                var responseModel = new ResponseModels()
-                {
-                    HttpCode = StatusCodes.Status400BadRequest,
-                    Message = ex.Message.ToString()
-                };
-                return BadRequest(responseModel);
-            }
-        }
-
 
     }
 }

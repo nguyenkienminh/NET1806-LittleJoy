@@ -81,6 +81,19 @@ namespace NET1806_LittleJoy.Repository.Repositories
         {
             var products = _context.Products.AsQueryable();
 
+            if (model.IsStock != null)
+            {
+                if (model.IsStock == true)
+                {
+                    products = products.Where(p => p.Quantity > 10);
+
+                }
+                else if (model.IsStock == false)
+                {
+                    products = products.Where(p => p.Quantity <= 10);
+                }
+            }
+
             if(model.IsActive == true || model.IsActive.HasValue == false)
             {
                 products = products.Where(p => p.IsActive == true);
@@ -142,25 +155,6 @@ namespace NET1806_LittleJoy.Repository.Repositories
                                      .ToListAsync();
 
             var result = new Pagination<Product>(item, itemCount, paging.PageIndex, paging.PageSize);
-
-            return result;
-        }
-
-        public async Task<Pagination<Product>> GetAllProductOutOfStockPagingAsync(PaginationParameter paginationParameter)
-        {
-            var itemCount = await _context.Products.CountAsync(p => p.Quantity < 10);
-
-            var item = await _context.Products.Where(p => p.Quantity < 10)
-                                              .Include(p => p.Age)
-                                              .Include(p => p.Brand)
-                                              .Include(p => p.Cate)
-                                              .Include(p => p.Origin)
-                                              .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
-                                              .Take(paginationParameter.PageSize)
-                                              .AsNoTracking()
-                                              .ToListAsync();
-
-            var result = new Pagination<Product>(item, itemCount, paginationParameter.PageIndex, paginationParameter.PageSize);
 
             return result;
         }
