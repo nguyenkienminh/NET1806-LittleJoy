@@ -68,10 +68,14 @@ namespace NET1806_LittleJoy.Service.Services
         {
             try
             {
+                if (!model.Rating.HasValue)
+                {
+                    throw new Exception("Rating khong được trống");
+                }
 
                 if (model.Rating < 1 || model.Rating > 5)
                 {
-                    return false;
+                    throw new Exception("Sai số rating");
                 }
 
                 var feedback = _mapper.Map<Feedback>(model);
@@ -89,8 +93,7 @@ namespace NET1806_LittleJoy.Service.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Fail to create FeedBack {ex.Message}");
-                return false;
+                throw ex; 
             }
         }
 
