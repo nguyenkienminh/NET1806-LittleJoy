@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace NET1806_LittleJoy.Service.Services
 {
-    public  class OriginService : IOriginService
+    public class OriginService : IOriginService
     {
         private readonly IOriginRepository _originRepo;
         private readonly IMapper _mapper;
@@ -56,27 +56,45 @@ namespace NET1806_LittleJoy.Service.Services
 
             return _mapper.Map<OriginModel>(origin);
 
-            
+
         }
 
         public async Task<bool?> AddOriginAsync(OriginModel originModel)
         {
             try
             {
-                var originInfo = _mapper.Map<Origin>(originModel);
-                var item = await _originRepo.AddOriginAsync(originInfo);
-
-                if (item == null)
+                if (originModel.OriginName != null)
                 {
-                    return false;
+
+                    if (originModel.OriginName.Equals(""))
+                    {
+                        throw new Exception("Không được tạo Origin trống");
+                    }
+
+                    var listOrigin = await _originRepo.GetAllOriginAsync();
+
+                    foreach (var origin in listOrigin)
+                    {
+                        if (origin.OriginName.Equals(originModel.OriginName) && origin.Id != originModel.Id)
+                        {
+                            throw new Exception("Không được tạo Origin trùng lặp");
+                        }
+                    }
+
+                    var originInfo = _mapper.Map<Origin>(originModel);
+                    var item = await _originRepo.AddOriginAsync(originInfo);
+
+                    if (item == null)
+                    {
+                        return false;
+                    }
                 }
                 return true;
 
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Fail to add Origin {ex.Message}");
-                return false;
+                throw ex;
             }
         }
 
@@ -101,22 +119,44 @@ namespace NET1806_LittleJoy.Service.Services
 
         public async Task<OriginModel> UpdateOriginAsync(OriginModel originModel)
         {
-            var originModify = _mapper.Map<Origin>(originModel);
 
-            var originPlace = await _originRepo.GetOriginByIdAsync(originModel.Id);
-
-            if (originPlace == null)
+            if (originModel.OriginName != null)
             {
-                return null;
+
+                if (originModel.OriginName.Equals(""))
+                {
+                    throw new Exception("Không được tạo Origin trống");
+                }
+
+                var listOrigin = await _originRepo.GetAllOriginAsync();
+
+                foreach (var origin in listOrigin)
+                {
+                    if (origin.OriginName.Equals(originModel.OriginName) && origin.Id != originModel.Id)
+                    {
+                        throw new Exception("Không được thay đổi Origin trùng lặp");
+                    }
+                }
+
+                var originModify = _mapper.Map<Origin>(originModel);
+
+                var originPlace = await _originRepo.GetOriginByIdAsync(originModel.Id);
+
+                if (originPlace == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    originPlace.OriginName = originModify.OriginName;
+                    var updateOrigin = await _originRepo.UpdateOriginAsync(originPlace);
+
+                    if (updateOrigin != null)
+                    {
+                        return _mapper.Map<OriginModel>(updateOrigin);
+                    }
+                }
             }
-
-            var updateOrigin = await _originRepo.UpdateOriginAsync(originModify, originPlace);
-
-            if (updateOrigin != null)
-            {
-                return _mapper.Map<OriginModel>(updateOrigin);
-            }
-
             return null;
         }
     }

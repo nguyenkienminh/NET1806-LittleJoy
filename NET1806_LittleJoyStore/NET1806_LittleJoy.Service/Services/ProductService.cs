@@ -20,9 +20,9 @@ namespace NET1806_LittleJoy.Service.Services
     {
         private readonly IProductRepositoty _productRepository;
         private readonly IMapper _mapper;
-        private readonly IFeedBackService _feedBack;
+        private readonly IFeedBackRepository _feedBack;
 
-        public ProductService(IProductRepositoty productRepository, IMapper mapper, IFeedBackService feedBack)
+        public ProductService(IProductRepositoty productRepository, IMapper mapper, IFeedBackRepository feedBack)
         {
             _productRepository = productRepository;
             _mapper = mapper;
@@ -53,7 +53,7 @@ namespace NET1806_LittleJoy.Service.Services
                 OriginId = p.OriginId,
                 BrandId = p.BrandId,
                 UnsignProductName = p.UnsignProductName, 
-                RatingAver = _feedBack.AverageFeedBackInProduct(p.Id).Result
+                RatingAver = _feedBack.AverageRatingAsync(p.Id).Result
             }).ToList();
 
 
@@ -73,7 +73,7 @@ namespace NET1806_LittleJoy.Service.Services
             }
 
             var productModelInfo = _mapper.Map<ProductModel>(productDetail);
-            productModelInfo.RatingAver = await _feedBack.AverageFeedBackInProduct(productModelInfo.Id);
+            productModelInfo.RatingAver = await _feedBack.AverageRatingAsync(productModelInfo.Id);
             return productModelInfo;
            
         }
@@ -174,41 +174,7 @@ namespace NET1806_LittleJoy.Service.Services
                 OriginId = p.OriginId,
                 BrandId = p.BrandId,
                 UnsignProductName = p.UnsignProductName,
-                RatingAver = _feedBack.AverageFeedBackInProduct(p.Id).Result
-            }).ToList();
-
-
-            return new Pagination<ProductModel>(listProductModels,
-                listProduct.TotalCount,
-                listProduct.CurrentPage,
-                listProduct.PageSize);
-        }
-
-        public async Task<Pagination<ProductModel>> GetAllProductOutOfStockPagingAsync(PaginationParameter paginationParameter)
-        {
-            var listProduct = await _productRepository.GetAllProductOutOfStockPagingAsync(paginationParameter);
-            if (!listProduct.Any())
-            {
-                return null;
-            }
-
-
-            var listProductModels = listProduct.Select(p => new ProductModel
-            {
-                Id = p.Id,
-                CateId = p.CateId,
-                ProductName = p.ProductName,
-                Price = p.Price,
-                Description = p.Description,
-                Weight = p.Weight,
-                IsActive = p.IsActive,
-                Quantity = p.Quantity,
-                Image = p.Image,
-                AgeId = p.AgeId,
-                OriginId = p.OriginId,
-                BrandId = p.BrandId,
-                UnsignProductName = p.UnsignProductName,
-                RatingAver = _feedBack.AverageFeedBackInProduct(p.Id).Result
+                RatingAver = _feedBack.AverageRatingAsync(p.Id).Result
             }).ToList();
 
 

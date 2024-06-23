@@ -17,11 +17,15 @@ namespace NET1806_LittleJoy.Service.Services
     {
         private readonly IFeedBackRepository _feedBackRepo;
         private readonly IMapper _mapper;
+        private readonly IUserService _userService;
+        private readonly IProductRepositoty _productRepositoty;
 
-        public FeedBackService(IFeedBackRepository feedBackRepo, IMapper mapper)
+        public FeedBackService(IFeedBackRepository feedBackRepo, IMapper mapper, IUserService userService, IProductRepositoty productRepositoty)
         {
             _feedBackRepo = feedBackRepo;
             _mapper = mapper;
+            _userService = userService;
+            _productRepositoty = productRepositoty;
         }
 
         public async Task<Pagination<FeedBackModel>> GetAllFeedBackPagingAsync(PaginationParameter paginationParameter)
@@ -97,7 +101,7 @@ namespace NET1806_LittleJoy.Service.Services
             }
         }
 
-        public async Task<bool> RemoveFeedBackByIdAsync(int id)
+        public async Task<bool> RemoveFeedBackByIdAsync(int id, int UserId)
         {
             var remove = await _feedBackRepo.GetFeedBackByIdAsync(id);
 
@@ -105,8 +109,25 @@ namespace NET1806_LittleJoy.Service.Services
             {
                 return false;
             }
+            else
+            {
+                var user = await _userService.GetUserByIdAsync(remove.UserId); // lay user tu feedback trong he thong
 
-            return await _feedBackRepo.RemoveFeedBackAsync(remove);
+                if (user != null)
+                {
+                    if (user.Id != UserId)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return await _feedBackRepo.RemoveFeedBackAsync(remove);
+                    }
+                }
+  
+            }
+            return false;
+                    
         }
 
         public async Task<FeedBackModel> UpdateFeedBackAsync(FeedBackModel model)
@@ -118,23 +139,51 @@ namespace NET1806_LittleJoy.Service.Services
             {
                 return null;
             }
-
-            Feedback feedBackModify = new Feedback()
+            else
             {
-                Id = model.Id,
-                ProductId = feedBackPlace.ProductId,
-                UserId = feedBackPlace.UserId,
-                Comment = model.Comment,
-                Rating = model.Rating,
-                Date = DateTime.UtcNow.AddHours(7)
-            };
 
-            var updateFeedBack = await _feedBackRepo.UpdateFeedBackAsync(feedBackModify, feedBackPlace);
+                var user = await _userService.GetUserByIdAsync(feedBackPlace.UserId); // lay user tu feedback trong he thong
 
-            if (updateFeedBack != null)
-            {
-                return _mapper.Map<FeedBackModel>(updateFeedBack);
+                if (user == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    if (user.Id != model.UserId)
+                    {
+                        return null;
+                    }
+                    else 
+                    {
+                        Feedback feedBackModify = new Feedback()
+                        {
+                            Id = model.Id,
+                            ProductId = feedBackPlace.ProductId,
+                            UserId = model.UserId,
+                            Comment = model.Comment,
+                            Rating = model.Rating,
+                            Date = DateTime.UtcNow.AddHours(7)
+                        };
+
+                        feedBackPlace.Id = feedBackModify.Id;
+                        feedBackPlace.UserId = feedBackModify.UserId;
+                        feedBackPlace.ProductId = feedBackModify.ProductId;
+                        feedBackPlace.Comment = feedBackModify.Comment;
+                        feedBackPlace.Rating = feedBackModify.Rating;
+                        feedBackPlace.Date = feedBackModify.Date;
+
+                        var updateFeedBack = await _feedBackRepo.UpdateFeedBackAsync(feedBackPlace);
+
+                        if (updateFeedBack != null)
+                        {
+                            return _mapper.Map<FeedBackModel>(updateFeedBack);
+                        }
+                    }
+                }
             }
+
+            
             return null;
         }
 
@@ -168,6 +217,26 @@ namespace NET1806_LittleJoy.Service.Services
                 list.TotalCount,
                 list.CurrentPage,
                 list.PageSize);
+        }
+
+        public async Task<int> CountFeedBackByProductAsync(int Id)
+        {
+            try
+            {
+                var item = await _productRepositoty.GetProductByIdAsync(Id);
+
+                if (item == null)
+                {
+                    throw new Exception("Product không tồn tại");
+                }
+
+                return await _feedBackRepo.CountFeedBackByProductAsync(Id);
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }
