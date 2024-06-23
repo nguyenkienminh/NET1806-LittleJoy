@@ -82,5 +82,28 @@ namespace NET1806_LittleJoy.API.Controllers
                 return BadRequest(responseModel);
             }
         }
+
+
+        /// <summary>
+        /// Delivery (1 - Chuẩn Bị, 2 - Đang Giao Hàng, 3 - Giao Hàng Thất Bại, 4 - Giao Hàng Thành Công)
+        /// </summary>
+        [HttpPut("update-order")]
+        public async Task<IActionResult> UpdateOrder([FromBody] OrderUpdateRequestModel model)
+        {
+            try
+            {
+                var result = await _orderService.UpdateOrder(model);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                var responseModel = new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(responseModel);
+            }
+        }
     }
 }

@@ -23,4 +23,11 @@
 
         public int Quantity { get; set; }
     }
+
+    public class OrderUpdateRequestModel
+    {
+        public int OrderCode { get; set; }
+
+        public int DeliveryStatus { get; set; }
+    }
 }

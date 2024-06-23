@@ -15,5 +15,7 @@ namespace NET1806_LittleJoy.Service.Services.Interface
         public Task<OrderResponseModel> CreateOrder(OrderRequestModel model, HttpContext context);
 
         public Task<Pagination<OrderWithDetailsModel>> GetOrderByUserId(PaginationParameter parameter, int userId);
+
+        public Task<bool> UpdateOrder(OrderUpdateRequestModel model);
     }
 }

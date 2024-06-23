@@ -86,7 +86,10 @@ namespace NET1806_LittleJoy.Service.Services
                         if (model.PaymentMethod == 1)
                         {
                             method = "COD";
-                        } else if (model.PaymentMethod == 2)
+                            result.Status = "Đặt Hàng Thành Công";
+                            await _orderRepository.UpdateOrder(result);
+                        }
+                        else if (model.PaymentMethod == 2)
                         {
                             method = "VNPAY";
                             urlPayment = _vnpayservice.RequestVNPay(orderCode, model.TotalPrice, context);
@@ -146,7 +149,7 @@ namespace NET1806_LittleJoy.Service.Services
                         throw new Exception("Không thể tạo order");
                     }
                 }
-                catch (Exception ex) 
+                catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
                     throw ex;
@@ -173,7 +176,7 @@ namespace NET1806_LittleJoy.Service.Services
             }).ToList();
 
             //lay tung order gan them thanh phan
-            foreach (var item in result) 
+            foreach (var item in result)
             {
                 //lay payment gan vao order
                 var payment = await _paymentRepository.GetPaymentByOrderId(item.Id);
@@ -199,6 +202,74 @@ namespace NET1806_LittleJoy.Service.Services
             }
 
             return new Pagination<OrderWithDetailsModel>(result, list.TotalCount, list.CurrentPage, list.PageSize);
+        }
+
+        public async Task<bool> UpdateOrder(OrderUpdateRequestModel model)
+        {
+            var paymentExist = await _paymentRepository.GetPaymentByOrderCode(model.OrderCode);
+            var orderExist = await _orderRepository.GetOrderById(paymentExist.OrderID);
+
+            //cập nhật tình trạng giao hàng, thanh toán
+            if (orderExist.DeliveryStatus != "Giao Hàng Thành Công")
+            {
+                switch (model.DeliveryStatus)
+                {
+                    case 1:
+                        {
+                            orderExist.DeliveryStatus = "Đang Chuẩn Bị";
+                            break;
+                        }
+                    case 2:
+                        {
+                            orderExist.DeliveryStatus = "Đang Giao Hàng";
+                            break;
+                        }
+                    case 3:
+                        {
+                            orderExist.DeliveryStatus = "Giao Hàng Thất Bại";
+                            if(paymentExist.Method == "COD")
+                            {
+                                paymentExist.Status = "Thất Bại";
+                                await _paymentRepository.UpdatePayment(paymentExist);
+                            }
+                            break;
+                        }
+                    case 4:
+                        {
+                            orderExist.DeliveryStatus = "Giao Hàng Thành Công";
+                            if (paymentExist.Method == "COD")
+                            {
+                                paymentExist.Status = "Thành Công";
+                                await _paymentRepository.UpdatePayment(paymentExist);
+
+                                var user = await _userRepository.GetUserByIdAsync(orderExist.UserId);
+                                if (orderExist.AmountDiscount != 0)
+                                {
+                                    //nếu có dùng điểm thì trừ điểm
+                                    var points = await _pointsMoneyRepository.GetPointsByMoneyDiscount(orderExist.AmountDiscount);
+                                    user.Points -= points.MinPoints;
+                                }
+
+                                //cộng điểm theo đơn hàng
+                                user.Points += orderExist.TotalPrice / 1000;
+
+                                //update user
+                                await _userRepository.UpdateUserAsync(user);
+                            }
+                            break;
+                        }
+                    default:
+                        {
+                            throw new Exception("Vui Lòng Chọn Đúng Trạng Thái 1-4");
+                        }
+                }
+                await _orderRepository.UpdateOrder(orderExist);
+                return true;
+            }
+            else
+            {
+                throw new Exception("Không Thể Cập Nhật Đơn Hàng Đã Thành Công");
+            }
         }
     }
 }
