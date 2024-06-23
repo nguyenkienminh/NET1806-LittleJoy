@@ -53,6 +53,7 @@ namespace NET1806_LittleJoy.Service.Services
                 OriginId = p.OriginId,
                 BrandId = p.BrandId,
                 UnsignProductName = p.UnsignProductName, 
+                RatingAver = _feedBack.AverageFeedBackInProduct(p.Id).Result
             }).ToList();
 
 
@@ -72,7 +73,7 @@ namespace NET1806_LittleJoy.Service.Services
             }
 
             var productModelInfo = _mapper.Map<ProductModel>(productDetail);
-
+            productModelInfo.RatingAver = await _feedBack.AverageFeedBackInProduct(productModelInfo.Id);
             return productModelInfo;
            
         }
@@ -119,7 +120,28 @@ namespace NET1806_LittleJoy.Service.Services
 
             var productPlace = await _productRepository.GetProductByIdAsync(productModel.Id);
 
-            var updateProduct = await _productRepository.UpdateProductAsync(productModify, productPlace);
+            if (productPlace == null)
+            {
+                return null;
+            }
+            else
+            {
+                productPlace.ProductName = productModify.ProductName;
+                productPlace.Price = productModify.Price;
+                productPlace.Description = productModify.Description;
+                productPlace.Weight = productModify.Weight;
+                productPlace.Quantity = productModify.Quantity;
+                productPlace.Image = productModify.Image;
+                productPlace.IsActive = productModify.IsActive;
+                productPlace.AgeId = productModify.AgeId;
+                productPlace.OriginId = productModify.OriginId;
+                productPlace.BrandId = productModify.BrandId;
+                productPlace.CateId = productModify.CateId;
+                productPlace.UnsignProductName = productModify.UnsignProductName;
+            }
+
+
+            var updateProduct = await _productRepository.UpdateProductAsync(productPlace);
 
             if (updateProduct != null)
             {
@@ -152,6 +174,7 @@ namespace NET1806_LittleJoy.Service.Services
                 OriginId = p.OriginId,
                 BrandId = p.BrandId,
                 UnsignProductName = p.UnsignProductName,
+                RatingAver = _feedBack.AverageFeedBackInProduct(p.Id).Result
             }).ToList();
 
 
@@ -185,6 +208,7 @@ namespace NET1806_LittleJoy.Service.Services
                 OriginId = p.OriginId,
                 BrandId = p.BrandId,
                 UnsignProductName = p.UnsignProductName,
+                RatingAver = _feedBack.AverageFeedBackInProduct(p.Id).Result
             }).ToList();
 
 

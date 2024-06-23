@@ -158,6 +158,14 @@ namespace NET1806_LittleJoy.API
             builder.Services.AddScoped<IAddressRepository, AddressRepository>();
             builder.Services.AddScoped<IAddressService, AddressService>();
 
+            builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+
+            builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+
+            builder.Services.AddScoped<IVNPayService, VNPayService>();
+            builder.Services.AddScoped<IPointsMoneyRepository, PointsMoneyRepository>();
+
             builder.Services.AddTransient<IMailService, MailService>();
 
             var app = builder.Build();

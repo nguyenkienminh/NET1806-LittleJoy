@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using NET1806_LittleJoy.Repository.Commons;
 using NET1806_LittleJoy.Repository.Entities;
 using NET1806_LittleJoy.Service.BusinessModels;
 using System;
@@ -26,11 +27,19 @@ namespace NET1806_LittleJoy.Service.Mapper
             CreateMap<CategoryModel, Category>().ReverseMap();
 
             CreateMap<FeedBackModel, Feedback>().ReverseMap();
+
             CreateMap<BlogModel, Post>().ReverseMap();
 
             CreateMap<AddressModel, Address>().ReverseMap();
 
             CreateMap<RoleModel, Role>().ReverseMap();
+
+            CreateMap<OrderModel, Order>().ReverseMap();
+
+            CreateMap<OrderDetailModel, OrderDetail>().ReverseMap();
+
+            CreateMap<PaymentModel, Payment>().ReverseMap();
+
         }
     }
 }

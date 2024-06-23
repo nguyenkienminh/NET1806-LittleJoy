@@ -133,14 +133,16 @@ public partial class LittleJoyContext : DbContext
             entity.Property(e => e.Status).HasMaxLength(250);
             entity.Property(e => e.Date).HasColumnType("datetime");
             entity.Property(e => e.DeliveryStatus).HasMaxLength(250);
-            entity.HasOne(d => d.Payment).WithMany(p => p.Orders)
-                .HasForeignKey(d => d.PaymentId)
-                .HasConstraintName("FK__Order__PaymentId__6A30C649");
 
             entity.HasOne(d => d.User).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Order__UserId__6B24EA82");
+
+            entity.HasOne(d => d.Payment)
+                  .WithOne(p => p.Order)
+                  .HasForeignKey<Payment>(p => p.OrderID)
+                  .HasConstraintName("FK__Order__Payment");
         });
 
         modelBuilder.Entity<OrderDetail>(entity =>
@@ -173,6 +175,11 @@ public partial class LittleJoyContext : DbContext
 
             entity.Property(e => e.Method).HasMaxLength(100);
             entity.Property(e => e.Status).HasMaxLength(250);
+
+            entity.HasOne(e => e.Order)
+                  .WithOne(o => o.Payment)
+                  .HasForeignKey<Payment>(e => e.OrderID)
+                  .HasConstraintName("FK_Payment_Order");
         });
 
         modelBuilder.Entity<PointMoney>(entity =>
