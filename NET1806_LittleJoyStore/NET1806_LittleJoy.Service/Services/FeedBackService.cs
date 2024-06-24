@@ -150,7 +150,7 @@ namespace NET1806_LittleJoy.Service.Services
 
                             if(orders.DeliveryStatus != null) {
 
-                                if (/*orders.DeliveryStatus.Equals("Giao hàng thành công "*/ orders.Status.Equals("Đặt Hàng Thành Công"))
+                                if (orders.DeliveryStatus.Equals("Giao hàng thành công"))
                                 {
 
                                     var OrderDetail = await _orderRepository.GetOrderDetailsByOrderId(orders.Id); //lay chi tiet don hang cua tung don hang
