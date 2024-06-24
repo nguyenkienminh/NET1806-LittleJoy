@@ -87,7 +87,7 @@ namespace NET1806_LittleJoy.Service.Services
 
                 if (validateSignature)
                 {
-                    //lấy ordercode từ vnpay respone
+                    //lấy ordercode từ vnpay response
                     int orderCode = 0;
                     _ = int.TryParse(vnPayResponse.vnp_TxnRef, out orderCode);
 
