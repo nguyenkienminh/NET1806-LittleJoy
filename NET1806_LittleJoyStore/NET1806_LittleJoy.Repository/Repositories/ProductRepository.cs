@@ -81,19 +81,6 @@ namespace NET1806_LittleJoy.Repository.Repositories
         {
             var products = _context.Products.AsQueryable();
 
-            if (model.IsStock != null)
-            {
-                if (model.IsStock == true)
-                {
-                    products = products.Where(p => p.Quantity > 10);
-
-                }
-                else if (model.IsStock == false)
-                {
-                    products = products.Where(p => p.Quantity <= 10);
-                }
-            }
-
             if(model.IsActive == true || model.IsActive.HasValue == false)
             {
                 products = products.Where(p => p.IsActive == true);
@@ -143,6 +130,40 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
                     case 3:
                         products = products.OrderBy(p => p.Price);
+                        break;
+                }
+            }
+
+            var itemCount = await products.CountAsync();
+
+            var item = await products.Skip((paging.PageIndex - 1) * paging.PageSize)
+                                     .Take(paging.PageSize)
+                                     .AsNoTracking()
+                                     .ToListAsync();
+
+            var result = new Pagination<Product>(item, itemCount, paging.PageIndex, paging.PageSize);
+
+            return result;
+        }
+
+        public async Task<Pagination<Product>> FilterStatusProductPagingAsync(PaginationParameter paging, ProductFilterStatusModel filterStatus)
+        {
+            var products = _context.Products.AsQueryable();
+
+            if (filterStatus.status.HasValue)
+            {
+                switch (filterStatus.status)
+                {
+                    case 1:
+                        products = products.Where(p => p.Quantity > 10);
+                        break;
+
+                    case 2:
+                        products = products.Where(p => p.Quantity <= 10);
+                        break;
+
+                    case 3:
+                        products = products.Where(p => p.Quantity == 0);
                         break;
                 }
             }
