@@ -26,7 +26,12 @@ namespace NET1806_LittleJoy.Repository.Commons
         public int? brandId { get; set; }
 
         public bool? IsActive { get; set; }
-
-        public bool? IsStock { get; set; }  
     }
+
+
+    public class ProductFilterStatusModel 
+    { 
+        public int? status { get; set;}
+    }
+
 }
