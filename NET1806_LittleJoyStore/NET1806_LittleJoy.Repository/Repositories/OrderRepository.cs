@@ -70,5 +70,11 @@ namespace NET1806_LittleJoy.Repository.Repositories
         {
             return await _context.OrderDetails.Where(x => x.OrderId == orderId).ToListAsync();
         }
+
+        public async Task<List<Order>> GetOrderListByUserIdAsync(int userId)
+        {
+            var query = _context.Orders.Where(x => x.UserId == userId).AsQueryable();
+            return await query.ToListAsync();
+        }
     }
 }

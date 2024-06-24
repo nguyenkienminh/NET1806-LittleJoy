@@ -18,11 +18,13 @@ namespace NET1806_LittleJoy.Service.Services
     {
         private readonly IAddressRepository _repo;
         private readonly IMapper _mapper;
+        private readonly IUserRepository _userRepository;
 
-        public AddressService(IAddressRepository repo, IMapper mapper)
+        public AddressService(IAddressRepository repo, IMapper mapper, IUserRepository userRepository)
         {
             _repo = repo;
             _mapper = mapper;
+            _userRepository = userRepository;
         }
 
         public async Task<Pagination<AddressModel>> GetAllPagingAddressAsync(PaginationParameter paging)
@@ -68,6 +70,34 @@ namespace NET1806_LittleJoy.Service.Services
         {
             try
             {
+
+                if (model.Address1 != null)
+                {
+                    if (model.Address1.Equals(""))
+                    {
+                        throw new Exception("Address Name không được trống");
+                    }
+                }
+
+                var user = await _userRepository.GetUserByIdAsync(model.UserId);
+
+                if (user == null)
+                {
+                    throw new Exception("Tài khoản không tồn tại");
+                }
+
+                foreach (var item1 in await _repo.GetAddressByUserIdAsync(model.UserId))
+                {
+                    if (item1.Address1 != null)
+                    {
+
+                        if (item1.Address1.Equals(model.Address1))
+                        {
+                            throw new Exception("Address không được trùng");
+                        }
+                    }
+                }
+
                 var addressInfo = _mapper.Map<Address>(model);
 
                 var countAddress = await _repo.CountAddressByUserIdAsync(model.UserId);
@@ -138,6 +168,34 @@ namespace NET1806_LittleJoy.Service.Services
                 if (addressPlace == null) // Nếu vị trí là null
                 {
                     throw new Exception("Address không tồn tại");
+                }
+
+
+                if (model.Address1 != null)
+                {
+                    if (model.Address1.Equals(""))
+                    {
+                        throw new Exception("Address Name không được trống");
+                    }
+                }
+
+                var user = await _userRepository.GetUserByIdAsync(addressPlace.UserId);
+
+                if (user == null)
+                {
+                    throw new Exception("Tài khoản không tồn tại");
+                }
+
+                foreach (var item1 in await _repo.GetAddressByUserIdAsync(addressPlace.UserId))
+                {
+                    if (item1.Address1 != null)
+                    {
+
+                        if (item1.Address1.Equals(model.Address1) && item1.Id != model.Id)
+                        {
+                            throw new Exception("Address không được trùng");
+                        }
+                    }
                 }
 
                 addressDetailUpdate.UserId = addressPlace.UserId; // gắn giá trị UserId cho cái update
