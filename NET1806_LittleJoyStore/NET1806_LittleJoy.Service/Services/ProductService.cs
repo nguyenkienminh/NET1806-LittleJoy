@@ -152,7 +152,53 @@ namespace NET1806_LittleJoy.Service.Services
 
         public async Task<Pagination<ProductModel>> FilterProductPagingAsync(PaginationParameter paging, ProductFilterModel model)
         {
+
+            if (model.sortOrder < 1 || model.sortOrder > 4)
+            {
+                throw new Exception("Thông tin không hợp lệ");
+            }
+
             var listProduct =  await _productRepository.FilterProductPagingAsync(paging,model);
+
+            if (!listProduct.Any())
+            {
+                return null;
+            }
+
+            var listProductModels = listProduct.Select(p => new ProductModel
+            {
+                Id = p.Id,
+                CateId = p.CateId,
+                ProductName = p.ProductName,
+                Price = p.Price,
+                Description = p.Description,
+                Weight = p.Weight,
+                IsActive = p.IsActive,
+                Quantity = p.Quantity,
+                Image = p.Image,
+                AgeId = p.AgeId,
+                OriginId = p.OriginId,
+                BrandId = p.BrandId,
+                UnsignProductName = p.UnsignProductName,
+                RatingAver = _feedBack.AverageRatingAsync(p.Id).Result
+            }).ToList();
+
+
+            return new Pagination<ProductModel>(listProductModels,
+                listProduct.TotalCount,
+                listProduct.CurrentPage,
+                listProduct.PageSize);
+        }
+
+        public async Task<Pagination<ProductModel>> FilterStatusProductPagingAsync(PaginationParameter paging, ProductFilterStatusModel filterStatus)
+        {
+
+            if(filterStatus.status < 1 || filterStatus.status > 4) 
+            {
+                throw new Exception("Thông tin không hợp lệ");
+            }
+
+            var listProduct = await _productRepository.FilterStatusProductPagingAsync(paging, filterStatus);
 
             if (!listProduct.Any())
             {
