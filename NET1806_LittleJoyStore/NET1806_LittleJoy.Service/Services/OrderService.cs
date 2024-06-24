@@ -210,7 +210,7 @@ namespace NET1806_LittleJoy.Service.Services
             var orderExist = await _orderRepository.GetOrderById(paymentExist.OrderID);
 
             //cập nhật tình trạng giao hàng, thanh toán
-            if (orderExist.DeliveryStatus != "Giao Hàng Thành Công")
+            if (orderExist.DeliveryStatus != "Giao Hàng Thành Công" || orderExist.Status != "Đã Hủy")
             {
                 switch (model.DeliveryStatus)
                 {
@@ -268,7 +268,7 @@ namespace NET1806_LittleJoy.Service.Services
             }
             else
             {
-                throw new Exception("Không Thể Cập Nhật Đơn Hàng Đã Thành Công");
+                throw new Exception("Không Thể Cập Nhật Đơn Hàng");
             }
         }
     }

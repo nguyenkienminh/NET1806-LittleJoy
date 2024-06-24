@@ -129,7 +129,7 @@ namespace NET1806_LittleJoy.Service.Services
                         var result = await _paymentRepository.UpdatePayment(payment);
 
                         //update order
-                        order.Status = "Thất Bại";
+                        order.Status = "Đã Hủy";
                         await _orderRepository.UpdateOrder(order);
                         return _mapper.Map<PaymentModel>(result);
                     }
