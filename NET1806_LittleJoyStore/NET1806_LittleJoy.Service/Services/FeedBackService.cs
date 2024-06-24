@@ -19,13 +19,15 @@ namespace NET1806_LittleJoy.Service.Services
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
         private readonly IProductRepositoty _productRepositoty;
+        private readonly IOrderRepository _orderRepository;
 
-        public FeedBackService(IFeedBackRepository feedBackRepo, IMapper mapper, IUserService userService, IProductRepositoty productRepositoty)
+        public FeedBackService(IFeedBackRepository feedBackRepo, IMapper mapper, IUserService userService, IProductRepositoty productRepositoty, IOrderRepository orderRepository)
         {
             _feedBackRepo = feedBackRepo;
             _mapper = mapper;
             _userService = userService;
             _productRepositoty = productRepositoty;
+            _orderRepository = orderRepository;
         }
 
         public async Task<Pagination<FeedBackModel>> GetAllFeedBackPagingAsync(PaginationParameter paginationParameter)
@@ -72,32 +74,117 @@ namespace NET1806_LittleJoy.Service.Services
         {
             try
             {
-                if (!model.Rating.HasValue)
+                var product = await _productRepositoty.GetProductByIdAsync(model.ProductId);
+
+                if (product == null)
                 {
-                    throw new Exception("Rating không được trống");
+                    throw new Exception($"Sản phẩm không tồn tại");
                 }
 
-                if (model.Rating < 1 || model.Rating > 5)
+                var checkBuy = await CheckProductHasBuyByUser(model);
+
+                if (checkBuy == false)
                 {
-                    throw new Exception("Sai số rating");
+
+                    if (product != null)
+                    {
+                        throw new Exception($"Người dùng chưa mua sản phẩm đó nên không thể tạo feedback");
+                    }
+                    else
+                    {
+                        throw new Exception($"Product không tồn tại");
+                    }
                 }
-
-                var feedback = _mapper.Map<Feedback>(model);
-
-                feedback.Date = DateTime.UtcNow.AddHours(7);
-
-                var item = await _feedBackRepo.AddFeedBackAsync(feedback);
-
-                if (item == null)
+                else
                 {
-                    return false;
+
+                    if (!model.Rating.HasValue)
+                    {
+                        throw new Exception("Rating không được trống");
+                    }
+
+                    if (model.Rating < 1 || model.Rating > 5)
+                    {
+                        throw new Exception("Sai số rating");
+                    }
+
+                    var feedback = _mapper.Map<Feedback>(model);
+
+                    feedback.Date = DateTime.UtcNow.AddHours(7);
+
+                    var item = await _feedBackRepo.AddFeedBackAsync(feedback);
+
+                    if (item == null)
+                    {
+                        return false;
+                    }
                 }
                 return true;
 
             }
             catch (Exception ex)
             {
-                throw ex; 
+                throw ex;
+            }
+        }
+
+        public async Task<bool> CheckProductHasBuyByUser(FeedBackModel model)
+        {
+            try
+            {
+                #region check người dùng đã mua hàng đó chưa
+                var user = await _userService.GetUserByIdAsync(model.UserId); // lay user  trong he thong
+
+                if (user == null)
+                {
+                    throw new Exception("User is not exist");
+                }
+                else
+                {
+                    var listOrder = await _orderRepository.GetOrderListByUserIdAsync(user.Id); // lay danh sach don hang cua nguoi dung
+
+                    if (listOrder.Any())
+                    {
+                        foreach (var orders in listOrder)
+                        {
+
+                            if(orders.DeliveryStatus != null) {
+
+                                if (/*orders.DeliveryStatus.Equals("Giao hàng thành công "*/ orders.Status.Equals("Đặt Hàng Thành Công"))
+                                {
+
+                                    var OrderDetail = await _orderRepository.GetOrderDetailsByOrderId(orders.Id); //lay chi tiet don hang cua tung don hang
+
+                                    if (OrderDetail.Any())
+                                    {
+                                        foreach (var detail in OrderDetail)
+                                        {
+                                            if (detail.ProductId == model.ProductId)
+                                            {
+                                                return true;
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        throw new Exception("Đơn hàng không có chi tiết bên trong");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception("Người dùng chưa mua hàng");
+                    }
+                }
+
+                return false;
+                #endregion
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
 
@@ -213,7 +300,7 @@ namespace NET1806_LittleJoy.Service.Services
 
         public async Task<Pagination<FeedBackModel>> GetFeedBackByProductIdAsync(int productId, PaginationParameter paginationParameter)
         {
-            var list = await _feedBackRepo.FeedBackInProductAsync(productId,paginationParameter);
+            var list = await _feedBackRepo.FeedBackInProductAsync(productId, paginationParameter);
 
             if (!list.Any())
             {
