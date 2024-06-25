@@ -28,8 +28,7 @@
     {
         public int OrderCode { get; set; }
 
-        public int DeliveryStatus { get; set; }
-
         public int Status { get; set; }
+
     }
 }

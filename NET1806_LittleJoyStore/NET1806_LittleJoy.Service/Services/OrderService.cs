@@ -157,6 +157,47 @@ namespace NET1806_LittleJoy.Service.Services
             }
         }
 
+        public async Task<OrderWithDetailsModel> GetOrderByOrderCode(int orderCode)
+        {
+            var payment = await _paymentRepository.GetPaymentByOrderCode(orderCode);
+            if(payment == null)
+            {
+                throw new Exception("Không tìm thấy order");
+            }
+            var order = await _orderRepository.GetOrderById(payment.OrderID);
+
+            OrderWithDetailsModel model = new OrderWithDetailsModel()
+            {
+                Id = order.Id,
+                Address = order.Address,
+                AmountDiscount = order.AmountDiscount,
+                DeliveryStatus = order.DeliveryStatus,
+                Note = order.Note,
+                OrderCode = orderCode,
+                PaymentMethod = payment.Method,
+                PaymentStatus = payment.Status,
+                Status = order.Status,
+                TotalPrice = (int)order.TotalPrice,
+                UserId = order.UserId,
+            };
+
+            var listDetails = await _orderRepository.GetOrderDetailsByOrderId(order.Id);
+            List<OrderProductModel> listProductDetails = new List<OrderProductModel>();
+            foreach (var item1 in listDetails)
+            {
+                var product = await _productRepositoty.GetProductByIdAsync((int)item1.ProductId);
+                listProductDetails.Add(new OrderProductModel()
+                {
+                    Id = product.Id,
+                    ProductName = product.ProductName,
+                    Price = ((int)(item1.Price * item1.Quantity)),
+                    Quantity = (int)item1.Quantity,
+                });
+            }
+            model.ProductOrders = listProductDetails;
+            return model;
+        }
+
         public async Task<Pagination<OrderWithDetailsModel>> GetOrderByUserId(PaginationParameter parameter, int userId)
         {
             //lấy list order
@@ -194,7 +235,7 @@ namespace NET1806_LittleJoy.Service.Services
                     {
                         Id = product.Id,
                         ProductName = product.ProductName,
-                        Price = (int)item1.Price,
+                        Price = ((int)(item1.Price * item1.Quantity)),
                         Quantity = (int)item1.Quantity,
                     });
                 }
@@ -204,15 +245,15 @@ namespace NET1806_LittleJoy.Service.Services
             return new Pagination<OrderWithDetailsModel>(result, list.TotalCount, list.CurrentPage, list.PageSize);
         }
 
-        public async Task<bool> UpdateOrder(OrderUpdateRequestModel model)
+        public async Task<bool> UpdateOrderDelivery(OrderUpdateRequestModel model)
         {
             var paymentExist = await _paymentRepository.GetPaymentByOrderCode(model.OrderCode);
             var orderExist = await _orderRepository.GetOrderById(paymentExist.OrderID);
 
             //cập nhật tình trạng giao hàng, thanh toán
-            if (orderExist.DeliveryStatus != "Giao Hàng Thành Công" || orderExist.Status != "Đã Hủy")
+            if (orderExist.DeliveryStatus != "Giao Hàng Thành Công" && orderExist.Status == "Đặt Hàng Thành Công")
             {
-                switch (model.DeliveryStatus)
+                switch (model.Status)
                 {
                     case 1:
                         {
@@ -269,6 +310,51 @@ namespace NET1806_LittleJoy.Service.Services
             else
             {
                 throw new Exception("Không Thể Cập Nhật Đơn Hàng");
+            }
+        }
+
+        public async Task<bool> UpdateOrderStatus(OrderUpdateRequestModel model)
+        {
+            var paymentExist = await _paymentRepository.GetPaymentByOrderCode(model.OrderCode);
+            var orderExist = await _orderRepository.GetOrderById(paymentExist.OrderID);
+
+            if (orderExist.DeliveryStatus != "Đang Giao Hàng" && orderExist.DeliveryStatus != "Giao Hàng Thành Công" && orderExist.DeliveryStatus != "Đang Chuẩn Bị")
+            {
+                if(paymentExist.Method == "VNPay" && paymentExist.Status == "Thành Công")
+                {
+                    throw new Exception("Không thể cập nhật đơn hàng này");
+                }
+
+                string status = "";
+
+                switch (model.Status) 
+                {
+                    case 1:
+                        {
+                            status = "Đặt Hàng Thành Công";
+                            break;
+                        }
+                    case 2: 
+                        {
+                            status = "Đã Hủy";
+                            break;
+                        }
+                }
+
+                if (orderExist.Status == status)
+                {
+                    throw new Exception("Không Có Gì Để Cập Nhật");
+                }
+                else 
+                {
+                    orderExist.Status = status;
+                    await _orderRepository.UpdateOrder(orderExist);
+                }
+                return true;
+            }
+            else
+            {
+                throw new Exception("Không thể cập nhật đơn hàng này");
             }
         }
     }

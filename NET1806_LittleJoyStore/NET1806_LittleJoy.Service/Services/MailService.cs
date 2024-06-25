@@ -4,6 +4,7 @@ using MailKit.Security;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using NET1806_LittleJoy.Repository.Commons;
+using NET1806_LittleJoy.Service.Helpers;
 using NET1806_LittleJoy.Service.Services.Interface;
 using System;
 using System.Collections.Generic;

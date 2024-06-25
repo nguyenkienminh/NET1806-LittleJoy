@@ -103,7 +103,6 @@ namespace NET1806_LittleJoy.Service.Services
                         //update trạng thái order
                         
                         order.Status = "Đặt Hàng Thành Công";
-                        order.DeliveryStatus = "Đang Chờ";
                         await _orderRepository.UpdateOrder(order);
 
                         //lấy user để cộng, trừ điểm theo order
