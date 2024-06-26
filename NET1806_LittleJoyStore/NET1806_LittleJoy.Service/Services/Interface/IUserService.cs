@@ -21,6 +21,8 @@ namespace NET1806_LittleJoy.Service.Services.Interface
 
         public Task<UserModel?> GetUserByIdAsync(int id);
 
+        public Task<UserModel?> GetUserByNameAsync(string name);
+
         public Task<bool?> AddUserAsync(UserModel model, string mainAddress);
 
         public Task<bool> DeleteUserByIdAsync(int id);
@@ -29,7 +31,7 @@ namespace NET1806_LittleJoy.Service.Services.Interface
 
         public Task<UserModel> UpdateUserRoleAsync(UserModel model);
 
-        public Task<string> ChangePasswordUserRoleAsync(ChangePasswordModel model);
+        public Task<bool?> ChangePasswordUserRoleAsync(ChangePasswordModel model);
 
         public Task<ICollection<UserModel>> GetUserListHighestScoreAsync();
 

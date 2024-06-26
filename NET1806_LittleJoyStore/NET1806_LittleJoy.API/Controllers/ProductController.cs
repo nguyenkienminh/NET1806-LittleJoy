@@ -236,14 +236,14 @@ namespace NET1806_LittleJoy.API.Controllers
         /// Sort Order:
         ///     1 - Hàng mới |
         ///     2 - Giá tiền Cao đến thấp |
-        ///     3 - Giá tiền Thấp đến cao
+        ///     3 - Giá tiền Thấp đến cao |
         /// </summary>
         [HttpGet("filter")]
         public async Task<IActionResult> FilterProductPagingAsync([FromQuery] PaginationParameter paging, [FromQuery] ProductFilterModel model)
         {
             try
             {
-                var result = await _productService.FilterProductPagingAsync(paging,model);
+                var result = await _productService.FilterProductPagingAsync(paging, model);
 
                 if (result != null)
                 {
@@ -280,13 +280,19 @@ namespace NET1806_LittleJoy.API.Controllers
             }
         }
 
-
-        [HttpGet("product-out-of-stock")]
-        public async Task<IActionResult> GetListProductOutOfStockPagingAsync([FromQuery] PaginationParameter paginationParameter)
+        /// <summary>
+        /// Inventory Status:
+        ///     1 - Còn hàng  |
+        ///     2 - sắp hết hàng  |
+        ///     3 - hết hàng |
+        ///     không nhập - lấy hết |
+        /// </summary>
+        [HttpGet("filter-inventory-status")]
+        public async Task<IActionResult> FilterStatusProductPagingAsync([FromQuery] PaginationParameter paging, [FromQuery] ProductFilterStatusModel filterStatus)
         {
             try
             {
-                var result = await _productService.GetAllProductOutOfStockPagingAsync(paginationParameter);
+                var result = await _productService.FilterStatusProductPagingAsync(paging, filterStatus);
 
                 if (result != null)
                 {
@@ -322,7 +328,5 @@ namespace NET1806_LittleJoy.API.Controllers
                 return BadRequest(responseModel);
             }
         }
-
-
     }
 }

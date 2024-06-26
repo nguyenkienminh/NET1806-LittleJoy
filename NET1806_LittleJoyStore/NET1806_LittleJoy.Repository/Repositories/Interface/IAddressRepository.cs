@@ -28,5 +28,7 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
 
         public Task<Address?> GetMainAddressByUserIdAsync(int id);
 
+        public Task<ICollection<Address?>> GetAddressListByUserIdAsync(int id);
+
     }
 }

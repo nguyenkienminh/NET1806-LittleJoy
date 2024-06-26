@@ -20,9 +20,9 @@ namespace NET1806_LittleJoy.Service.Services
     {
         private readonly IProductRepositoty _productRepository;
         private readonly IMapper _mapper;
-        private readonly IFeedBackService _feedBack;
+        private readonly IFeedBackRepository _feedBack;
 
-        public ProductService(IProductRepositoty productRepository, IMapper mapper, IFeedBackService feedBack)
+        public ProductService(IProductRepositoty productRepository, IMapper mapper, IFeedBackRepository feedBack)
         {
             _productRepository = productRepository;
             _mapper = mapper;
@@ -53,7 +53,7 @@ namespace NET1806_LittleJoy.Service.Services
                 OriginId = p.OriginId,
                 BrandId = p.BrandId,
                 UnsignProductName = p.UnsignProductName, 
-                RatingAver = _feedBack.AverageFeedBackInProduct(p.Id).Result
+                RatingAver = _feedBack.AverageRatingAsync(p.Id).Result
             }).ToList();
 
 
@@ -73,7 +73,7 @@ namespace NET1806_LittleJoy.Service.Services
             }
 
             var productModelInfo = _mapper.Map<ProductModel>(productDetail);
-            productModelInfo.RatingAver = await _feedBack.AverageFeedBackInProduct(productModelInfo.Id);
+            productModelInfo.RatingAver = await _feedBack.AverageRatingAsync(productModelInfo.Id);
             return productModelInfo;
            
         }
@@ -152,6 +152,12 @@ namespace NET1806_LittleJoy.Service.Services
 
         public async Task<Pagination<ProductModel>> FilterProductPagingAsync(PaginationParameter paging, ProductFilterModel model)
         {
+
+            if (model.sortOrder < 1 || model.sortOrder > 4)
+            {
+                throw new Exception("Thông tin không hợp lệ");
+            }
+
             var listProduct =  await _productRepository.FilterProductPagingAsync(paging,model);
 
             if (!listProduct.Any())
@@ -174,7 +180,7 @@ namespace NET1806_LittleJoy.Service.Services
                 OriginId = p.OriginId,
                 BrandId = p.BrandId,
                 UnsignProductName = p.UnsignProductName,
-                RatingAver = _feedBack.AverageFeedBackInProduct(p.Id).Result
+                RatingAver = _feedBack.AverageRatingAsync(p.Id).Result
             }).ToList();
 
 
@@ -184,14 +190,20 @@ namespace NET1806_LittleJoy.Service.Services
                 listProduct.PageSize);
         }
 
-        public async Task<Pagination<ProductModel>> GetAllProductOutOfStockPagingAsync(PaginationParameter paginationParameter)
+        public async Task<Pagination<ProductModel>> FilterStatusProductPagingAsync(PaginationParameter paging, ProductFilterStatusModel filterStatus)
         {
-            var listProduct = await _productRepository.GetAllProductOutOfStockPagingAsync(paginationParameter);
+
+            if(filterStatus.status < 1 || filterStatus.status > 4) 
+            {
+                throw new Exception("Thông tin không hợp lệ");
+            }
+
+            var listProduct = await _productRepository.FilterStatusProductPagingAsync(paging, filterStatus);
+
             if (!listProduct.Any())
             {
                 return null;
             }
-
 
             var listProductModels = listProduct.Select(p => new ProductModel
             {
@@ -208,7 +220,7 @@ namespace NET1806_LittleJoy.Service.Services
                 OriginId = p.OriginId,
                 BrandId = p.BrandId,
                 UnsignProductName = p.UnsignProductName,
-                RatingAver = _feedBack.AverageFeedBackInProduct(p.Id).Result
+                RatingAver = _feedBack.AverageRatingAsync(p.Id).Result
             }).ToList();
 
 

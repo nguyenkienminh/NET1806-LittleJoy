@@ -71,19 +71,6 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
         public async Task<Product> UpdateProductAsync(Product productModify)
         {
-            //productPlace.ProductName = productModify.ProductName;
-            //productPlace.Price = productModify.Price;
-            //productPlace.Description = productModify.Description;
-            //productPlace.Weight = productModify.Weight;
-            //productPlace.Quantity = productModify.Quantity;
-            //productPlace.Image = productModify.Image;
-            //productPlace.IsActive = productModify.IsActive;
-            //productPlace.AgeId = productModify.AgeId;
-            //productPlace.OriginId = productModify.OriginId;
-            //productPlace.BrandId = productModify.BrandId;
-            //productPlace.CateId = productModify.CateId;
-            //productPlace.UnsignProductName = productModify.UnsignProductName;
-
             _context.Products.Update(productModify);
 
             await _context.SaveChangesAsync();
@@ -159,21 +146,36 @@ namespace NET1806_LittleJoy.Repository.Repositories
             return result;
         }
 
-        public async Task<Pagination<Product>> GetAllProductOutOfStockPagingAsync(PaginationParameter paginationParameter)
+        public async Task<Pagination<Product>> FilterStatusProductPagingAsync(PaginationParameter paging, ProductFilterStatusModel filterStatus)
         {
-            var itemCount = await _context.Products.CountAsync(p => p.Quantity < 10);
+            var products = _context.Products.AsQueryable();
 
-            var item = await _context.Products.Where(p => p.Quantity < 10)
-                                              .Include(p => p.Age)
-                                              .Include(p => p.Brand)
-                                              .Include(p => p.Cate)
-                                              .Include(p => p.Origin)
-                                              .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
-                                              .Take(paginationParameter.PageSize)
-                                              .AsNoTracking()
-                                              .ToListAsync();
+            if (filterStatus.status.HasValue)
+            {
+                switch (filterStatus.status)
+                {
+                    case 1:
+                        products = products.Where(p => p.Quantity > 10);
+                        break;
 
-            var result = new Pagination<Product>(item, itemCount, paginationParameter.PageIndex, paginationParameter.PageSize);
+                    case 2:
+                        products = products.Where(p => p.Quantity <= 10);
+                        break;
+
+                    case 3:
+                        products = products.Where(p => p.Quantity == 0);
+                        break;
+                }
+            }
+
+            var itemCount = await products.CountAsync();
+
+            var item = await products.Skip((paging.PageIndex - 1) * paging.PageSize)
+                                     .Take(paging.PageSize)
+                                     .AsNoTracking()
+                                     .ToListAsync();
+
+            var result = new Pagination<Product>(item, itemCount, paging.PageIndex, paging.PageSize);
 
             return result;
         }
