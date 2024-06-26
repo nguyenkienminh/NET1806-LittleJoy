@@ -199,8 +199,7 @@ namespace NET1806_LittleJoy.Service.Helpers
 "                        <b>Kính chào quý khách,</b>\n" +
 "                    </p>\n" +
 "                    <p style=\"margin:0;font-size:16px\">\n" +
-"                        Chúng tôi trân trọng thông báo rằng đơn hàng của quý khách đã được đặt hàng thành công và đang\n" +
-"                        chờ xử lí.\n" +
+"                        Chúng tôi trân trọng thông báo rằng đơn hàng của quý khách đã được đặt hàng thành công\n" +
 "                    </p>\n" +
 "                    <br>\n" +
 "                    <div style=\"border-top:1px solid #dcdbdb\"></div>\n" +
