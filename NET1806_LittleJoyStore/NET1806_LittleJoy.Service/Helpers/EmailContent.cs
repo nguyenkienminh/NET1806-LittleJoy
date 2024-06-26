@@ -16,6 +16,32 @@ namespace NET1806_LittleJoy.Service.Helpers
         {
             return "<div style=\"background-color:#f8f8f8;font-family:sans-serif;padding:15px\">\n"
                 + "    <div style=\"max-width:1000px;margin:auto\">\n"
+                + "<div\n" +
+"                style=\"background-color:#fff;padding:5px 20px;border-radius:10px; margin-bottom: 20px;display: flex;justify-content: center;\">\n" +
+"                <div style=\"display: inline-block; width: 15%;\"><a href=\"https://littlejoy.vercel.app/\"><img\n" +
+"                            src=\"https://firebasestorage.googleapis.com/v0/b/little-joy-2c5d3.appspot.com/o/Logo%20Little%20Joy%20Store.png?alt=media&token=c0752ee7-f2c0-400e-9024-632160b7aa66\"\n" +
+"                            alt=\"\" style=\"width: 100%;\"></a></div>\n" +
+"                <div style=\"display: inline-block; width: 85%;\">\n" +
+"                    <table style=\"width: 100%; height: 100%;\">\n" +
+"                        <tr style=\"height: 33%; width: 33%;\">\n" +
+"                            <td></td>\n" +
+"                            <td></td>\n" +
+"                            <td></td>\n" +
+"                        </tr>\n" +
+"                        <tr style=\"height: 33%;\">\n" +
+"                            <td colspan=\"3\" style=\"text-align: center;\">\n" +
+"                                <span style=\"font-size: 22px; color: #3C75A6; font-weight: 600;\">\n" +
+"                                    Little Joy Store - Cửa Hàng Sữa Cho Mẹ Bầu Và Em Bé\n" +
+"                                </span>\n" +
+"                            </td>\n" +
+"                        </tr>\n" +
+"                        <tr style=\"height: 33%;\">\n" +
+"                            <td></td>\n" +
+"                            <td></td>\n" +
+"                        </tr>\n" +
+"                    </table>\n" +
+"                </div>\n" +
+"            </div>\n"
                 + "        <div class=\"adM\">\n"
                 + "            <div style=\"background-color:#fff;padding:5px 20px;color:#000;border-radius:0px 0px 2px 2px\">\n"
                 + "                <div style=\"padding:35px 15px\">\n"
@@ -53,6 +79,32 @@ namespace NET1806_LittleJoy.Service.Helpers
         {
             return "<div style=\"background-color:#f8f8f8;font-family:sans-serif;padding:15px\">\n"
                 + "        <div style=\"max-width:1000px ; margin:auto\">\n"
+                + "<div\n" +
+"                style=\"background-color:#fff;padding:5px 20px;border-radius:10px; margin-bottom: 20px;display: flex;justify-content: center;\">\n" +
+"                <div style=\"display: inline-block; width: 15%;\"><a href=\"https://littlejoy.vercel.app/\"><img\n" +
+"                            src=\"https://firebasestorage.googleapis.com/v0/b/little-joy-2c5d3.appspot.com/o/Logo%20Little%20Joy%20Store.png?alt=media&token=c0752ee7-f2c0-400e-9024-632160b7aa66\"\n" +
+"                            alt=\"\" style=\"width: 100%;\"></a></div>\n" +
+"                <div style=\"display: inline-block; width: 85%;\">\n" +
+"                    <table style=\"width: 100%; height: 100%;\">\n" +
+"                        <tr style=\"height: 33%; width: 33%;\">\n" +
+"                            <td></td>\n" +
+"                            <td></td>\n" +
+"                            <td></td>\n" +
+"                        </tr>\n" +
+"                        <tr style=\"height: 33%;\">\n" +
+"                            <td colspan=\"3\" style=\"text-align: center;\">\n" +
+"                                <span style=\"font-size: 22px; color: #3C75A6; font-weight: 600;\">\n" +
+"                                    Little Joy Store - Cửa Hàng Sữa Cho Mẹ Bầu Và Em Bé\n" +
+"                                </span>\n" +
+"                            </td>\n" +
+"                        </tr>\n" +
+"                        <tr style=\"height: 33%;\">\n" +
+"                            <td></td>\n" +
+"                            <td></td>\n" +
+"                        </tr>\n" +
+"                    </table>\n" +
+"                </div>\n" +
+"            </div>\n"
                 + "            <div class=\"adM\">\n"
                 + "                <div style=\"background-color:#fff;padding:5px 20px;color:#000;border-radius:0px 0px 2px 2px\">\n"
                 + "                    <div style=\"padding:35px 15px\">\n"
@@ -129,40 +181,40 @@ namespace NET1806_LittleJoy.Service.Helpers
         public static string OrderEmail(OrderWithDetailsModel model, UserModel user)
         {
             string address = model.Address;
-            if(address.Length > 30)
+            if (address.Length > 30)
             {
                 address = address.Substring(0, 30) + "...";
             }
 
             string infoDetails = "";
             int count = 1;
-            foreach(var item in model.ProductOrders)
+            foreach (var item in model.ProductOrders)
             {
                 infoDetails += "                            <tr>\n" +
-"                                <td style=\"border: 1px solid gray;padding: 7px 10px; text-align: center;\">"+ count++ +"</td>\n" +
-"                                <td style=\"border: 1px solid gray; padding-left: 7px ;\"><span>"+item.ProductName+"</span>\n" +
+"                                <td style=\"border: 1px solid gray;padding: 7px 10px; text-align: center;\">" + count++ + "</td>\n" +
+"                                <td style=\"border: 1px solid gray; padding-left: 7px ;\"><span>" + item.ProductName + "</span>\n" +
 "                                </td>\n" +
 "                                <td style=\"border: 1px solid gray; padding-right: 7px ;\"><span\n" +
-"                                        style=\"float: inline-end;\">"+item.Quantity+"</span></td>\n" +
+"                                        style=\"float: inline-end;\">" + item.Quantity + "</span></td>\n" +
 "                                <td style=\"border: 1px solid gray; padding-right: 7px ;\"><span\n" +
-"                                        style=\"float: inline-end;\">"+ (item.Price / item.Quantity).ToString("N0") + "</span></td>\n" +
+"                                        style=\"float: inline-end;\">" + (item.Price / item.Quantity).ToString("N0") + "</span></td>\n" +
 "                                <td style=\"border: 1px solid gray; padding-right: 7px ;\"><span\n" +
-"                                        style=\"float: inline-end;\">"+item.Price.ToString("N0") +"</span></td>\n" +
+"                                        style=\"float: inline-end;\">" + item.Price.ToString("N0") + "</span></td>\n" +
 "                            </tr>\n";
             }
 
-            if(model.AmountDiscount != 0)
+            if (model.AmountDiscount != 0)
             {
                 int amount = (int)model.AmountDiscount;
                 infoDetails += "                            <tr>\n" +
-"                                <td style=\"border: 1px solid gray;padding: 7px 10px; text-align: center;\">"+ count++ +"</td>\n" +
+"                                <td style=\"border: 1px solid gray;padding: 7px 10px; text-align: center;\">" + count++ + "</td>\n" +
 "                                <td style=\"border: 1px solid gray; padding-left: 7px ;\"><span>Giảm giá</span></td>\n" +
 "                                <td style=\"border: 1px solid gray; padding-right: 7px ;\"><span\n" +
 "                                        style=\"float: inline-end;\"></span></td>\n" +
 "                                <td style=\"border: 1px solid gray; padding-right: 7px ;\"><span\n" +
 "                                        style=\"float: inline-end;\"></span></td>\n" +
 "                                <td style=\"border: 1px solid gray; padding-right: 7px ;\"><span\n" +
-"                                        style=\"float: inline-end;\">- "+ amount.ToString("N0") + "</span></td>\n" +
+"                                        style=\"float: inline-end;\">- " + amount.ToString("N0") + "</span></td>\n" +
 "                            </tr>\n";
             }
             return "<div style=\"background-color:#f8f8f8;font-family:sans-serif;padding:15px\">\n" +
@@ -212,19 +264,19 @@ namespace NET1806_LittleJoy.Service.Helpers
 "                                </tr>\n" +
 "                                <tr>\n" +
 "                                    <td style=\"width: 40%; padding: 10px 0;\">Tên khách hàng :</td>\n" +
-"                                    <td style=\"width: 60%;\"><span>"+ user.Fullname +"</span></td>\n" +
+"                                    <td style=\"width: 60%;\"><span>" + user.Fullname + "</span></td>\n" +
 "                                </tr>\n" +
 "                                <tr>\n" +
 "                                    <td style=\"padding: 10px 0;\">Địa chỉ giao hàng :</td>\n" +
-"                                    <td><span>"+address+"</span></td>\n" +
+"                                    <td><span>" + address + "</span></td>\n" +
 "                                </tr>\n" +
 "                                <tr>\n" +
 "                                    <td style=\"padding: 10px 0;\">Số điện thoại :</td>\n" +
-"                                    <td><span>"+user.PhoneNumber+"</span></td>\n" +
+"                                    <td><span>" + user.PhoneNumber + "</span></td>\n" +
 "                                </tr>\n" +
 "                                <tr>\n" +
 "                                    <td style=\"padding: 10px 0;\">Email :</td>\n" +
-"                                    <td><span>"+user.Email+"</span></td>\n" +
+"                                    <td><span>" + user.Email + "</span></td>\n" +
 "                                </tr>\n" +
 "                            </table>\n" +
 "                        </div>\n" +
@@ -236,19 +288,19 @@ namespace NET1806_LittleJoy.Service.Helpers
 "                                </tr>\n" +
 "                                <tr>\n" +
 "                                    <td style=\"width: 40%; padding: 10px 0;\">Mã đơn hàng :</td>\n" +
-"                                    <td style=\"width: 60%;\">#"+model.OrderCode+"</td>\n" +
+"                                    <td style=\"width: 60%;\">#" + model.OrderCode + "</td>\n" +
 "                                </tr>\n" +
 "                                <tr>\n" +
 "                                    <td style=\"padding: 10px 0;\">Tổng tiền :</td>\n" +
-"                                    <td><span>"+model.TotalPrice.ToString("N0") +"</span></td>\n" +
+"                                    <td><span>" + model.TotalPrice.ToString("N0") + "</span></td>\n" +
 "                                </tr>\n" +
 "                                <tr>\n" +
 "                                    <td style=\"padding: 10px 0;\">Phương thức :</td>\n" +
-"                                    <td><span>"+model.PaymentMethod+"</span></td>\n" +
+"                                    <td><span>" + model.PaymentMethod + "</span></td>\n" +
 "                                </tr>\n" +
 "                                <tr>\n" +
 "                                    <td style=\"padding: 10px 0;\">Ngày tạo hóa đơn: </td>\n" +
-"                                    <td><span>"+model.date.ToString("dd/MM/yyyy") + "</span></td>\n" +
+"                                    <td><span>" + model.date.ToString("dd/MM/yyyy") + "</span></td>\n" +
 "                                </tr>\n" +
 "                            </table>\n" +
 "                        </div>\n" +
@@ -269,7 +321,7 @@ namespace NET1806_LittleJoy.Service.Helpers
 "                            <tr style=\"background-color: #3C75A6; color: white;\">\n" +
 "                                <td colspan=\"4\" style=\"padding: 5px 10px; border: 1px solid gray;\">TỔNG TIỀN (VNĐ)</td>\n" +
 "                                <td style=\"text-align: center; border: 1px solid gray; padding-right: 7px ;\"><span\n" +
-"                                        style=\"float: inline-end;\">"+model.TotalPrice.ToString("N0") +"</span></td>\n" +
+"                                        style=\"float: inline-end;\">" + model.TotalPrice.ToString("N0") + "</span></td>\n" +
 "                            </tr>\n" +
 "                        </table>\n" +
 "                    </div>\n" +
