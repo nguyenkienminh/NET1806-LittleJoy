@@ -6,6 +6,7 @@ using NET1806_LittleJoy.Repository.Entities;
 using NET1806_LittleJoy.Repository.Repositories;
 using NET1806_LittleJoy.Repository.Repositories.Interface;
 using NET1806_LittleJoy.Service.BusinessModels;
+using NET1806_LittleJoy.Service.Helpers;
 using NET1806_LittleJoy.Service.Services.Interface;
 using NET1806_LittleJoy.Service.Ultils;
 using Org.BouncyCastle.Crypto.Engines;
@@ -24,16 +25,19 @@ namespace NET1806_LittleJoy.Service.Services
         private readonly IUserRepository _userRepository;
         private readonly IPaymentRepository _paymentRepository;
         private readonly IVNPayService _vnpayservice;
+        private readonly IMailService _mailService;
         private readonly IPointsMoneyRepository _pointsMoneyRepository;
         private readonly IMapper _mapper;
 
-        public OrderService(IOrderRepository orderRepository, IProductRepositoty productRepositoty, IUserRepository userRepository, IPaymentRepository paymentRepository, IVNPayService vnpayservice, IMapper mapper)
+        public OrderService(IOrderRepository orderRepository, IProductRepositoty productRepositoty, IUserRepository userRepository, IPaymentRepository paymentRepository, IVNPayService vnpayservice, IPointsMoneyRepository pointsMoneyRepository, IMailService mailService, IMapper mapper)
         {
             _orderRepository = orderRepository;
             _productRepositoty = productRepositoty;
             _userRepository = userRepository;
             _paymentRepository = paymentRepository;
             _vnpayservice = vnpayservice;
+            _pointsMoneyRepository = pointsMoneyRepository;
+            _mailService = mailService;
             _mapper = mapper;
         }
 
@@ -179,6 +183,7 @@ namespace NET1806_LittleJoy.Service.Services
                 Status = order.Status,
                 TotalPrice = (int)order.TotalPrice,
                 UserId = order.UserId,
+                date = (DateTime)order.Date,
             };
 
             var listDetails = await _orderRepository.GetOrderDetailsByOrderId(order.Id);
@@ -213,7 +218,8 @@ namespace NET1806_LittleJoy.Service.Services
                 TotalPrice = (int)x.TotalPrice,
                 UserId = userId,
                 DeliveryStatus = x.DeliveryStatus,
-                Status = x.Status
+                Status = x.Status,
+                date = (DateTime)x.Date
             }).ToList();
 
             //lay tung order gan them thanh phan
@@ -296,6 +302,16 @@ namespace NET1806_LittleJoy.Service.Services
 
                                 //update user
                                 await _userRepository.UpdateUserAsync(user);
+
+                                var orderWithDetails = await GetOrderByOrderCode((int)paymentExist.Code);
+                                string body = EmailContent.OrderEmail(orderWithDetails, _mapper.Map<UserModel>(user));
+
+                                await _mailService.sendEmailAsync(new MailRequest()
+                                {
+                                    ToEmail = user.Email,
+                                    Body = body,
+                                    Subject = "[Little Joy] Hóa đơn điện tử số #" + paymentExist.Code
+                                });
                             }
                             break;
                         }
