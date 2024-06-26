@@ -236,11 +236,7 @@ namespace NET1806_LittleJoy.API.Controllers
         /// Sort Order:
         ///     1 - Hàng mới |
         ///     2 - Giá tiền Cao đến thấp |
-        ///     3 - Giá tiền Thấp đến cao
-        ///  IsStock:
-        ///     true - còn hàng (>10)
-        ///     false - hết hàng (<=10)
-        ///     không nhập - lấy cả hai
+        ///     3 - Giá tiền Thấp đến cao |
         /// </summary>
         [HttpGet("filter")]
         public async Task<IActionResult> FilterProductPagingAsync([FromQuery] PaginationParameter paging, [FromQuery] ProductFilterModel model)
@@ -284,5 +280,53 @@ namespace NET1806_LittleJoy.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Inventory Status:
+        ///     1 - Còn hàng  |
+        ///     2 - sắp hết hàng  |
+        ///     3 - hết hàng |
+        ///     không nhập - lấy hết |
+        /// </summary>
+        [HttpGet("filter-inventory-status")]
+        public async Task<IActionResult> FilterStatusProductPagingAsync([FromQuery] PaginationParameter paging, [FromQuery] ProductFilterStatusModel filterStatus)
+        {
+            try
+            {
+                var result = await _productService.FilterStatusProductPagingAsync(paging, filterStatus);
+
+                if (result != null)
+                {
+                    var metadata = new
+                    {
+                        result.TotalCount,
+                        result.PageSize,
+                        result.CurrentPage,
+                        result.TotalPages,
+                        result.HasNext,
+                        result.HasPrevious
+                    };
+
+                    Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+                    return Ok(result);
+                }
+                else
+                {
+                    return NotFound(new ResponseModels
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "Product is empty"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                var responseModel = new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(responseModel);
+            }
+        }
     }
 }
