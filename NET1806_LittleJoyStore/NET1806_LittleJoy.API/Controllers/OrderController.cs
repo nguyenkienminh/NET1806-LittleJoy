@@ -146,22 +146,22 @@ namespace NET1806_LittleJoy.API.Controllers
             }
         }
 
-        [HttpGet("get-orders")]
-        public async Task<IActionResult> ProductFilter(OrderFilterModel model)
-        {
-            try
-            {
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                var responseModel = new ResponseModels()
-                {
-                    HttpCode = StatusCodes.Status400BadRequest,
-                    Message = ex.Message.ToString()
-                };
-                return BadRequest(responseModel);
-            }
-        }
+        //[HttpGet("get-orders")]
+        //public async Task<IActionResult> ProductFilter(OrderFilterModel model)
+        //{
+        //    try
+        //    {
+        //        return Ok();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var responseModel = new ResponseModels()
+        //        {
+        //            HttpCode = StatusCodes.Status400BadRequest,
+        //            Message = ex.Message.ToString()
+        //        };
+        //        return BadRequest(responseModel);
+        //    }
+        //}
     }
 }
