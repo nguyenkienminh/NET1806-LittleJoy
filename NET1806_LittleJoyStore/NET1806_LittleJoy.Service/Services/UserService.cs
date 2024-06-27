@@ -267,10 +267,20 @@ namespace NET1806_LittleJoy.Service.Services
 
         /**************************************************************/
 
-        public async Task<Pagination<UserModel>> GetAllPagingUserByRoleIdAndStatusAsync(PaginationParameter paging, int roleId, bool status)
+        public async Task<Pagination<UserModel>> GetAllPagingUserByRoleIdAndStatusAsync(PaginationParameter paging, UserFilterModel userFilterModel)
         {
 
-            var listUser = await _userRepository.GetAllPagingUserByRoleIdAndStatusAsync(paging, roleId, status);
+            if (userFilterModel.status < 0 || userFilterModel.status > 1)
+            {
+                throw new Exception("nhập sai dữ liệu");
+            }
+
+            if (userFilterModel.RoleId < 1 || userFilterModel.RoleId > 3)
+            {
+                throw new Exception("nhập sai dữ liệu");
+            }
+
+            var listUser = await _userRepository.GetAllPagingUserByRoleIdAndStatusAsync(paging, userFilterModel);
 
             if (!listUser.Any())
             {
