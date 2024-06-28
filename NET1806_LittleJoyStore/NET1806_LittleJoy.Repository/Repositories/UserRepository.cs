@@ -50,15 +50,36 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
         /*****************************************************************/
 
-        public async Task<Pagination<User>> GetAllPagingUserByRoleIdAndStatusAsync(PaginationParameter paging, int roleId, bool status)
+        public async Task<Pagination<User>> GetAllPagingUserByRoleIdAndStatusAsync(PaginationParameter paging, UserFilterModel userFilterModel)
         {
-            var itemCount = await _context.Users.CountAsync(u => u.RoleId == roleId && u.Status == status);
 
-            var item = await _context.Users .Where(u => u.RoleId == roleId && u.Status == status)
-                                            .Skip((paging.PageIndex - 1) * paging.PageSize)
-                                            .Take(paging.PageSize)
-                                            .AsNoTracking()
-                                            .ToListAsync();
+            var users = _context.Users.AsQueryable();
+
+            if (userFilterModel.RoleId.HasValue)
+            {
+                users = users.Where(u => u.RoleId == userFilterModel.RoleId);
+            }
+
+            if (userFilterModel.status.HasValue)
+            {
+                switch (userFilterModel.status)
+                {
+                    case 1:
+                        users = users.Where(x => x.Status == true);
+                        break;
+
+                    case 0:
+                        users = users.Where(x => x.Status == false);
+                        break;
+                }
+            }
+
+            var itemCount = await users.CountAsync();
+
+            var item = await users.Skip((paging.PageIndex - 1) * paging.PageSize)
+                                     .Take(paging.PageSize)
+                                     .AsNoTracking()
+                                     .ToListAsync();
 
             var result = new Pagination<User>(item, itemCount, paging.PageIndex, paging.PageSize);
 

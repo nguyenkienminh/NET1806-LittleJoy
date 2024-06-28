@@ -19,7 +19,7 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
 
         /***************************************************/
 
-        public Task<Pagination<User>> GetAllPagingUserByRoleIdAndStatusAsync(PaginationParameter paging, int roleId, bool status);
+        public Task<Pagination<User>> GetAllPagingUserByRoleIdAndStatusAsync(PaginationParameter paging, UserFilterModel userFilterModel);
 
         public Task<User?> GetUserByIdAsync(int id);
 

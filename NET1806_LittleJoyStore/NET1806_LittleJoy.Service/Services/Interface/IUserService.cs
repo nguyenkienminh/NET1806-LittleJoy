@@ -17,7 +17,7 @@ namespace NET1806_LittleJoy.Service.Services.Interface
         public Task<bool> AddNewPassword(AddPasswordModel model);
 
         /*******************************************************************/
-        public Task<Pagination<UserModel>> GetAllPagingUserByRoleIdAndStatusAsync(PaginationParameter paging, int roleId, bool status);
+        public Task<Pagination<UserModel>> GetAllPagingUserByRoleIdAndStatusAsync(PaginationParameter paging, UserFilterModel userFilterModel);
 
         public Task<UserModel?> GetUserByIdAsync(int id);
 
