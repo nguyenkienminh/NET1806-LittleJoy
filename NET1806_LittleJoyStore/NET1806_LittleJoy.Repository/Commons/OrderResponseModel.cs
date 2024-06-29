@@ -26,6 +26,8 @@ namespace NET1806_LittleJoy.Repository.Commons
 
         public string Address { get; set; }
 
+        public DateTime date { get; set; }
+
         public string? Note { get; set; }
 
         public int? AmountDiscount { get; set; }

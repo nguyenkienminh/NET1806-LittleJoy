@@ -25,7 +25,7 @@ namespace NET1806_LittleJoy.Service.BusinessModels
 
         [Required(ErrorMessage = "Phone number is required!")]
         [DataType(DataType.PhoneNumber, ErrorMessage = "Invalid Phone Number!")]
-        [RegularExpression(@"^([0-9]{10})$", ErrorMessage = "Invalid Phone Number!")]
+        [RegularExpression(@"^0([0-9]{9})$", ErrorMessage = "Invalid Phone Number!")]
         [Display(Name = "Phone Number")]
         public string PhoneNumber { get; set; } = "";
 
