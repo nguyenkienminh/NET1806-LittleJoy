@@ -25,13 +25,25 @@ namespace NET1806_LittleJoy.API.Controllers
         }
 
 
+        /// <summary>
+        /// Role:
+        ///    1 - Admin|
+        ///    2 - STAFF|
+        ///    3 - USER|
+        ///    không nhập lấy hết|
+        /// Status:
+        ///    1 - Đang hoạt động|
+        ///    0 - không hoạt động|
+        ///    không nhập  - lấy hết|
+        /// </summary>
+
         [HttpGet]
         //[Authorize(Roles = "STAFF,ADMIN")]
-        public async Task<IActionResult> GetAllUserByRoleIdAndStatusAsync([FromQuery] PaginationParameter paging, int roleId, bool status)
+        public async Task<IActionResult> GetAllUserByRoleIdAndStatusAsync([FromQuery] PaginationParameter paging, [FromQuery] UserFilterModel userFilterModel)
         {
             try
             {
-                var model = await _service.GetAllPagingUserByRoleIdAndStatusAsync(paging, roleId, status);
+                var model = await _service.GetAllPagingUserByRoleIdAndStatusAsync(paging, userFilterModel);
 
 
                 if(model == null)
