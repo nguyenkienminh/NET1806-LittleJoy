@@ -328,5 +328,59 @@ namespace NET1806_LittleJoy.API.Controllers
                 return BadRequest(responseModel);
             }
         }
+
+
+        [HttpPost("check-product-can-payment")]
+        public async Task<IActionResult> CheckProductCanPaymentAsync(List<ProductPaymentRequestModel> requestModels)
+        {
+            try
+            {
+                List<ProductModel> productModel = requestModels.Select(x => new ProductModel
+                {
+                    Id = x.Id,
+                    Quantity = x.quantity,
+                }).ToList();
+
+                var result = await _productService.CheckProductCanPaymentAsync(productModel);
+
+                List<ProductPaymentResponseModel> response = result.Select(p => new ProductPaymentResponseModel
+                {
+                    Id = p.Id,
+                    message = p.message,
+                }).ToList();
+
+                if (response != null)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return NotFound(new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "Check Product failure"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                });
+            }
+
+
+
+
+
+            
+            
+
+
+            throw new NotImplementedException();
+        }
     }
 }

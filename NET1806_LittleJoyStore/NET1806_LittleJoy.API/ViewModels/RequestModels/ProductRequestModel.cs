@@ -61,4 +61,11 @@ namespace NET1806_LittleJoy.API.ViewModels.RequestModels
 
         public string? UnsignProductName { get; set; }
     }
+
+    public class ProductPaymentRequestModel
+    {
+        public int Id { get; set; }
+
+        public int quantity { get; set;}
+    }
 }
