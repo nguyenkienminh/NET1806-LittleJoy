@@ -37,13 +37,13 @@ namespace NET1806_LittleJoy.Service.Services
             }).ToList();
             foreach (var item in list) 
             {
-                if(userPoints < item.MinPoints)
+                if(userPoints > item.MinPoints)
                 {
-                    item.CanDiscount = false;
+                    item.CanDiscount = true;
                 }
                 else
                 {
-                    item.CanDiscount = true;
+                    item.CanDiscount = false;
                 }
             }
 
