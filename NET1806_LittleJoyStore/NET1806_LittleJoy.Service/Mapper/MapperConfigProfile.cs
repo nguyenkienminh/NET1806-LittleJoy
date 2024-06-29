@@ -40,6 +40,8 @@ namespace NET1806_LittleJoy.Service.Mapper
 
             CreateMap<PaymentModel, Payment>().ReverseMap();
 
+            CreateMap<PointMoney, PointMoneyModel>().ReverseMap();
+
         }
     }
 }
