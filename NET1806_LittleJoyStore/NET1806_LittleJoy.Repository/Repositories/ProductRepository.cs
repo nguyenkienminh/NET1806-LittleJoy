@@ -179,5 +179,11 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
             return result;
         }
+
+
+        public async Task<ICollection<Product>> GetProductsListAsync()
+        {
+            return await _context.Products.ToListAsync();
+        }
     }
 }
