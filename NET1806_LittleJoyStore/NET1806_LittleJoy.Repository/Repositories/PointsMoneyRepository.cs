@@ -17,6 +17,12 @@ namespace NET1806_LittleJoy.Repository.Repositories
         {
             _context = context;
         }
+
+        public async Task<List<PointMoney>> GetAll()
+        {
+            return await _context.PointMoneys.ToListAsync();
+        }
+
         public async Task<PointMoney> GetPointsByMoneyDiscount(int? amount)
         {
             return await _context.PointMoneys.Where(x => x.AmountDiscount == amount).FirstOrDefaultAsync();

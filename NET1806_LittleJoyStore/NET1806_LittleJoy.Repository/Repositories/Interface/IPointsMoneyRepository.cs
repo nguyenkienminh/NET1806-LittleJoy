@@ -10,5 +10,6 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
     public interface IPointsMoneyRepository
     {
         public Task<PointMoney> GetPointsByMoneyDiscount(int? amount);
+        public Task<List<PointMoney>> GetAll();
     }
 }
