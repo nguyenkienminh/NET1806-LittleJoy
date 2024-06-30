@@ -49,4 +49,11 @@ namespace NET1806_LittleJoy.Service.BusinessModels
 
         //public virtual Origin? Origin { get; set; }
     }
+
+    public class ProductPaymentModel
+    {
+        public int Id { get; set; }
+
+        public string? message { get; set; }
+    }
 }
