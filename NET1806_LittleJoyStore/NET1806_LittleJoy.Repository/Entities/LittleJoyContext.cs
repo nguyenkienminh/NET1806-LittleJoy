@@ -70,7 +70,7 @@ public partial class LittleJoyContext : DbContext
             entity.ToTable("AgeGroupProduct");
 
             entity.Property(e => e.AgeRange).HasMaxLength(250);
-            
+
         });
 
         modelBuilder.Entity<Brand>(entity =>
@@ -131,6 +131,9 @@ public partial class LittleJoyContext : DbContext
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.Address).HasMaxLength(500);
             entity.Property(e => e.Status).HasMaxLength(250);
+            entity.Property(e => e.PhoneNumber)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
             entity.Property(e => e.Date).HasColumnType("datetime");
             entity.Property(e => e.DeliveryStatus).HasMaxLength(250);
 
@@ -274,7 +277,7 @@ public partial class LittleJoyContext : DbContext
             entity.HasOne(d => d.Role).WithMany(p => p.Users)
                 .HasForeignKey(d => d.RoleId)
                 .HasConstraintName("FK__User__RoleId__73BA3083");
-            
+
         });
 
         OnModelCreatingPartial(modelBuilder);
