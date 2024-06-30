@@ -18,6 +18,8 @@ namespace NET1806_LittleJoy.Service.BusinessModels
 
         public string? Note { get; set; }
 
+        public string PhoneNumber { get; set; }
+
         public int? AmountDiscount { get; set; }
 
         public string? Status { get; set; }
