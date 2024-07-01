@@ -61,6 +61,7 @@ namespace NET1806_LittleJoy.Service.Services
                     var orderModel = new OrderModel()
                     {
                         UserId = user.Id,
+                        PhoneNumber = model.PhoneNumber,
                         TotalPrice = model.TotalPrice,
                         Address = model.Address,
                         Note = model.Note,
@@ -177,6 +178,7 @@ namespace NET1806_LittleJoy.Service.Services
                 Id = order.Id,
                 Address = order.Address,
                 AmountDiscount = order.AmountDiscount,
+                PhoneNumber = order.PhoneNumber,
                 DeliveryStatus = order.DeliveryStatus,
                 Note = order.Note,
                 OrderCode = orderCode,
