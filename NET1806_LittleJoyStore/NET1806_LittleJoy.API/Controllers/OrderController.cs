@@ -146,22 +146,44 @@ namespace NET1806_LittleJoy.API.Controllers
             }
         }
 
-        //[HttpGet("get-orders")]
-        //public async Task<IActionResult> ProductFilter(OrderFilterModel model)
-        //{
-        //    try
-        //    {
-        //        return Ok();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        var responseModel = new ResponseModels()
-        //        {
-        //            HttpCode = StatusCodes.Status400BadRequest,
-        //            Message = ex.Message.ToString()
-        //        };
-        //        return BadRequest(responseModel);
-        //    }
-        //}
+        [HttpGet("get-orders-filter")]
+        public async Task<IActionResult> OrderFilterAsync([FromQuery] PaginationParameter paginationParameter, [FromQuery] OrderFilterModel filterModel)
+        {
+            try
+            {
+                var result = await _orderService.OrderFilterAsync(paginationParameter, filterModel);
+                if (result != null)
+                {
+                    var metadata = new
+                    {
+                        result.TotalCount,
+                        result.PageSize,
+                        result.CurrentPage,
+                        result.TotalPages,
+                        result.HasNext,
+                        result.HasPrevious
+                    };
+                    Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+                    return Ok(result);
+                }
+                else
+                {
+                    return NotFound(new ResponseModels
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "Order is empty"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                var responseModel = new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(responseModel);
+            }
+        }
     }
 }

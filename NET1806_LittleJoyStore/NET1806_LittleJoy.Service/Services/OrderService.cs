@@ -12,9 +12,11 @@ using NET1806_LittleJoy.Service.Ultils;
 using Org.BouncyCastle.Crypto.Engines;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace NET1806_LittleJoy.Service.Services
 {
@@ -197,6 +199,7 @@ namespace NET1806_LittleJoy.Service.Services
                     ProductName = product.ProductName,
                     Price = ((int)(item1.Price * item1.Quantity)),
                     Quantity = (int)item1.Quantity,
+                    Image = product.Image,
                 });
             }
             model.ProductOrders = listProductDetails;
@@ -243,6 +246,7 @@ namespace NET1806_LittleJoy.Service.Services
                         ProductName = product.ProductName,
                         Price = ((int)(item1.Price * item1.Quantity)),
                         Quantity = (int)item1.Quantity,
+                        Image = product.Image,
                     });
                 }
                 item.ProductOrders = listProductDetails;
@@ -372,6 +376,90 @@ namespace NET1806_LittleJoy.Service.Services
             {
                 throw new Exception("Không thể cập nhật đơn hàng này");
             }
+        }
+
+        public async Task<Pagination<OrderWithDetailsModel>> OrderFilterAsync(PaginationParameter parameter, OrderFilterModel filterModel)
+        {
+            #region check filter Valid
+            if (filterModel.Status < 1 || filterModel.Status > 3)
+            {
+                throw new Exception("Thông tin trạng thái đơn hàng không hợp lệ");
+            }
+
+            if (filterModel.PaymentStatus < 1 || filterModel.PaymentStatus > 3)
+            {
+                throw new Exception("Thông tin trạng thái thanh toán không hợp lệ");
+            }
+
+            if (filterModel.DeliveryStatus < 1 || filterModel.DeliveryStatus > 4)
+            {
+                throw new Exception("Thông tin trạng thái giao hàng không hợp lệ");
+            }
+
+            if (filterModel.SortDate < 1 || filterModel.SortDate > 2)
+            {
+                throw new Exception("Thông tin theo ngày không hợp lệ");
+            }
+
+            if (filterModel.SortPrice < 1 || filterModel.SortPrice > 2)
+            {
+                throw new Exception("Thông tin sắp xếp giá tiền không hợp lệ");
+            }
+
+            if (filterModel.PaymentMethod < 1 || filterModel.PaymentMethod > 2)
+            {
+                throw new Exception("Thông tin phương thức thanh toán không hợp lệ");
+            }
+            #endregion
+
+            var list = await _orderRepository.OrderFilterAsync(parameter, filterModel);
+
+            if(!list.Any())
+            {
+                throw new Exception("danh sách đơn hàng không tồn tại");
+            }
+
+            var result = list.Select(x => new OrderWithDetailsModel()
+            {
+                Id = x.Id,
+                Address = x.Address,
+                AmountDiscount = x.AmountDiscount,
+                Note = x.Note,
+                TotalPrice = (int)x.TotalPrice,
+                UserId = x.UserId,
+                DeliveryStatus = x.DeliveryStatus,
+                Status = x.Status,
+                date = (DateTime)x.Date
+            }).ToList();
+
+            //lay tung order gan them thanh phan
+            foreach (var item in result)
+            {
+                //lay payment gan vao order
+                var payment = await _paymentRepository.GetPaymentByOrderId(item.Id);
+                item.PaymentMethod = payment.Method;
+                item.PaymentStatus = payment.Status;
+                item.OrderCode = (int)payment.Code;
+
+                //gan order details vo
+                var listDetails = await _orderRepository.GetOrderDetailsByOrderId(item.Id);
+                List<OrderProductModel> listProductDetails = new List<OrderProductModel>();
+                foreach (var item1 in listDetails)
+                {
+                    var product = await _productRepositoty.GetProductByIdAsync((int)item1.ProductId);
+                    listProductDetails.Add(new OrderProductModel()
+                    {
+                        Id = product.Id,
+                        ProductName = product.ProductName,
+                        Price = ((int)(item1.Price * item1.Quantity)),
+                        Quantity = (int)item1.Quantity,
+                        Image = product.Image,
+                    });
+                }
+                item.ProductOrders = listProductDetails;
+            }
+
+            return new Pagination<OrderWithDetailsModel>(result, list.TotalCount, list.CurrentPage, list.PageSize);
         }
     }
 }
