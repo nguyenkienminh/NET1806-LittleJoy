@@ -84,10 +84,6 @@ namespace NET1806_LittleJoy.Repository.Repositories
                                        .Include(o => o.User)
                                        .AsQueryable();
 
-            var check = await CheckFilterHasData(filterModel);
-
-            if (check)
-            {
                 if (filterModel.Status.HasValue)
                 {
                     switch (filterModel.Status)
@@ -197,16 +193,13 @@ namespace NET1806_LittleJoy.Repository.Repositories
                             break;
                     }
                 }
-            }
-            else
-            {
-                query = query.OrderByDescending(o => o.Id);
-            }
+            
 
             var itemCount = await query.CountAsync();
 
             var item = await query.Skip((paging.PageIndex - 1) * paging.PageSize)
                                      .Take(paging.PageSize)
+                                     .OrderByDescending(o => o.Id)
                                      .AsNoTracking()
                                      .ToListAsync();
 
@@ -215,17 +208,5 @@ namespace NET1806_LittleJoy.Repository.Repositories
             return result;
         }
 
-
-        public async Task<bool> CheckFilterHasData(OrderFilterModel filterModel)
-        {
-            if (!filterModel.Status.HasValue && !filterModel.SortDate.HasValue && !filterModel.SortPrice.HasValue
-                && !filterModel.DeliveryStatus.HasValue && !filterModel.PaymentStatus.HasValue && !filterModel.PaymentMethod.HasValue &&
-                !filterModel.OrderCode.HasValue && filterModel.UserName == null)
-            {
-                return false;
-            }
-
-            return true;
-        }
     }
 }
