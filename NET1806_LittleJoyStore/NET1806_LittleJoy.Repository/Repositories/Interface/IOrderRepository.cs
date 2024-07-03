@@ -30,6 +30,5 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
 
         public Task<Pagination<Order>> OrderFilterAsync(PaginationParameter parameter, OrderFilterModel filterModel);
 
-        public Task<bool> CheckFilterHasData(OrderFilterModel filterModel);
     }
 }
