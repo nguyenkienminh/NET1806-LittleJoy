@@ -40,7 +40,13 @@ namespace NET1806_LittleJoy.API.Controllers
             try
             {
                 var result = await _vnpayservice.ReturnFromVNPay(model);
-                return Ok(result);
+                if(result.Status == "Thất Bại")
+                {
+                    return BadRequest(result);
+                } else
+                {
+                    return Ok(result);
+                }
             }
             catch (Exception ex) 
             {
