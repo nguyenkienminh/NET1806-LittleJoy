@@ -28,5 +28,7 @@ namespace NET1806_LittleJoy.Service.Services.Interface
         public Task<int> CountFeedBackByProductAsync(int Id);
 
         public Task<bool> CheckProductHasBuyByUser(FeedBackModel model);
+
+        public Task<bool> CheckAddFeedBack(FeedBackModel model);
     }
 }

@@ -142,6 +142,32 @@ namespace NET1806_LittleJoy.API.Controllers
         }
 
 
+        [HttpGet("check-add-feedback")]
+        public async Task<IActionResult> CheckAddFeedBack(int productId, int userID)
+        {
+            try
+            {
+                FeedBackModel ModelAdd = new FeedBackModel()
+                {
+                    ProductId = productId,
+                    UserId = userID,
+                };
+
+                var result = await _service.CheckAddFeedBack(ModelAdd);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                var responseModel = new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(responseModel);
+            }
+        }
+
+
         [HttpPost]
         //[Authorize(Roles = "STAFF,ADMIN,USER")]
         public async Task<IActionResult> AddFeedBackAsync([FromBody] FeedBackRequestModel request)

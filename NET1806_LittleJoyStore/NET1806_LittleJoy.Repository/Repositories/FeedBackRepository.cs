@@ -100,5 +100,10 @@ namespace NET1806_LittleJoy.Repository.Repositories
         {
             return await _context.Feedbacks.CountAsync(p => p.ProductId == Id);
         }
+
+        public async Task<Feedback?> GetFeedBackByProductAndUserAsync(int UserId, int ProductId)
+        {
+            return await _context.Feedbacks.SingleOrDefaultAsync(p => p.UserId == UserId && p.ProductId == ProductId);
+        }
     }
 }
