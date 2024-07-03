@@ -229,5 +229,60 @@ namespace NET1806_LittleJoy.Service.Services
                 listProduct.CurrentPage,
                 listProduct.PageSize);
         }
+
+        public async Task<List<ProductPaymentModel>> CheckProductCanPaymentAsync(List<ProductModel> productModel)
+        {
+            if (!productModel.Any())
+            {
+                throw new Exception("Không có danh sách mua hàng");
+            }
+            List<ProductPaymentModel> products = new List<ProductPaymentModel>();   
+
+            foreach (var item in productModel)
+            {
+                if(item != null)
+                {
+                    var product = await _productRepository.GetProductByIdAsync(item.Id);
+
+                    if(product != null)
+                    {
+                        if(product.Quantity >= item.Quantity)
+                        {
+                            products.Add(new ProductPaymentModel()
+                            {
+                                Id = item.Id,
+                                message = "",
+                            }); 
+                        }
+                        else
+                        {
+                            products.Add(new ProductPaymentModel()
+                            {
+                                Id = item.Id,
+                                message = $" chỉ còn {product.Quantity} sản phẩm",
+                            }); 
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception("Sản phẩm không tồn tại");
+                    }
+                }
+                else
+                {
+                    throw new Exception("Sản phẩm này không có mua");
+                }
+            }
+
+            foreach (var item in products)
+            {
+                if (!item.message.Equals(""))
+                {
+                    return products;
+                }
+            }
+
+            return new List<ProductPaymentModel>();
+        }
     }
 }

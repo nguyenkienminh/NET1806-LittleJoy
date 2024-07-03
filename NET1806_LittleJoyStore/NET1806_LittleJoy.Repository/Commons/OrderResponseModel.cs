@@ -30,6 +30,8 @@ namespace NET1806_LittleJoy.Repository.Commons
 
         public string? Note { get; set; }
 
+        public string PhoneNumber { get; set; }
+
         public int? AmountDiscount { get; set; }
 
         public string PaymentMethod { get; set; }
@@ -52,5 +54,7 @@ namespace NET1806_LittleJoy.Repository.Commons
         public int Price { get; set; }
 
         public int Quantity { get; set; }
+
+        public string Image { get; set; }
     }
 }

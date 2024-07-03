@@ -27,5 +27,8 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
         public Task<List<OrderDetail>> GetOrderDetailsByOrderId(int orderId);
 
         public Task<List<Order>> GetOrderListByUserIdAsync(int userId);
+
+        public Task<Pagination<Order>> OrderFilterAsync(PaginationParameter parameter, OrderFilterModel filterModel);
+
     }
 }

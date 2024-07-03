@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using NET1806_LittleJoy.API.ViewModels.RequestModels;
 using NET1806_LittleJoy.API.ViewModels.ResponeModels;
 using NET1806_LittleJoy.Repository.Commons;
+using NET1806_LittleJoy.Repository.Entities;
 using NET1806_LittleJoy.Service.Services.Interface;
 using Newtonsoft.Json;
 
@@ -44,7 +45,7 @@ namespace NET1806_LittleJoy.API.Controllers
         }
 
         [HttpGet("get-orders/{id}")]
-        public async Task<IActionResult> GetOrderByUserId([FromQuery]PaginationParameter paginationParameter, int id)
+        public async Task<IActionResult> GetOrderByUserId([FromQuery] PaginationParameter paginationParameter, int id)
         {
             try
             {
@@ -133,9 +134,10 @@ namespace NET1806_LittleJoy.API.Controllers
         {
             try
             {
-                var result = await _orderService.GetOrderByOrderCode(orderCode); 
+                var result = await _orderService.GetOrderByOrderCode(orderCode);
                 return Ok(result);
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 var responseModel = new ResponseModels()
                 {
@@ -146,22 +148,70 @@ namespace NET1806_LittleJoy.API.Controllers
             }
         }
 
-        //[HttpGet("get-orders")]
-        //public async Task<IActionResult> ProductFilter(OrderFilterModel model)
-        //{
-        //    try
-        //    {
-        //        return Ok();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        var responseModel = new ResponseModels()
-        //        {
-        //            HttpCode = StatusCodes.Status400BadRequest,
-        //            Message = ex.Message.ToString()
-        //        };
-        //        return BadRequest(responseModel);
-        //    }
-        //}
+        [HttpPut("check-cancel-order/{orderCode}")]
+        public async Task<IActionResult> CheckOrderCancel(int orderCode)
+        {
+            try
+            {
+                var result = await _orderService.CheckCancelOrder(orderCode);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                var responseModel = new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(responseModel);
+            }
+        }
+
+        /// <summary>
+        /// Status: (1 Đang chờ | 2 Đặt Hàng Thành Công | 3 Đã hủy)   | 
+        /// PaymentStatus: (1 Đang chờ |  2 Thành công |  3 Thất bại)   | 
+        /// DeliveryStatus: (1 Đang Chuẩn Bị |  2 Đang Giao Hàng | 3 Giao hàng thất bại |  4 Giao Hàng Thành Công) | 5 ""  | 
+        /// SortDate, sortPrice: (1 tăng dần | 2 giảm dần)   | 
+        /// Method Payment: (1 - COD | 2 - VNPAY)   | 
+        /// </summary>
+        [HttpGet("get-orders-filter")]
+        public async Task<IActionResult> OrderFilterAsync([FromQuery] PaginationParameter paginationParameter, [FromQuery] OrderFilterModel filterModel)
+        {
+            try
+            {
+                var result = await _orderService.OrderFilterAsync(paginationParameter, filterModel);
+                if (result != null)
+                {
+                    var metadata = new
+                    {
+                        result.TotalCount,
+                        result.PageSize,
+                        result.CurrentPage,
+                        result.TotalPages,
+                        result.HasNext,
+                        result.HasPrevious
+                    };
+                    Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+                    return Ok(result);
+                }
+                else
+                {
+                    return NotFound(new ResponseModels
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "Order is empty"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                var responseModel = new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(responseModel);
+            }
+        }
     }
 }

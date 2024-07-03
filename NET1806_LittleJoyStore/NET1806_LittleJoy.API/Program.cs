@@ -166,6 +166,8 @@ namespace NET1806_LittleJoy.API
             builder.Services.AddScoped<IVNPayService, VNPayService>();
             builder.Services.AddScoped<IPointsMoneyRepository, PointsMoneyRepository>();
 
+            builder.Services.AddScoped<IPointMoneyService, PointMoneyService>();
+
             builder.Services.AddTransient<IMailService, MailService>();
 
             var app = builder.Build();

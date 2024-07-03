@@ -21,5 +21,9 @@ namespace NET1806_LittleJoy.Service.Services.Interface
         public Task<bool> UpdateOrderStatus(OrderUpdateRequestModel model);
 
         public Task<OrderWithDetailsModel> GetOrderByOrderCode(int orderCode);
+
+        public Task<Pagination<OrderWithDetailsModel>> OrderFilterAsync(PaginationParameter parameter, OrderFilterModel filterModel);
+
+        public Task<bool> CheckCancelOrder(int OrderCode);
     }
 }
