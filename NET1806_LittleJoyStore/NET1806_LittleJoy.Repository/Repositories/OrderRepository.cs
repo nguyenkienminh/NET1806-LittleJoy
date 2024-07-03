@@ -58,7 +58,8 @@ namespace NET1806_LittleJoy.Repository.Repositories
             var query = _context.Orders.Where(x => x.UserId == userId).AsQueryable();
 
             var itemCount = await query.CountAsync();
-            var items = await query.Skip((paging.PageIndex - 1) * paging.PageSize)
+            var items = await query.OrderByDescending(x => x.Id)
+                                    .Skip((paging.PageIndex - 1) * paging.PageSize)
                                     .Take(paging.PageSize)
                                     .AsNoTracking().ToListAsync();
 
@@ -84,109 +85,112 @@ namespace NET1806_LittleJoy.Repository.Repositories
                                        .Include(o => o.User)
                                        .AsQueryable();
 
-                if (filterModel.Status.HasValue)
+            if (filterModel.Status.HasValue)
+            {
+                switch (filterModel.Status)
                 {
-                    switch (filterModel.Status)
-                    {
-                        case 1:
-                            query = query.Where(o => o.Status.Equals("Đang chờ"));
-                            break;
+                    case 1:
+                        query = query.Where(o => o.Status.Equals("Đang chờ"));
+                        break;
 
-                        case 2:
-                            query = query.Where(o => o.Status.Equals("Đặt Hàng Thành Công"));
-                            break;
+                    case 2:
+                        query = query.Where(o => o.Status.Equals("Đặt Hàng Thành Công"));
+                        break;
 
-                        case 3:
-                            query = query.Where(o => o.Status.Equals("Đã hủy"));
-                            break;
-                    }
+                    case 3:
+                        query = query.Where(o => o.Status.Equals("Đã hủy"));
+                        break;
                 }
+            }
 
-                if (filterModel.PaymentStatus.HasValue)
+            if (filterModel.PaymentStatus.HasValue)
+            {
+                switch (filterModel.PaymentStatus)
                 {
-                    switch (filterModel.PaymentStatus)
-                    {
-                        case 1:
-                            query = query.Where(o => o.Payment.Status.Equals("Đang chờ"));
-                            break;
+                    case 1:
+                        query = query.Where(o => o.Payment.Status.Equals("Đang chờ"));
+                        break;
 
-                        case 2:
-                            query = query.Where(o => o.Payment.Status.Equals("Thành công"));
-                            break;
+                    case 2:
+                        query = query.Where(o => o.Payment.Status.Equals("Thành công"));
+                        break;
 
-                        case 3:
-                            query = query.Where(o => o.Payment.Status.Equals("Thất bại"));
-                            break;
-                    }
+                    case 3:
+                        query = query.Where(o => o.Payment.Status.Equals("Thất bại"));
+                        break;
                 }
+            }
 
-                if (filterModel.DeliveryStatus.HasValue)
+            if (filterModel.DeliveryStatus.HasValue)
+            {
+                switch (filterModel.DeliveryStatus)
                 {
-                    switch (filterModel.DeliveryStatus)
-                    {
-                        case 1:
-                            query = query.Where(o => o.DeliveryStatus.Equals("Đang Chuẩn Bị"));
-                            break;
+                    case 1:
+                        query = query.Where(o => o.DeliveryStatus.Equals("Đang Chuẩn Bị"));
+                        break;
 
-                        case 2:
-                            query = query.Where(o => o.DeliveryStatus.Equals("Đang Giao Hàng"));
-                            break;
+                    case 2:
+                        query = query.Where(o => o.DeliveryStatus.Equals("Đang Giao Hàng"));
+                        break;
 
-                        case 3:
-                            query = query.Where(o => o.DeliveryStatus.Equals("Giao hàng thất bại"));
-                            break;
+                    case 3:
+                        query = query.Where(o => o.DeliveryStatus.Equals("Giao hàng thất bại"));
+                        break;
 
-                        case 4:
-                            query = query.Where(o => o.DeliveryStatus.Equals("Giao Hàng Thành Công"));
-                            break;
-                    }
+                    case 4:
+                        query = query.Where(o => o.DeliveryStatus.Equals("Giao Hàng Thành Công"));
+                        break;
+                    case 5:
+                        query = query.Where(o => o.DeliveryStatus.Equals(""));
+                        break;
                 }
+            }
 
-                if (filterModel.OrderCode.HasValue)
+            if (filterModel.OrderCode.HasValue)
+            {
+                query = query.Where(o => o.Payment.Code == filterModel.OrderCode);
+            }
+
+            if (!string.IsNullOrEmpty(filterModel.UserName))
+            {
+                query = query.Where(o => o.User.UserName.Contains(filterModel.UserName));
+            }
+
+            if (filterModel.SortDate.HasValue)
+            {
+                switch (filterModel.SortDate)
                 {
-                    query = query.Where(o => o.Payment.Code == filterModel.OrderCode);
+                    case 1:
+                        query = query.OrderBy(o => o.Date);
+                        break;
+
+                    case 2:
+                        query = query.OrderByDescending(o => o.Date);
+                        break;
                 }
+            }
 
-                if (!string.IsNullOrEmpty(filterModel.UserName))
+            if (filterModel.SortPrice.HasValue)
+            {
+                switch (filterModel.SortPrice)
                 {
-                    query = query.Where(o => o.User.UserName.Contains(filterModel.UserName));
+                    case 1:
+                        query = query.OrderBy(o => o.TotalPrice);
+                        break;
+
+                    case 2:
+                        query = query.OrderByDescending(o => o.TotalPrice);
+                        break;
                 }
+            }
 
-                if (filterModel.SortDate.HasValue)
+            if (filterModel.PaymentMethod.HasValue)
+            {
+                switch (filterModel.PaymentMethod)
                 {
-                    switch (filterModel.SortDate)
-                    {
-                        case 1:
-                            query = query.OrderBy(o => o.Date);
-                            break;
-
-                        case 2:
-                            query = query.OrderByDescending(o => o.Date);
-                            break;
-                    }
-                }
-
-                if (filterModel.SortPrice.HasValue)
-                {
-                    switch (filterModel.SortPrice)
-                    {
-                        case 1:
-                            query = query.OrderBy(o => o.TotalPrice);
-                            break;
-
-                        case 2:
-                            query = query.OrderByDescending(o => o.TotalPrice);
-                            break;
-                    }
-                }
-
-                if (filterModel.PaymentMethod.HasValue)
-                {
-                    switch (filterModel.PaymentMethod)
-                    {
-                        case 1:
-                            query = query.Where(o => o.Payment.Status.Equals("COD"));
-                            break;
+                    case 1:
+                        query = query.Where(o => o.Payment.Status.Equals("COD"));
+                        break;
 
                         case 2:
                             query = query.Where(o => o.Payment.Status.Equals("VNPAY"));
