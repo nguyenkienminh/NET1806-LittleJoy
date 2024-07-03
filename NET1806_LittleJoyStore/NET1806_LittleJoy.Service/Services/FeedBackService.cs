@@ -74,58 +74,62 @@ namespace NET1806_LittleJoy.Service.Services
         {
             try
             {
-                var product = await _productRepositoty.GetProductByIdAsync(model.ProductId);
-
-                if (product == null)
+                if (!model.Rating.HasValue)
                 {
-                    throw new Exception($"Sản phẩm không tồn tại");
+                    throw new Exception("Rating không được trống");
                 }
 
-                var checkBuy = await CheckProductHasBuyByUser(model);
-
-                if (checkBuy == false)
+                if (model.Rating < 1 || model.Rating > 5)
                 {
-
-                    if (product != null)
-                    {
-                        throw new Exception($"Người dùng chưa mua sản phẩm đó nên không thể tạo feedback");
-                    }
-                    else
-                    {
-                        throw new Exception($"Product không tồn tại");
-                    }
+                    throw new Exception("Sai số rating");
                 }
-                else
+
+                var feedback = _mapper.Map<Feedback>(model);
+
+                feedback.Date = DateTime.UtcNow.AddHours(7);
+
+                var item = await _feedBackRepo.AddFeedBackAsync(feedback);
+
+                if (item == null)
                 {
-
-                    if (!model.Rating.HasValue)
-                    {
-                        throw new Exception("Rating không được trống");
-                    }
-
-                    if (model.Rating < 1 || model.Rating > 5)
-                    {
-                        throw new Exception("Sai số rating");
-                    }
-
-                    var feedback = _mapper.Map<Feedback>(model);
-
-                    feedback.Date = DateTime.UtcNow.AddHours(7);
-
-                    var item = await _feedBackRepo.AddFeedBackAsync(feedback);
-
-                    if (item == null)
-                    {
-                        return false;
-                    }
+                    return false;
                 }
+
                 return true;
-
             }
             catch (Exception ex)
             {
                 throw ex;
             }
+        }
+
+        public async Task<bool> CheckAddFeedBack(FeedBackModel model)
+        {
+
+            var product = await _productRepositoty.GetProductByIdAsync(model.ProductId);
+
+            if (product == null)
+            {
+                throw new Exception($"Sản phẩm không tồn tại");
+            }
+
+            var checkBuy = await CheckProductHasBuyByUser(model); // kiểm tra user đó có mua sản phẩm đc để trong model hay chưa
+
+            if (checkBuy == false)
+            {
+                if (product != null)
+                {
+                    throw new Exception($"Người dùng chưa mua sản phẩm đó nên không thể tạo feedback");
+                }
+            }
+
+            var feedback = await _feedBackRepo.GetFeedBackByProductAndUserAsync(model.UserId, model.ProductId);// kiểm tra đã có feedback hay chưa.
+
+            if (feedback != null)
+            {
+                return false;
+            }
+            return true;
         }
 
         public async Task<bool> CheckProductHasBuyByUser(FeedBackModel model)
@@ -148,9 +152,10 @@ namespace NET1806_LittleJoy.Service.Services
                         foreach (var orders in listOrder)
                         {
 
-                            if(orders.DeliveryStatus != null) {
+                            if (orders.DeliveryStatus != null)
+                            {
 
-                                if (orders.DeliveryStatus.Equals("Giao hàng thành công"))
+                                if (orders.DeliveryStatus.Equals("Giao Hàng Thành Công"))
                                 {
 
                                     var OrderDetail = await _orderRepository.GetOrderDetailsByOrderId(orders.Id); //lay chi tiet don hang cua tung don hang
