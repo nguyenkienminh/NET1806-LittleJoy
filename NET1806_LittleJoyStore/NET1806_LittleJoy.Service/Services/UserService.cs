@@ -342,7 +342,7 @@ namespace NET1806_LittleJoy.Service.Services
             try
             {
 
-                if(model.UserName != null)
+                if (model.UserName != null)
                 {
                     var checkUsername = await _userRepository.GetUserByUserNameAsync(model.UserName);
 
@@ -351,7 +351,7 @@ namespace NET1806_LittleJoy.Service.Services
                         throw new Exception("Tài khoản đã tồn tại");
                     }
                 }
-                
+
                 if (model.PhoneNumber != null)
                 {
                     if (StringUtils.IsValidPhoneNumber(model.PhoneNumber) == false)
@@ -360,14 +360,11 @@ namespace NET1806_LittleJoy.Service.Services
                     }
                     else
                     {
-                        var listUser = await _userRepository.GetListUserAsync();
+                        var check = await _userRepository.CheckExistPhoneNumber(model.PhoneNumber.Trim());
 
-                        foreach (var item in listUser)
+                        if (!check)
                         {
-                            if (item.PhoneNumber.Equals(model.PhoneNumber))
-                            {
-                                throw new Exception("Phone Number is exist");
-                            }
+                            throw new Exception("Phone Number is exist");
                         }
                     }
                 }
@@ -381,7 +378,7 @@ namespace NET1806_LittleJoy.Service.Services
                     else
                     {
                         var checkEmail = await _userRepository.GetUserByEmailAsync(model.Email);
-                        
+
                         if (checkEmail != null)
                         {
                             throw new Exception("Account already exists.");
@@ -426,7 +423,7 @@ namespace NET1806_LittleJoy.Service.Services
             catch (Exception ex)
             {
                 throw;
-                
+
             }
         }
 
@@ -445,7 +442,7 @@ namespace NET1806_LittleJoy.Service.Services
         public async Task<UserModel> UpdateUserAsync(UserModel model, string mainAddress)
         {
 
-            if(model.RoleId == null)
+            if (model.RoleId == null)
             {
                 return null;
             }
@@ -477,14 +474,12 @@ namespace NET1806_LittleJoy.Service.Services
                 }
                 else
                 {
-                    var listUser = await _userRepository.GetListUserAsync();
 
-                    foreach (var item in listUser)
+                    var check = await _userRepository.CheckExistPhoneNumber(model.PhoneNumber.Trim());
+
+                    if (!check)
                     {
-                        if (item.PhoneNumber.Equals(model.PhoneNumber) && item.Id != model.Id)
-                        {
-                            throw new Exception("Phone Number is exist");
-                        }
+                        throw new Exception("Phone Number is exist");
                     }
                 }
             }
@@ -573,14 +568,11 @@ namespace NET1806_LittleJoy.Service.Services
                 }
                 else
                 {
-                    var listUser = await _userRepository.GetListUserAsync();
+                    var check = await _userRepository.CheckExistPhoneNumber(model.PhoneNumber.Trim());
 
-                    foreach (var item in listUser)
+                    if (!check)
                     {
-                        if (item.PhoneNumber.Equals(model.PhoneNumber) && item.Id != model.Id)
-                        {
-                            throw new Exception("Phone Number is exist");
-                        }
+                        throw new Exception("Phone Number is exist");
                     }
                 }
             }
@@ -649,8 +641,9 @@ namespace NET1806_LittleJoy.Service.Services
                         }
                     }
                 }
-                throw new Exception( "Mật khẩu không đúng");
-            }catch (Exception ex)
+                throw new Exception("Mật khẩu không đúng");
+            }
+            catch (Exception ex)
             {
                 throw ex;
             }
