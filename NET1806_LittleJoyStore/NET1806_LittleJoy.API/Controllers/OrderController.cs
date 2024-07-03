@@ -148,7 +148,24 @@ namespace NET1806_LittleJoy.API.Controllers
             }
         }
 
-
+        [HttpPut("check-cancel-order/{orderCode}")]
+        public async Task<IActionResult> CheckOrderCancel(int orderCode)
+        {
+            try
+            {
+                var result = await _orderService.CheckCancelOrder(orderCode);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                var responseModel = new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(responseModel);
+            }
+        }
 
         /// <summary>
         /// Status: (1 Đang chờ | 2 Đặt Hàng Thành Công | 3 Đã hủy)   | 
