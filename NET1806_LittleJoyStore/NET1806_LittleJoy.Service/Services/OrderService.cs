@@ -424,7 +424,7 @@ namespace NET1806_LittleJoy.Service.Services
                 throw new Exception("Thông tin trạng thái thanh toán không hợp lệ");
             }
 
-            if (filterModel.DeliveryStatus < 1 || filterModel.DeliveryStatus > 4)
+            if (filterModel.DeliveryStatus < 1 || filterModel.DeliveryStatus > 5)
             {
                 throw new Exception("Thông tin trạng thái giao hàng không hợp lệ");
             }

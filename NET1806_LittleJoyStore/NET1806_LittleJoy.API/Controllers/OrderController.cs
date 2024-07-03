@@ -170,7 +170,7 @@ namespace NET1806_LittleJoy.API.Controllers
         /// <summary>
         /// Status: (1 Đang chờ | 2 Đặt Hàng Thành Công | 3 Đã hủy)   | 
         /// PaymentStatus: (1 Đang chờ |  2 Thành công |  3 Thất bại)   | 
-        /// DeliveryStatus: (1 Đang Chuẩn Bị |  2 Đang Giao Hàng | 3 Giao hàng thất bại |  4 Giao Hàng Thành Công)   | 
+        /// DeliveryStatus: (1 Đang Chuẩn Bị |  2 Đang Giao Hàng | 3 Giao hàng thất bại |  4 Giao Hàng Thành Công) | 5 ""  | 
         /// SortDate, sortPrice: (1 tăng dần | 2 giảm dần)   | 
         /// Method Payment: (1 - COD | 2 - VNPAY)   | 
         /// </summary>
