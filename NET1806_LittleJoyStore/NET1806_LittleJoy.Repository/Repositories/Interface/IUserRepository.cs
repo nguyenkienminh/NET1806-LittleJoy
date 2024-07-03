@@ -32,5 +32,7 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
         public Task<User?> GetUserByConfirmToken(string token);
 
         public Task<ICollection<User>> GetListUserAsync();
+
+        public Task<bool> CheckExistPhoneNumber(string phoneNumber);
     }
 }
