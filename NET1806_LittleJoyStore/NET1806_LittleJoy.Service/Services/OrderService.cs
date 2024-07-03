@@ -224,6 +224,7 @@ namespace NET1806_LittleJoy.Service.Services
                 UserId = userId,
                 DeliveryStatus = x.DeliveryStatus,
                 Status = x.Status,
+                PhoneNumber = x.PhoneNumber,
                 date = (DateTime)x.Date
             }).ToList();
 
@@ -380,6 +381,36 @@ namespace NET1806_LittleJoy.Service.Services
             }
         }
 
+        public async Task<bool> CheckCancelOrder(int OrderCode)
+        {
+            var paymentExist = await _paymentRepository.GetPaymentByOrderCode(OrderCode);
+
+            if(paymentExist == null) 
+            {
+                throw new Exception("đơn hàng không tồn tại");
+            }
+
+            var orderExist = await _orderRepository.GetOrderById(paymentExist.OrderID);
+
+            if (orderExist.DeliveryStatus != "Đang Giao Hàng" && orderExist.DeliveryStatus != "Giao Hàng Thành Công" && orderExist.DeliveryStatus != "Giao hàng thất bại")
+            {
+                if (paymentExist.Status == "Thành công" || paymentExist.Status == "Thất bại")
+                {
+                    return false;
+                }
+                
+                if(orderExist.Status.Equals("Đã hủy"))
+                {
+                    return false;
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public async Task<Pagination<OrderWithDetailsModel>> OrderFilterAsync(PaginationParameter parameter, OrderFilterModel filterModel)
         {
             #region check filter Valid
@@ -431,6 +462,7 @@ namespace NET1806_LittleJoy.Service.Services
                 UserId = x.UserId,
                 DeliveryStatus = x.DeliveryStatus,
                 Status = x.Status,
+                PhoneNumber = x.PhoneNumber,
                 date = (DateTime)x.Date
             }).ToList();
 
