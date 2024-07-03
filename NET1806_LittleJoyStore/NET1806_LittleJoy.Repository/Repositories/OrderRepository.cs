@@ -140,6 +140,7 @@ namespace NET1806_LittleJoy.Repository.Repositories
                     case 4:
                         query = query.Where(o => o.DeliveryStatus.Equals("Giao Hàng Thành Công"));
                         break;
+
                     case 5:
                         query = query.Where(o => o.DeliveryStatus.Equals(""));
                         break;

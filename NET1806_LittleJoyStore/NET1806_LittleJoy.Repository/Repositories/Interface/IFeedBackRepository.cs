@@ -26,5 +26,7 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
         public Task<double> AverageRatingAsync(int productId);
 
         public Task<int> CountFeedBackByProductAsync(int Id);
+
+        public Task<Feedback?> GetFeedBackByProductAndUserAsync(int UserId, int ProductId);
     }
 }
