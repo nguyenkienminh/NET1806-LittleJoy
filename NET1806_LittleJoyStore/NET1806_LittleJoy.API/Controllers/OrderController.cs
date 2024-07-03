@@ -148,7 +148,7 @@ namespace NET1806_LittleJoy.API.Controllers
             }
         }
 
-        [HttpPut("check-cancel-order/{orderCode}")]
+        [HttpGet("check-cancel-order/{orderCode}")]
         public async Task<IActionResult> CheckOrderCancel(int orderCode)
         {
             try
