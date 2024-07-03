@@ -362,7 +362,7 @@ namespace NET1806_LittleJoy.Service.Services
                     {
                         var check = await _userRepository.CheckExistPhoneNumber(model.PhoneNumber.Trim());
 
-                        if (!check)
+                        if (check != null)
                         {
                             throw new Exception("Phone Number is exist");
                         }
@@ -453,7 +453,7 @@ namespace NET1806_LittleJoy.Service.Services
 
             if (userPlace == null)
             {
-                return null;
+                throw new Exception("User không tồn tại");
             }
 
             if (userModify.Fullname != "".Trim() && userModify.Fullname != null)
@@ -474,12 +474,15 @@ namespace NET1806_LittleJoy.Service.Services
                 }
                 else
                 {
-
                     var check = await _userRepository.CheckExistPhoneNumber(model.PhoneNumber.Trim());
 
-                    if (!check)
+                    if (check != null && userModify.Id != check.Id)
                     {
                         throw new Exception("Phone Number is exist");
+                    }
+                    else
+                    {
+                        userModify.PhoneNumber = userPlace.PhoneNumber;
                     }
                 }
             }
@@ -570,9 +573,13 @@ namespace NET1806_LittleJoy.Service.Services
                 {
                     var check = await _userRepository.CheckExistPhoneNumber(model.PhoneNumber.Trim());
 
-                    if (!check)
+                    if (check != null && userModify.Id != check.Id)
                     {
                         throw new Exception("Phone Number is exist");
+                    }
+                    else
+                    {
+                        userModify.PhoneNumber = userPlace.PhoneNumber;
                     }
                 }
             }
