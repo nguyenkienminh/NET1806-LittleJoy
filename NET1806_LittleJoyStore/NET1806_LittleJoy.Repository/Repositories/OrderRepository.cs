@@ -185,11 +185,11 @@ namespace NET1806_LittleJoy.Repository.Repositories
                     switch (filterModel.PaymentMethod)
                     {
                         case 1:
-                            query = query.Where(o => o.Payment.Status.Equals("COD"));
+                            query = query.Where(o => o.Payment.Method.Equals("COD"));
                             break;
 
                         case 2:
-                            query = query.Where(o => o.Payment.Status.Equals("VNPAY"));
+                            query = query.Where(o => o.Payment.Method.Equals("VNPAY"));
                             break;
                     }
                 }
