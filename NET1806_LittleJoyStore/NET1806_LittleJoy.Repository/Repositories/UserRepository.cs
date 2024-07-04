@@ -100,6 +100,13 @@ namespace NET1806_LittleJoy.Repository.Repositories
             return true;
         }
 
+        public async Task<User> CheckExistPhoneNumber(string phoneNumber)
+        {
+            var check =  await _context.Users.Where(u => u.PhoneNumber.Equals(phoneNumber)).FirstOrDefaultAsync();
+
+            return check;
+        }
+
         public async Task<User> UpdateUserAsync(User userModify, User userPlace)
         {
             userPlace.Fullname = userModify.Fullname;
