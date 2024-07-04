@@ -93,7 +93,7 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
             var total = (double) await item.SumAsync(f => f.Rating);
 
-            return Math.Round( (double) total/count);
+            return Math.Ceiling( (double) total/count);
         }
 
         public async Task<int> CountFeedBackByProductAsync(int Id)
