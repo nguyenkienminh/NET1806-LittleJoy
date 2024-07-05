@@ -43,7 +43,7 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
         public async Task<User> UpdateUserAsync(User user)
         {
-             _context.Users.Update(user);
+            _context.Users.Update(user);
             await _context.SaveChangesAsync();
             return user;
         }
@@ -54,6 +54,16 @@ namespace NET1806_LittleJoy.Repository.Repositories
         {
 
             var users = _context.Users.AsQueryable();
+
+            if (!string.IsNullOrEmpty(userFilterModel.userName))
+            {
+                users = users.Where(u => u.UserName.Contains(userFilterModel.userName));
+            }
+
+            if (!string.IsNullOrEmpty(userFilterModel.fullName))
+            {
+                users = users.Where(u => u.UnsignName.Contains(userFilterModel.fullName));
+            }
 
             if (userFilterModel.RoleId.HasValue)
             {
@@ -102,7 +112,7 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
         public async Task<User> CheckExistPhoneNumber(string phoneNumber)
         {
-            var check =  await _context.Users.Where(u => u.PhoneNumber.Equals(phoneNumber)).FirstOrDefaultAsync();
+            var check = await _context.Users.Where(u => u.PhoneNumber.Equals(phoneNumber)).FirstOrDefaultAsync();
 
             return check;
         }
