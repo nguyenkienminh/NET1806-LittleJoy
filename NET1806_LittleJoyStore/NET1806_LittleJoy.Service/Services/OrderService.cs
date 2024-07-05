@@ -392,17 +392,20 @@ namespace NET1806_LittleJoy.Service.Services
 
             var orderExist = await _orderRepository.GetOrderById(paymentExist.OrderID);
 
-            if (orderExist.DeliveryStatus != "Đang Giao Hàng" && orderExist.DeliveryStatus != "Giao Hàng Thành Công" && orderExist.DeliveryStatus != "Giao hàng thất bại")
+            if (orderExist.DeliveryStatus == "Đang Chuẩn Bị" || orderExist.DeliveryStatus == "")
             {
-                if (paymentExist.Status == "Thành công" || paymentExist.Status == "Thất bại")
+                if (paymentExist.Status == "Thất bại")
                 {
                     return false;
                 }
-                
-                if(orderExist.Status.Equals("Đã hủy"))
+                else
                 {
-                    return false;
+                    if (orderExist.Status.Equals("Đã hủy"))
+                    {
+                        return false;
+                    }
                 }
+
                 return true;
             }
             else
