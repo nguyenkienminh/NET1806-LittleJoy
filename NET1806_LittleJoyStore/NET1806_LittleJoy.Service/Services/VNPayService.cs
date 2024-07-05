@@ -147,6 +147,7 @@ namespace NET1806_LittleJoy.Service.Services
 
                         //update order
                         order.Status = "Đã Hủy";
+                        order.DeliveryStatus = "Giao Hàng Thất Bại";
                         await _orderRepository.UpdateOrder(order);
                         return _mapper.Map<PaymentModel>(result);
                     }
