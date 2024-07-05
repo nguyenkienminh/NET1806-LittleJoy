@@ -270,6 +270,11 @@ namespace NET1806_LittleJoy.Service.Services
         public async Task<Pagination<UserModel>> GetAllPagingUserByRoleIdAndStatusAsync(PaginationParameter paging, UserFilterModel userFilterModel)
         {
 
+            if (!string.IsNullOrEmpty(userFilterModel.fullName))
+            {
+                userFilterModel.fullName = StringUtils.ConvertToUnSign(userFilterModel.fullName);
+            }
+
             if (userFilterModel.status < 0 || userFilterModel.status > 1)
             {
                 throw new Exception("nhập sai dữ liệu");

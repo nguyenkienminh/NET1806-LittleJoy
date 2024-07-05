@@ -11,5 +11,9 @@ namespace NET1806_LittleJoy.Repository.Commons
         public int? RoleId { get; set; }
 
         public int? status { get; set; }
+
+        public string? userName { get; set; }
+
+        public string? fullName { get; set; }
     }
 }
