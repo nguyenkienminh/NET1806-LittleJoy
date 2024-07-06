@@ -38,5 +38,7 @@ namespace NET1806_LittleJoy.Service.Services.Interface
         public Task<bool> ConfirmEmailAsync(string token);
 
         public Task<AuthenModel> LoginWithGoogle(string credental);
+
+        public Task<int> CountUser();
     }
 }
