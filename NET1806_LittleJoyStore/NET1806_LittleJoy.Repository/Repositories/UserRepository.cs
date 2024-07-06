@@ -148,5 +148,12 @@ namespace NET1806_LittleJoy.Repository.Repositories
         {
             return await _context.Users.ToListAsync();
         }
+
+        public async Task<int> CountUser()
+        {
+            var user = _context.Users.Where(u => u.Role.RoleName == "USER" && u.Status == true).AsQueryable();
+
+            return await user.CountAsync();
+        }
     }
 }

@@ -34,5 +34,7 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
         public Task<ICollection<User>> GetListUserAsync();
 
         public Task<User> CheckExistPhoneNumber(string phoneNumber);
+
+        public Task<int> CountUser();
     }
 }
