@@ -514,5 +514,21 @@ namespace NET1806_LittleJoy.Service.Services
 
             return await _orderRepository.CountOrder(currentDate, status);
         }
+
+        public async Task<List<RevenueOverviewModel>> GetRevenueOverview()
+        {
+            DateTime currentDate = DateTime.UtcNow.AddHours(7);
+            List<RevenueOverviewModel> revenueOverviewModel = new List<RevenueOverviewModel>();
+            for (int i = 1; i <= 12; i++)
+            {
+                var item = await _orderRepository.GetRevenueOverviewByMonth(currentDate,i);
+                revenueOverviewModel.Add(new RevenueOverviewModel
+                {
+                    Month = i,
+                    TotalMoney = item,
+                });
+            }
+            return revenueOverviewModel;
+        }
     }
 }

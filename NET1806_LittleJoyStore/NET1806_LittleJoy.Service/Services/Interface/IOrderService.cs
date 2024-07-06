@@ -29,5 +29,7 @@ namespace NET1806_LittleJoy.Service.Services.Interface
         public Task<int> GetRevenueToday();
 
         public Task<int> CountOrder(bool status);
+
+        public Task<List<RevenueOverviewModel>> GetRevenueOverview();
     }
 }

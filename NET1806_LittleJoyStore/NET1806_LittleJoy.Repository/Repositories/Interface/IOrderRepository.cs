@@ -34,5 +34,7 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
 
         public Task<int> CountOrder(DateTime currentDate, bool status);
 
+        public Task<int> GetRevenueOverviewByMonth(DateTime currentDate, int month);
+
     }
 }

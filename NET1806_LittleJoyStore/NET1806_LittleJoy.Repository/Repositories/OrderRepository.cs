@@ -238,5 +238,16 @@ namespace NET1806_LittleJoy.Repository.Repositories
             return (int)await itemFalse.CountAsync();
         }
 
+        public async Task<int> GetRevenueOverviewByMonth(DateTime currentDate, int month)
+        {
+            var itemDate = _context.Orders.Include(p => p.Payment).Where(u => u.Date.HasValue && u.Date.Value.Year == currentDate.Year && u.Date.Value.Month == month).AsQueryable();
+
+            var itemStatus = itemDate.Where(u => u.Status.Trim() == "Đặt Hàng Thành Công" && u.DeliveryStatus.Trim() == "Giao Hàng Thành Công" && u.Payment.Status.Trim() == "Thành Công");
+
+            var total = (int) await itemStatus.SumAsync(u => u.TotalPrice);
+
+            return total;
+        }
+
     }
 }
