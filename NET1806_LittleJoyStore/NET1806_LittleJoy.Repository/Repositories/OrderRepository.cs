@@ -249,5 +249,18 @@ namespace NET1806_LittleJoy.Repository.Repositories
             return total;
         }
 
+        public async Task<List<Order>> GetAllOrderWithCurrentDate(DateTime currentDate)
+        {
+            var itemDate = _context.Orders.Include(o => o.OrderDetails)
+                                                .Where(u => u.Date.HasValue && 
+                                                       u.Date.Value.Year == currentDate.Year && 
+                                                       u.Date.Value.Month == currentDate.Month)
+                                                .AsQueryable();
+
+            var item = itemDate.Where(u => u.Status.Trim() == "Đặt Hàng Thành Công" && u.DeliveryStatus.Trim() == "Giao Hàng Thành Công" && u.Payment.Status.Trim() == "Thành Công");
+
+            return await item.ToListAsync();
+        } 
+
     }
 }

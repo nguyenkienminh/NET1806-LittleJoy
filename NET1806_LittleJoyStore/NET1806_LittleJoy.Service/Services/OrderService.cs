@@ -530,5 +530,72 @@ namespace NET1806_LittleJoy.Service.Services
             }
             return revenueOverviewModel;
         }
+
+        public async Task<List<ProductHighSalesModel>> GetProductHighSales()
+        {
+            DateTime currentDate = DateTime.UtcNow.AddHours(7);
+            List<ProductHighSalesModel> productList = new List<ProductHighSalesModel>();
+            var order = await _orderRepository.GetAllOrderWithCurrentDate(currentDate);
+
+            if(order.Any())
+            {
+                foreach (var item in order)
+                {
+                    var orderDetail = await _orderRepository.GetOrderDetailsByOrderId(item.Id);
+
+                    if (orderDetail.Any())
+                    {
+
+                        List<OrderDetailModel> orderDetailModel = orderDetail.Select(u => new OrderDetailModel
+                        {
+                            Id = u.Id,
+                            OrderId = u.OrderId,
+                            Price = u.Price,
+                            ProductId = u.ProductId,
+                            Quantity = u.Quantity,
+                        }).ToList();
+
+                        foreach (var item1 in orderDetailModel)
+                        {
+                            ProductHighSalesModel salesModel = new ProductHighSalesModel
+                            {
+                                ProductId = item1.ProductId,
+                                TotalPrice = item1.Price
+                            };
+
+                            if (await CheckExistInHighSales(item1, productList))
+                            {
+                                productList.Add(salesModel);
+                            }
+                            else
+                            {
+                                foreach (var sales in productList)
+                                {
+                                    if (sales.ProductId == salesModel.ProductId)
+                                    {
+                                        sales.TotalPrice += salesModel.TotalPrice;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return productList.OrderByDescending(u => u.TotalPrice).Take(5).ToList();
+
+        }
+
+        public async Task<bool> CheckExistInHighSales(OrderDetailModel model, List<ProductHighSalesModel> highSalesModels) 
+        {
+            foreach (var item in highSalesModels)
+            {
+                if(item.ProductId == model.ProductId)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }

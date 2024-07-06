@@ -34,4 +34,11 @@ namespace NET1806_LittleJoy.Repository.Commons
         public int? status { get; set;}
     }
 
+    public class ProductHighSalesModel
+    {
+        public int? ProductId { get; set; }
+
+        public int? TotalPrice { get; set; }
+    }
+
 }

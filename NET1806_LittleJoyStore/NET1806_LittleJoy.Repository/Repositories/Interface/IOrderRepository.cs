@@ -36,5 +36,7 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
 
         public Task<int> GetRevenueOverviewByMonth(DateTime currentDate, int month);
 
+        public Task<List<Order>> GetAllOrderWithCurrentDate(DateTime currentDate);
+
     }
 }

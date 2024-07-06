@@ -302,5 +302,35 @@ namespace NET1806_LittleJoy.API.Controllers
                 return BadRequest(responseModel);
             }
         }
+
+        [HttpGet("get-product-high-sales")]
+        public async Task<IActionResult> GetAllProductHighSales()
+        {
+            try
+            {
+                var result = await _orderService.GetProductHighSales();
+                if (result != null)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return NotFound(new ResponseModels
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "Product not exist"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                var responseModel = new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(responseModel);
+            }
+        }
     }
 }
