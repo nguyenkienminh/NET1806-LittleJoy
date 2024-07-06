@@ -149,7 +149,7 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
             if (filterModel.OrderCode.HasValue)
             {
-                query = query.Where(o => o.Payment.Code == filterModel.OrderCode);
+                query = query.Where(o => o.Payment.Code.ToString().Contains(filterModel.OrderCode.ToString()));
             }
 
             if (!string.IsNullOrEmpty(filterModel.UserName))
