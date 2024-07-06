@@ -213,5 +213,63 @@ namespace NET1806_LittleJoy.API.Controllers
                 return BadRequest(responseModel);
             }
         }
+
+
+        [HttpGet("get-revenue-today")]
+        public async Task<IActionResult> GetRevenueToday()
+        {
+            try
+            {
+                var result = await _orderService.GetRevenueToday();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                var responseModel = new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(responseModel);
+            }
+        }
+
+        [HttpGet("count-order-active")]
+        public async Task<IActionResult> CountOrderActive()
+        {
+            try
+            {
+                var result = await _orderService.CountOrder(true);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                var responseModel = new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(responseModel);
+            }
+        }
+
+        [HttpGet("count-order-in-active")]
+        public async Task<IActionResult> CountOrderInActive()
+        {
+            try
+            {
+                var result = await _orderService.CountOrder(false);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                var responseModel = new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                };
+                return BadRequest(responseModel);
+            }
+        }
     }
 }

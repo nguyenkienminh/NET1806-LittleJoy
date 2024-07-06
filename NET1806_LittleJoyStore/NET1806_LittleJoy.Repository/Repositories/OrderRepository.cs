@@ -212,6 +212,31 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
             return result;
         }
+        
+        public async Task<int> GetRevenueToday(DateTime currentDate)
+        {
+            var itemDate = _context.Orders.Include(p => p.Payment).Where(u => u.Date.HasValue && u.Date.Value.Date == currentDate.Date).AsQueryable();
+
+            var itemStatus = itemDate.Where(u => u.Status.Trim() == "Đặt Hàng Thành Công" && u.DeliveryStatus.Trim() == "Giao Hàng Thành Công" && u.Payment.Status.Trim() == "Thành Công");
+                                           
+            var total = (int) await itemStatus.SumAsync(u => u.TotalPrice);
+
+            return total;
+        }
+
+        public async Task<int> CountOrder(DateTime currentDate, bool status)
+        {
+            var itemDate = _context.Orders.Include(p => p.Payment).Where(u => u.Date.HasValue && u.Date.Value.Year == currentDate.Year && u.Date.Value.Month == currentDate.Month).AsQueryable();
+
+            if (status)
+            {
+                var itemTrue = itemDate.Where(u => u.Status.Trim() != "Đã Hủy" && u.Payment.Status.Trim() != "Thất Bại");
+                return (int) await itemTrue.CountAsync();
+            }
+
+            var itemFalse = itemDate.Where(u => u.Status.Trim() == "Đã Hủy" && u.DeliveryStatus == "Giao Hàng Thất Bại");
+            return (int)await itemFalse.CountAsync();
+        }
 
     }
 }

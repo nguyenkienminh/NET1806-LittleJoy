@@ -498,5 +498,21 @@ namespace NET1806_LittleJoy.Service.Services
 
             return new Pagination<OrderWithDetailsModel>(result, list.TotalCount, list.CurrentPage, list.PageSize);
         }
+
+        public async Task<int> GetRevenueToday()
+        {
+            DateTime currentDate = DateTime.UtcNow.AddHours(7);
+            var item = await _orderRepository.GetRevenueToday(currentDate);
+            return item;
+        }
+
+        public async Task<int> CountOrder(bool status)
+        {
+            int item;
+
+            DateTime currentDate = DateTime.UtcNow.AddHours(7);
+
+            return await _orderRepository.CountOrder(currentDate, status);
+        }
     }
 }

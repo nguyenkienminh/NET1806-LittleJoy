@@ -25,5 +25,9 @@ namespace NET1806_LittleJoy.Service.Services.Interface
         public Task<Pagination<OrderWithDetailsModel>> OrderFilterAsync(PaginationParameter parameter, OrderFilterModel filterModel);
 
         public Task<bool> CheckCancelOrder(int OrderCode);
+
+        public Task<int> GetRevenueToday();
+
+        public Task<int> CountOrder(bool status);
     }
 }

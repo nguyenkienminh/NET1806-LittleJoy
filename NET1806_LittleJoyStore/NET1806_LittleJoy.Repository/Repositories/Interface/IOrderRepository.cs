@@ -30,5 +30,9 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
 
         public Task<Pagination<Order>> OrderFilterAsync(PaginationParameter parameter, OrderFilterModel filterModel);
 
+        public Task<int> GetRevenueToday(DateTime currentDate);
+
+        public Task<int> CountOrder(DateTime currentDate, bool status);
+
     }
 }
