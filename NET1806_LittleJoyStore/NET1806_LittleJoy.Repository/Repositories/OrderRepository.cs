@@ -202,9 +202,9 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
             var itemCount = await query.CountAsync();
 
-            var item = await query.Skip((paging.PageIndex - 1) * paging.PageSize)
+                                     
+            var item = await query.OrderByDescending(x => x.Id).Skip((paging.PageIndex - 1) * paging.PageSize)
                                      .Take(paging.PageSize)
-                                     .OrderByDescending(o => o.Id)
                                      .AsNoTracking()
                                      .ToListAsync();
 
