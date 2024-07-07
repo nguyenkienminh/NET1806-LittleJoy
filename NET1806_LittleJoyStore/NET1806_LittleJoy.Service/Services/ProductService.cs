@@ -82,7 +82,7 @@ namespace NET1806_LittleJoy.Service.Services
         {
             try
             {
-                productModel.IsActive = true;
+                //productModel.IsActive = true;
 
                 var productInfo = _mapper.Map<Product>(productModel);
 
@@ -283,6 +283,38 @@ namespace NET1806_LittleJoy.Service.Services
             }
 
             return new List<ProductPaymentModel>();
+        }
+
+        public async Task<List<ProductModel>> GetRelatedProducts(int productId)
+        {
+            var item = await _productRepository.GetProductByIdAsync(productId);
+
+            if(item == null)
+            {
+                throw new Exception($"Product {productId} does not exist");
+            }
+
+            var related = await _productRepository.GetRelatedProducts(item);
+
+            var listRelated = related.Select(p => new ProductModel
+            {
+                Id = p.Id,
+                CateId = p.CateId,
+                ProductName = p.ProductName,
+                Price = p.Price,
+                Description = p.Description,
+                Weight = p.Weight,
+                IsActive = p.IsActive,
+                Quantity = p.Quantity,
+                Image = p.Image,
+                AgeId = p.AgeId,
+                OriginId = p.OriginId,
+                BrandId = p.BrandId,
+                UnsignProductName = p.UnsignProductName,
+                RatingAver = _feedBack.AverageRatingAsync(p.Id).Result
+            }).ToList();
+
+            return listRelated;
         }
     }
 }

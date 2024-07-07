@@ -185,5 +185,14 @@ namespace NET1806_LittleJoy.Repository.Repositories
         {
             return await _context.Products.ToListAsync();
         }
+
+        public async Task<List<Product>> GetRelatedProducts(Product product)
+        {
+            return await _context.Products.Where(p => p.IsActive == true &&
+                                                      p.Id != product.Id &&
+                                                      p.CateId == product.CateId)
+                                          .OrderByDescending(p => p.Id)
+                                          .Take(4).ToListAsync();
+        }
     }
 }
