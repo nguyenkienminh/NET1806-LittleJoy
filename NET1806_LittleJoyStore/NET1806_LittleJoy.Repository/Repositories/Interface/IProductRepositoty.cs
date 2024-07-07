@@ -25,5 +25,7 @@ namespace NET1806_LittleJoy.Repository.Repositories.Interface
         public Task<Pagination<Product>> FilterStatusProductPagingAsync(PaginationParameter paging, ProductFilterStatusModel filterStatus);
 
         public Task<ICollection<Product>> GetProductsListAsync();
+
+        public Task<List<Product>> GetRelatedProducts(Product product);
     }
 }

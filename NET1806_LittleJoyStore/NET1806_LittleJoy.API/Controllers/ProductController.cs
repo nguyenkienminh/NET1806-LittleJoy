@@ -112,6 +112,7 @@ namespace NET1806_LittleJoy.API.Controllers
                     OriginId = productRequestModel.OriginId,
                     BrandId = productRequestModel.BrandId,
                     CateId = productRequestModel.CateId,
+                    IsActive = productRequestModel.IsActive,
                 };
 
                 var result = await _productService.AddNewProductAsync(productModel);
@@ -371,16 +372,35 @@ namespace NET1806_LittleJoy.API.Controllers
                     Message = ex.Message.ToString()
                 });
             }
-
-
-
-
-
-            
-            
-
-
             throw new NotImplementedException();
+        }
+
+        [HttpGet("get-product-related/{Id}")]
+        public async Task<IActionResult> GetProductRelated(int Id)
+        {
+            try
+            {
+                var response = await _productService.GetRelatedProducts(Id);
+
+                if (!response.Any())
+                {
+                    return NotFound(new ResponseModels()
+                    {
+                        HttpCode = StatusCodes.Status404NotFound,
+                        Message = "Product does not exist"
+                    });
+                }
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new ResponseModels()
+                {
+                    HttpCode = StatusCodes.Status400BadRequest,
+                    Message = ex.Message.ToString()
+                });
+            }
         }
     }
 }
