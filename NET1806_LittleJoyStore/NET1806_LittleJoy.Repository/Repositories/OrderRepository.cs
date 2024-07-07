@@ -162,64 +162,114 @@ namespace NET1806_LittleJoy.Repository.Repositories
                 switch (filterModel.SortDate)
                 {
                     case 1:
-                        query = query.OrderBy(o => o.Date);
-                        break;
+                        {
+                            if (filterModel.SortPrice.HasValue)
+                            {
+                                switch (filterModel.SortPrice)
+                                {
+                                    case 1:
+                                        query = query.OrderBy(o => o.Date).ThenBy(x => x.TotalPrice);
+                                        break;
+
+                                    case 2:
+                                        query = query.OrderBy(o => o.Date).ThenByDescending(x => x.TotalPrice);
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                query = query.OrderBy(o => o.Date);
+                            }
+                            break;
+                        }
 
                     case 2:
-                        query = query.OrderByDescending(o => o.Date);
-                        break;
+                        {
+                            if (filterModel.SortPrice.HasValue)
+                            {
+                                switch (filterModel.SortPrice)
+                                {
+                                    case 1:
+                                        query = query.OrderByDescending(o => o.Date).ThenBy(x => x.TotalPrice);
+                                        break;
+
+                                    case 2:
+                                        query = query.OrderByDescending(o => o.Date).ThenByDescending(x => x.TotalPrice);
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                query = query.OrderByDescending(o => o.Date);
+                            }
+                            break;
+                        }
                 }
             }
-
-            if (filterModel.SortPrice.HasValue)
+            else if (filterModel.SortPrice.HasValue)
             {
                 switch (filterModel.SortPrice)
                 {
                     case 1:
-                        query = query.OrderBy(o => o.TotalPrice);
+                        {
+                            query = query.OrderBy(x => x.TotalPrice);
+                            break;
+                        }
+                    case 2:
+                        {
+                            query = query.OrderByDescending(x => x.TotalPrice);
+                            break;
+                        }
+                }
+            }
+
+
+            if (filterModel.PaymentMethod.HasValue)
+            {
+                switch (filterModel.PaymentMethod)
+                {
+                    case 1:
+                        query = query.Where(o => o.Payment.Method.Equals("COD"));
                         break;
 
                     case 2:
-                        query = query.OrderByDescending(o => o.TotalPrice);
+                        query = query.Where(o => o.Payment.Method.Equals("VNPAY"));
                         break;
                 }
             }
 
-                if (filterModel.PaymentMethod.HasValue)
-                {
-                    switch (filterModel.PaymentMethod)
-                    {
-                        case 1:
-                            query = query.Where(o => o.Payment.Method.Equals("COD"));
-                            break;
-
-                        case 2:
-                            query = query.Where(o => o.Payment.Method.Equals("VNPAY"));
-                            break;
-                    }
-                }
-            
 
             var itemCount = await query.CountAsync();
 
-                                     
-            var item = await query.OrderByDescending(x => x.Id).Skip((paging.PageIndex - 1) * paging.PageSize)
+
+            if(filterModel.SortPrice.HasValue || filterModel.SortDate.HasValue)
+            {
+                var item = await query.Skip((paging.PageIndex - 1) * paging.PageSize)
                                      .Take(paging.PageSize)
                                      .AsNoTracking()
                                      .ToListAsync();
 
-            var result = new Pagination<Order>(item, itemCount, paging.PageIndex, paging.PageSize);
+                return new Pagination<Order>(item, itemCount, paging.PageIndex, paging.PageSize);
+            }
+            else
+            {
+                var item = await query.OrderByDescending(x => x.Date).Skip((paging.PageIndex - 1) * paging.PageSize)
+                                     .Take(paging.PageSize)
+                                     .AsNoTracking()
+                                     .ToListAsync();
 
-            return result;
+                return new Pagination<Order>(item, itemCount, paging.PageIndex, paging.PageSize);
+            }
+            
         }
-        
+
         public async Task<int> GetRevenueToday(DateTime currentDate)
         {
             var itemDate = _context.Orders.Include(p => p.Payment).Where(u => u.Date.HasValue && u.Date.Value.Date == currentDate.Date).AsQueryable();
 
             var itemStatus = itemDate.Where(u => u.Status.Trim() == "Đặt Hàng Thành Công" && u.DeliveryStatus.Trim() == "Giao Hàng Thành Công" && u.Payment.Status.Trim() == "Thành Công");
-                                           
-            var total = (int) await itemStatus.SumAsync(u => u.TotalPrice);
+
+            var total = (int)await itemStatus.SumAsync(u => u.TotalPrice);
 
             return total;
         }
@@ -231,7 +281,7 @@ namespace NET1806_LittleJoy.Repository.Repositories
             if (status)
             {
                 var itemTrue = itemDate.Where(u => u.Status.Trim() != "Đã Hủy" && u.Payment.Status.Trim() != "Thất Bại");
-                return (int) await itemTrue.CountAsync();
+                return (int)await itemTrue.CountAsync();
             }
 
             var itemFalse = itemDate.Where(u => u.Status.Trim() == "Đã Hủy" && u.DeliveryStatus == "Giao Hàng Thất Bại");
@@ -244,7 +294,7 @@ namespace NET1806_LittleJoy.Repository.Repositories
 
             var itemStatus = itemDate.Where(u => u.Status.Trim() == "Đặt Hàng Thành Công" && u.DeliveryStatus.Trim() == "Giao Hàng Thành Công" && u.Payment.Status.Trim() == "Thành Công");
 
-            var total = (int) await itemStatus.SumAsync(u => u.TotalPrice);
+            var total = (int)await itemStatus.SumAsync(u => u.TotalPrice);
 
             return total;
         }
@@ -252,15 +302,15 @@ namespace NET1806_LittleJoy.Repository.Repositories
         public async Task<List<Order>> GetAllOrderWithCurrentDate(DateTime currentDate)
         {
             var itemDate = _context.Orders.Include(o => o.OrderDetails)
-                                                .Where(u => u.Date.HasValue && 
-                                                       u.Date.Value.Year == currentDate.Year && 
+                                                .Where(u => u.Date.HasValue &&
+                                                       u.Date.Value.Year == currentDate.Year &&
                                                        u.Date.Value.Month == currentDate.Month)
                                                 .AsQueryable();
 
             var item = itemDate.Where(u => u.Status.Trim() == "Đặt Hàng Thành Công" && u.DeliveryStatus.Trim() == "Giao Hàng Thành Công" && u.Payment.Status.Trim() == "Thành Công");
 
             return await item.ToListAsync();
-        } 
+        }
 
     }
 }
