@@ -158,6 +158,11 @@ namespace NET1806_LittleJoy.Service.Services
                 throw new Exception("Thông tin không hợp lệ");
             }
 
+            if (model.IsActive < 0 || model.IsActive > 1)
+            {
+                throw new Exception("Thông tin không hợp lệ");
+            }
+
             var listProduct =  await _productRepository.FilterProductPagingAsync(paging,model);
 
             if (!listProduct.Any())

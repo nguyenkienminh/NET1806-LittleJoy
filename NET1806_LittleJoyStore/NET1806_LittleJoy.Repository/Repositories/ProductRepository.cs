@@ -81,13 +81,18 @@ namespace NET1806_LittleJoy.Repository.Repositories
         {
             var products = _context.Products.AsQueryable();
 
-            if(model.IsActive == true || model.IsActive.HasValue == false)
+            if (model.IsActive.HasValue)
             {
-                products = products.Where(p => p.IsActive == true);
-            }
-            else if(model.IsActive == false) 
-            {
-                products = products.Where(p => p.IsActive == false);
+                switch (model.IsActive)
+                {
+                    case 0:
+                        products = products.Where(p => p.IsActive == false);
+                        break;
+
+                    case 1:
+                        products = products.Where(p => p.IsActive == true);
+                        break;
+                }
             }
 
             if (!string.IsNullOrEmpty(model.keyword))

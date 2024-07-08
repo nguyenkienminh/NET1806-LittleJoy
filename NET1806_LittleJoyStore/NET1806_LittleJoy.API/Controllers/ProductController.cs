@@ -238,6 +238,9 @@ namespace NET1806_LittleJoy.API.Controllers
         ///     1 - Hàng mới |
         ///     2 - Giá tiền Cao đến thấp |
         ///     3 - Giá tiền Thấp đến cao |
+        /// Sort IsActive:
+        ///     1 - True|  
+        ///     0 - False|
         /// </summary>
         [HttpGet("filter")]
         public async Task<IActionResult> FilterProductPagingAsync([FromQuery] PaginationParameter paging, [FromQuery] ProductFilterModel model)
