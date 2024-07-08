@@ -199,7 +199,7 @@ namespace NET1806_LittleJoy.Service.Services
                 {
                     Id = product.Id,
                     ProductName = product.ProductName,
-                    Price = ((int)(item1.Price * item1.Quantity)),
+                    Price = ((int)(item1.Price)),
                     Quantity = (int)item1.Quantity,
                     Image = product.Image,
                 });
@@ -247,7 +247,7 @@ namespace NET1806_LittleJoy.Service.Services
                     {
                         Id = product.Id,
                         ProductName = product.ProductName,
-                        Price = ((int)(item1.Price * item1.Quantity)),
+                        Price = ((int)(item1.Price)),
                         Quantity = (int)item1.Quantity,
                         Image = product.Image,
                     });
@@ -491,7 +491,7 @@ namespace NET1806_LittleJoy.Service.Services
                     {
                         Id = product.Id,
                         ProductName = product.ProductName,
-                        Price = ((int)(item1.Price * item1.Quantity)),
+                        Price = ((int)(item1.Price)),
                         Quantity = (int)item1.Quantity,
                         Image = product.Image,
                     });
