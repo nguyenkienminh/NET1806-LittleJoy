@@ -483,11 +483,11 @@ namespace NET1806_LittleJoy.Service.Services
 
                     if (check != null && userModify.Id != check.Id)
                     {
-                        throw new Exception("Phone Number is exist");
+                        throw new Exception($"Số điện thoại {check.PhoneNumber} đã tồn tại");
                     }
-                    else
+                    else if (check != null && userModify.Id == check.Id)
                     {
-                        userModify.PhoneNumber = userPlace.PhoneNumber;
+                        userModify.PhoneNumber = check.PhoneNumber;
                     }
                 }
             }
@@ -580,11 +580,11 @@ namespace NET1806_LittleJoy.Service.Services
 
                     if (check != null && userModify.Id != check.Id)
                     {
-                        throw new Exception("Phone Number is exist");
+                        throw new Exception($"Số điện thoại {check.PhoneNumber} đã tồn tại");
                     }
-                    else
+                    else if(check != null && userModify.Id == check.Id)
                     {
-                        userModify.PhoneNumber = userPlace.PhoneNumber;
+                        userModify.PhoneNumber = check.PhoneNumber;
                     }
                 }
             }
