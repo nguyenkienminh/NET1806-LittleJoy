@@ -111,7 +111,7 @@ namespace NET1806_LittleJoy.Service.Services
                             OrderID = result.Id,
                             Code = orderCode,
                             Method = method,
-                            Status = "Đang chờ",
+                            Status = "Đang Chờ",
                         };
                         await _paymentRepository.CreateNewPayment(_mapper.Map<Payment>(payment));
 
@@ -420,7 +420,7 @@ namespace NET1806_LittleJoy.Service.Services
         public async Task<Pagination<OrderWithDetailsModel>> OrderFilterAsync(PaginationParameter parameter, OrderFilterModel filterModel)
         {
             #region check filter Valid
-            if (filterModel.Status < 1 || filterModel.Status > 3)
+            if (filterModel.Status < 1 || filterModel.Status > 2)
             {
                 throw new Exception("Thông tin trạng thái đơn hàng không hợp lệ");
             }

@@ -90,15 +90,11 @@ namespace NET1806_LittleJoy.Repository.Repositories
                 switch (filterModel.Status)
                 {
                     case 1:
-                        query = query.Where(o => o.Status.Equals("Đang chờ"));
-                        break;
-
-                    case 2:
                         query = query.Where(o => o.Status.Equals("Đặt Hàng Thành Công"));
                         break;
 
-                    case 3:
-                        query = query.Where(o => o.Status.Equals("Đã hủy"));
+                    case 2:
+                        query = query.Where(o => o.Status.Equals("Đã Hủy"));
                         break;
                 }
             }
@@ -108,15 +104,15 @@ namespace NET1806_LittleJoy.Repository.Repositories
                 switch (filterModel.PaymentStatus)
                 {
                     case 1:
-                        query = query.Where(o => o.Payment.Status.Equals("Đang chờ"));
+                        query = query.Where(o => o.Payment.Status.Equals("Đang Chờ"));
                         break;
 
                     case 2:
-                        query = query.Where(o => o.Payment.Status.Equals("Thành công"));
+                        query = query.Where(o => o.Payment.Status.Equals("Thành Công"));
                         break;
 
                     case 3:
-                        query = query.Where(o => o.Payment.Status.Equals("Thất bại"));
+                        query = query.Where(o => o.Payment.Status.Equals("Thất Bại"));
                         break;
                 }
             }
