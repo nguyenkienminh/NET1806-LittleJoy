@@ -790,5 +790,10 @@ namespace NET1806_LittleJoy.Service.Services
                 }
             }
         }
+
+        public async Task<int> CountUser() 
+        {
+            return await _userRepository.CountUser();
+        }
     }
 }

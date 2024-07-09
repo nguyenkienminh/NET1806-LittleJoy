@@ -199,7 +199,7 @@ namespace NET1806_LittleJoy.Service.Services
                 {
                     Id = product.Id,
                     ProductName = product.ProductName,
-                    Price = ((int)(item1.Price * item1.Quantity)),
+                    Price = ((int)(item1.Price)),
                     Quantity = (int)item1.Quantity,
                     Image = product.Image,
                 });
@@ -247,7 +247,7 @@ namespace NET1806_LittleJoy.Service.Services
                     {
                         Id = product.Id,
                         ProductName = product.ProductName,
-                        Price = ((int)(item1.Price * item1.Quantity)),
+                        Price = ((int)(item1.Price)),
                         Quantity = (int)item1.Quantity,
                         Image = product.Image,
                     });
@@ -264,7 +264,7 @@ namespace NET1806_LittleJoy.Service.Services
             var orderExist = await _orderRepository.GetOrderById(paymentExist.OrderID);
 
             //cập nhật tình trạng giao hàng, thanh toán
-            if (orderExist.DeliveryStatus != "Giao Hàng Thành Công" && orderExist.Status == "Đặt Hàng Thành Công")
+            if (orderExist.DeliveryStatus != "Giao Hàng Thất Bại" && orderExist.DeliveryStatus != "Giao Hàng Thành Công" && orderExist.Status == "Đặt Hàng Thành Công")
             {
                 switch (model.Status)
                 {
@@ -285,6 +285,13 @@ namespace NET1806_LittleJoy.Service.Services
                             {
                                 paymentExist.Status = "Thất Bại";
                                 await _paymentRepository.UpdatePayment(paymentExist);
+
+                                orderExist.Status = "Đã Hủy";
+                                await _orderRepository.UpdateOrder(orderExist);
+                            } else if(paymentExist.Method == "VNPAY")
+                            {
+                                orderExist.Status = "Đã Hủy";
+                                await _orderRepository.UpdateOrder(orderExist);
                             }
                             break;
                         }
@@ -341,13 +348,8 @@ namespace NET1806_LittleJoy.Service.Services
             var paymentExist = await _paymentRepository.GetPaymentByOrderCode(model.OrderCode);
             var orderExist = await _orderRepository.GetOrderById(paymentExist.OrderID);
 
-            if (orderExist.DeliveryStatus != "Đang Giao Hàng" && orderExist.DeliveryStatus != "Giao Hàng Thành Công" && orderExist.DeliveryStatus != "Đang Chuẩn Bị")
+            if (orderExist.DeliveryStatus == "" && paymentExist.Method == "COD" && orderExist.Status != "Đã Hủy")
             {
-                if(paymentExist.Method == "VNPay" && paymentExist.Status == "Thành Công")
-                {
-                    throw new Exception("Không thể cập nhật đơn hàng này");
-                }
-
                 string status = "";
 
                 switch (model.Status) 
@@ -360,6 +362,12 @@ namespace NET1806_LittleJoy.Service.Services
                     case 2: 
                         {
                             status = "Đã Hủy";
+
+                            paymentExist.Status = "Thất Bại";
+                            await _paymentRepository.UpdatePayment(paymentExist);
+
+                            orderExist.DeliveryStatus = "Giao Hàng Thất Bại";
+                            await _orderRepository.UpdateOrder(orderExist);
                             break;
                         }
                 }
@@ -392,25 +400,20 @@ namespace NET1806_LittleJoy.Service.Services
 
             var orderExist = await _orderRepository.GetOrderById(paymentExist.OrderID);
 
-            if (orderExist.DeliveryStatus == "Đang Chuẩn Bị" || orderExist.DeliveryStatus == "")
+            if(paymentExist.Method == "COD")
             {
-                if (paymentExist.Status == "Thất bại")
+                if(orderExist.DeliveryStatus == "")
                 {
-                    return false;
+                    return true;
                 }
                 else
                 {
-                    if (orderExist.Status.Equals("Đã hủy"))
-                    {
-                        return false;
-                    }
+                    return false;
                 }
-
-                return true;
             }
             else
             {
-                return false;
+                return false ;
             }
         }
 
@@ -488,7 +491,7 @@ namespace NET1806_LittleJoy.Service.Services
                     {
                         Id = product.Id,
                         ProductName = product.ProductName,
-                        Price = ((int)(item1.Price * item1.Quantity)),
+                        Price = ((int)(item1.Price)),
                         Quantity = (int)item1.Quantity,
                         Image = product.Image,
                     });
