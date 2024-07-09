@@ -111,7 +111,7 @@ namespace NET1806_LittleJoy.Service.Services
                             OrderID = result.Id,
                             Code = orderCode,
                             Method = method,
-                            Status = "Đang chờ",
+                            Status = "Đang Chờ",
                         };
                         await _paymentRepository.CreateNewPayment(_mapper.Map<Payment>(payment));
 
