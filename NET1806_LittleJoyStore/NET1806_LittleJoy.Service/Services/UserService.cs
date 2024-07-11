@@ -461,17 +461,17 @@ namespace NET1806_LittleJoy.Service.Services
                 throw new Exception("User không tồn tại");
             }
 
-            if (userModify.Fullname != "".Trim() && userModify.Fullname != null)
+            if (!string.IsNullOrEmpty(userModify.Fullname))
             {
                 userModify.UnsignName = StringUtils.ConvertToUnSign(userModify.Fullname);
             }
             else
             {
-                userModify.Fullname = userPlace.Fullname;
-                userModify.UnsignName = StringUtils.ConvertToUnSign(userPlace.Fullname);
+                userModify.Fullname = null;
+                userModify.UnsignName = null;
             }
 
-            if (userModify.PhoneNumber != null && userModify.PhoneNumber != "".Trim())
+            if (!string.IsNullOrEmpty(userModify.PhoneNumber))
             {
                 if (StringUtils.IsValidPhoneNumber(userModify.PhoneNumber) == false)
                 {
@@ -493,7 +493,7 @@ namespace NET1806_LittleJoy.Service.Services
             }
             else
             {
-                userModify.PhoneNumber = userPlace.PhoneNumber;
+                userModify.PhoneNumber = null;
             }
 
             if (userModify.Status == null)
@@ -558,21 +558,17 @@ namespace NET1806_LittleJoy.Service.Services
                 throw new Exception("Tài khoản không tồn tại");
             }
 
-            if (userModify.Fullname != "".Trim())
+            if (!string.IsNullOrEmpty(userModify.Fullname))
             {
                 userModify.UnsignName = StringUtils.ConvertToUnSign(userModify.Fullname);
             }
-            else
+            else 
             {
                 userModify.Fullname = null;
+                userModify.UnsignName = null;
             }
-            //else
-            //{
-            //    userModify.Fullname = userPlace.Fullname;
-            //    userModify.UnsignName = StringUtils.ConvertToUnSign(userPlace.Fullname);
-            //}
 
-            if (!userModify.PhoneNumber.Equals("".Trim()))
+            if (!string.IsNullOrEmpty(userModify.PhoneNumber))
             {
                 if (StringUtils.IsValidPhoneNumber(userModify.PhoneNumber) == false)
                 {
