@@ -568,7 +568,7 @@ namespace NET1806_LittleJoy.Service.Services
                 userModify.UnsignName = StringUtils.ConvertToUnSign(userPlace.Fullname);
             }
 
-            if (userModify.PhoneNumber != null && userModify.PhoneNumber != "".Trim())
+            if (userModify.PhoneNumber != null)
             {
                 if (StringUtils.IsValidPhoneNumber(userModify.PhoneNumber) == false)
                 {
