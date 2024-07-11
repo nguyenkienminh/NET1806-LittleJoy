@@ -96,6 +96,9 @@ namespace NET1806_LittleJoy.Repository.Repositories
                     case 2:
                         query = query.Where(o => o.Status.Equals("Đã Hủy"));
                         break;
+                    case 3:
+                        query = query.Where(o => o.Status.Equals("Đang Chờ"));
+                        break;
                 }
             }
 
