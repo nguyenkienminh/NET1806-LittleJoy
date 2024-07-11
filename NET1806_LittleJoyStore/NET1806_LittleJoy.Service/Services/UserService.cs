@@ -558,17 +558,21 @@ namespace NET1806_LittleJoy.Service.Services
                 throw new Exception("Tài khoản không tồn tại");
             }
 
-            if (userModify.Fullname != "".Trim() && userModify.Fullname != null)
+            if (userModify.Fullname != "".Trim())
             {
                 userModify.UnsignName = StringUtils.ConvertToUnSign(userModify.Fullname);
             }
             else
             {
-                userModify.Fullname = userPlace.Fullname;
-                userModify.UnsignName = StringUtils.ConvertToUnSign(userPlace.Fullname);
+                userModify.Fullname = null;
             }
+            //else
+            //{
+            //    userModify.Fullname = userPlace.Fullname;
+            //    userModify.UnsignName = StringUtils.ConvertToUnSign(userPlace.Fullname);
+            //}
 
-            if (userModify.PhoneNumber != null)
+            if (!userModify.PhoneNumber.Equals("".Trim()))
             {
                 if (StringUtils.IsValidPhoneNumber(userModify.PhoneNumber) == false)
                 {
@@ -590,8 +594,9 @@ namespace NET1806_LittleJoy.Service.Services
             }
             else
             {
-                userModify.PhoneNumber = userPlace.PhoneNumber;
+                userModify.PhoneNumber = null;
             }
+           
 
             if (userModify.Avatar == null || userModify.Avatar == "".Trim())
             {
