@@ -420,7 +420,7 @@ namespace NET1806_LittleJoy.Service.Services
         public async Task<Pagination<OrderWithDetailsModel>> OrderFilterAsync(PaginationParameter parameter, OrderFilterModel filterModel)
         {
             #region check filter Valid
-            if (filterModel.Status < 1 || filterModel.Status > 2)
+            if (filterModel.Status < 1 || filterModel.Status > 3)
             {
                 throw new Exception("Thông tin trạng thái đơn hàng không hợp lệ");
             }

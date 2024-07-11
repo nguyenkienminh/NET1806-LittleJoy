@@ -168,7 +168,7 @@ namespace NET1806_LittleJoy.API.Controllers
         }
 
         /// <summary>
-        /// Status: (1 Đặt Hàng Thành Công | 2 Đã hủy)   | 
+        /// Status: (1 Đặt Hàng Thành Công | 2 Đã hủy  | 3 Đang Chờ)   | 
         /// PaymentStatus: (1 Đang Chờ | Thành Công |  3 Thất Bại)   | 
         /// DeliveryStatus: (1 Đang Chuẩn Bị |  2 Đang Giao Hàng | 3 Giao hàng thất bại |  4 Giao Hàng Thành Công) | 5 ""  | 
         /// SortDate, sortPrice: (1 tăng dần | 2 giảm dần)   | 
