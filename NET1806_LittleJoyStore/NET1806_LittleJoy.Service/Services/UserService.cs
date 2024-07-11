@@ -600,7 +600,7 @@ namespace NET1806_LittleJoy.Service.Services
             }
 
             userModify.Status = userPlace.Status;
-            var Role = await _roleRepository.GetRoleByNameAsync("USER");
+            var Role = await _roleRepository.GetRoleByIdAsync((int) userPlace.RoleId);
             userModify.RoleId = Role.Id;
 
             var updateUser = await _userRepository.UpdateUserAsync(userModify, userPlace);

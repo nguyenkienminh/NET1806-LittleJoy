@@ -247,7 +247,7 @@ namespace NET1806_LittleJoy.API.Controllers
         }
 
 
-        [HttpPut]
+        [HttpPut("update-user-for-admin")]
         //[Authorize(Roles = "STAFF,ADMIN")]
         public async Task<IActionResult> UpdateUserAsync([FromBody] UpdateUserRequestModel request)
         {
@@ -291,7 +291,7 @@ namespace NET1806_LittleJoy.API.Controllers
         }
 
 
-        [HttpPut("user-role")]
+        [HttpPut("update-user-profile")]
         //[Authorize(Roles = "USER")]
         public async Task<IActionResult> UpdateInformationForUserRoleAsync([FromBody] UpdateUserRoleRequestModel request)
         {
