@@ -27,7 +27,6 @@ C# Web Api Application - Our website dedicated to selling milk for pregnant wome
 
 #### System Design:
 
-Technologies:
 - Front-end: ReactJS, Bootstrap 5.3, FireBase
 - Back-end: C# Web API, MS SQL Server, 3 Layer Architecture
 - Authentication: Google OAuth
@@ -35,7 +34,6 @@ Technologies:
 
 #### Deployment:
 
-Technologies:
 - Front-end: https://littlejoy.vercel.app/
 - Back-end: https://littlejoyapi.azurewebsites.net/swagger/index.html
 
