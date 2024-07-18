@@ -27,8 +27,9 @@ namespace NET1806_LittleJoy.Service.Services
         private readonly IPointsMoneyRepository _pointsMoneyRepository;
         private readonly IMailService _mailService;
         private readonly IMapper _mapper;
+        private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
-        public VNPayService(IOrderRepository orderRepository, IUserRepository userRepository, IPointsMoneyRepository pointsMoneyRepository, IPaymentRepository paymentRepository, IMailService mailService, IProductRepositoty productRepositoty, IMapper mapper) 
+        public VNPayService(IOrderRepository orderRepository, IUserRepository userRepository, IPointsMoneyRepository pointsMoneyRepository, IPaymentRepository paymentRepository, IMailService mailService, IProductRepositoty productRepositoty, IMapper mapper)
         {
             _orderRepository = orderRepository;
             _userRepository = userRepository;
@@ -103,86 +104,92 @@ namespace NET1806_LittleJoy.Service.Services
                     var order = await _orderRepository.GetOrderById(payment.OrderID);
                     if (vnPayResponse.vnp_TransactionStatus == "00")
                     {
-                        using (var transaction = await _orderRepository.BeginTransactionAsync())
+                        await _semaphore.WaitAsync();
+                        try
                         {
-                            try
+                            using (var transaction = await _orderRepository.BeginTransactionAsync())
                             {
-                                var listDetail = await _orderRepository.GetOrderDetailsByOrderId(payment.OrderID);
-                                foreach (var item in listDetail)
+                                try
                                 {
-                                    var product = await _productRepository.GetProductByIdAsync((int)item.ProductId);
-                                    if(product.Quantity < item.Quantity)
+                                    var listDetail = await _orderRepository.GetOrderDetailsByOrderId(payment.OrderID);
+                                    foreach (var item in listDetail)
                                     {
-                                        throw new Exception("");
+                                        var product = await _productRepository.GetProductByIdAsync((int)item.ProductId);
+                                        if (product.Quantity < item.Quantity)
+                                        {
+                                            throw new Exception("");
+                                        }
+                                        product.Quantity -= (int)item.Quantity;
+                                        await _productRepository.UpdateProductAsync(product);
                                     }
-                                    product.Quantity -= (int)item.Quantity;
-                                    await _productRepository.UpdateProductAsync(product);
+
+                                    //cập nhật tình trạng thanh toán
+                                    payment.Status = "Thành Công";
+                                    var result = await _paymentRepository.UpdatePayment(payment);
+
+                                    //update trạng thái order
+
+                                    order.Status = "Đặt Hàng Thành Công";
+                                    await _orderRepository.UpdateOrder(order);
+
+                                    //lấy user để cộng, trừ điểm theo order
+                                    var user = await _userRepository.GetUserByIdAsync(order.UserId);
+                                    if (order.AmountDiscount != 0)
+                                    {
+                                        //nếu có dùng điểm thì trừ điểm
+                                        var points = await _pointsMoneyRepository.GetPointsByMoneyDiscount(order.AmountDiscount);
+                                        user.Points -= points.MinPoints;
+                                    }
+
+                                    //cộng điểm theo đơn hàng
+                                    user.Points += order.TotalPrice / 1000;
+
+                                    //update user
+                                    await _userRepository.UpdateUserAsync(user);
+
+                                    //send mail
+                                    var orderWithDetails = await GetOrderWithDetailsAsync(orderCode);
+                                    string body = EmailContent.OrderEmail(orderWithDetails, _mapper.Map<UserModel>(user));
+
+                                    await _mailService.sendEmailAsync(new MailRequest()
+                                    {
+                                        ToEmail = user.Email,
+                                        Body = body,
+                                        Subject = "[Little Joy] Hóa đơn điện tử số #" + orderCode
+                                    });
+
+                                    await transaction.CommitAsync();
+                                    _semaphore.Release();
+                                    return _mapper.Map<PaymentModel>(result);
                                 }
-
-                                //cập nhật tình trạng thanh toán
-                                payment.Status = "Thành Công";
-                                var result = await _paymentRepository.UpdatePayment(payment);
-
-                                //update trạng thái order
-
-                                order.Status = "Đặt Hàng Thành Công";
-                                await _orderRepository.UpdateOrder(order);
-
-                                //lấy user để cộng, trừ điểm theo order
-                                var user = await _userRepository.GetUserByIdAsync(order.UserId);
-                                if (order.AmountDiscount != 0)
+                                catch (Exception ex)
                                 {
-                                    //nếu có dùng điểm thì trừ điểm
-                                    var points = await _pointsMoneyRepository.GetPointsByMoneyDiscount(order.AmountDiscount);
-                                    user.Points -= points.MinPoints;
+                                    await transaction.RollbackAsync();
+                                    //update payment
+                                    payment.Status = "Thất Bại";
+                                    var result = await _paymentRepository.UpdatePayment(payment);
+
+                                    //update order
+                                    order.Status = "Đã Hủy";
+                                    order.DeliveryStatus = "Giao Hàng Thất Bại";
+                                    await _orderRepository.UpdateOrder(order);
+
+                                    var user = await _userRepository.GetUserByIdAsync(order.UserId);
+                                    string body = EmailContent.NotificationEmail(_mapper.Map<UserModel>(user), _mapper.Map<PaymentModel>(payment), _mapper.Map<OrderModel>(order), "không đủ số lượng sản phẩm");
+                                    await _mailService.sendEmailAsync(new MailRequest()
+                                    {
+                                        ToEmail = _configuration["Notification:Email"],
+                                        Body = body,
+                                        Subject = "[Little Joy Alert] Hoàn Tiền Đơn Hàng #" + orderCode
+                                    });
+                                    _semaphore.Release();
+                                    return _mapper.Map<PaymentModel>(result);
                                 }
-
-                                //cộng điểm theo đơn hàng
-                                user.Points += order.TotalPrice / 1000;
-
-                                //update user
-                                await _userRepository.UpdateUserAsync(user);
-
-                                //send mail
-                                var orderWithDetails = await GetOrderWithDetailsAsync(orderCode);
-                                string body = EmailContent.OrderEmail(orderWithDetails, _mapper.Map<UserModel>(user));
-
-                                await _mailService.sendEmailAsync(new MailRequest()
-                                {
-                                    ToEmail = user.Email,
-                                    Body = body,
-                                    Subject = "[Little Joy] Hóa đơn điện tử số #" + orderCode
-                                });
-
-                                await transaction.CommitAsync();
-
-                                return _mapper.Map<PaymentModel>(result);
-                            }
-                            catch(Exception ex)
-                            {
-                                await transaction.RollbackAsync();
-                                //update payment
-                                payment.Status = "Thất Bại";
-                                var result = await _paymentRepository.UpdatePayment(payment);
-
-                                //update order
-                                order.Status = "Đã Hủy";
-                                order.DeliveryStatus = "Giao Hàng Thất Bại";
-                                await _orderRepository.UpdateOrder(order);
-
-                                var user = await _userRepository.GetUserByIdAsync(order.UserId);
-                                string body = EmailContent.NotificationEmail(_mapper.Map<UserModel>(user), _mapper.Map<PaymentModel>(payment), _mapper.Map<OrderModel>(order), "không đủ số lượng sản phẩm");
-                                await _mailService.sendEmailAsync(new MailRequest()
-                                {
-                                    ToEmail = _configuration["Notification:Email"],
-                                    Body = body,
-                                    Subject = "[Little Joy Alert] Hoàn Tiền Đơn Hàng #" + orderCode
-                                });
-
-                                return _mapper.Map<PaymentModel>(result);
                             }
                         }
-                        
+                        finally
+                        {
+                        }
                     }
                     else
                     {
