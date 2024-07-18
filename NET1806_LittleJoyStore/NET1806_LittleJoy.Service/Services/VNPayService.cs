@@ -171,7 +171,7 @@ namespace NET1806_LittleJoy.Service.Services
                                 await _orderRepository.UpdateOrder(order);
 
                                 var user = await _userRepository.GetUserByIdAsync(order.UserId);
-                                string body = EmailContent.NotificationEmail(_mapper.Map<UserModel>(user), _mapper.Map<PaymentModel>(payment), "không đủ số lượng sản phẩm");
+                                string body = EmailContent.NotificationEmail(_mapper.Map<UserModel>(user), _mapper.Map<PaymentModel>(payment), _mapper.Map<OrderModel>(order), "không đủ số lượng sản phẩm");
                                 await _mailService.sendEmailAsync(new MailRequest()
                                 {
                                     ToEmail = _configuration["Notification:Email"],
