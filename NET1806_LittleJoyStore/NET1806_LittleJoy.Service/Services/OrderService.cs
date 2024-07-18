@@ -399,7 +399,7 @@ namespace NET1806_LittleJoy.Service.Services
                             if(paymentExist.Method == "VNPAY")
                             {
                                 var user = await _userRepository.GetUserByIdAsync(orderExist.UserId);
-                                string body = EmailContent.NotificationEmail(_mapper.Map<UserModel>(user), _mapper.Map<PaymentModel>(paymentExist), "người dùng hủy đơn");
+                                string body = EmailContent.NotificationEmail(_mapper.Map<UserModel>(user), _mapper.Map<PaymentModel>(paymentExist), _mapper.Map<OrderModel>(orderExist), "người dùng hủy đơn");
                                 await _mailService.sendEmailAsync(new MailRequest()
                                 {
                                     ToEmail = _configuration["Notification:Email"],
