@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using NET1806_LittleJoy.API.ViewModels.RequestModels;
 using NET1806_LittleJoy.Repository.Commons;
 using NET1806_LittleJoy.Repository.Entities;
@@ -123,9 +124,11 @@ namespace NET1806_LittleJoy.Service.Services
                             //kiểm tra product
                             if (product != null)
                             {
-                                product.Quantity -= item.Quantity;
-
-                                await _productRepositoty.UpdateProductAsync(product);
+                                if (model.PaymentMethod == 1)
+                                {
+                                    product.Quantity -= item.Quantity;
+                                    await _productRepositoty.UpdateProductAsync(product);
+                                }
 
                                 var orderDetailModel = new OrderDetailModel()
                                 {
@@ -167,7 +170,7 @@ namespace NET1806_LittleJoy.Service.Services
         public async Task<OrderWithDetailsModel> GetOrderByOrderCode(int orderCode)
         {
             var payment = await _paymentRepository.GetPaymentByOrderCode(orderCode);
-            if(payment == null)
+            if (payment == null)
             {
                 throw new Exception("Không tìm thấy order");
             }
@@ -281,14 +284,24 @@ namespace NET1806_LittleJoy.Service.Services
                     case 3:
                         {
                             orderExist.DeliveryStatus = "Giao Hàng Thất Bại";
-                            if(paymentExist.Method == "COD")
+                            if (paymentExist.Method == "COD")
                             {
                                 paymentExist.Status = "Thất Bại";
                                 await _paymentRepository.UpdatePayment(paymentExist);
 
                                 orderExist.Status = "Đã Hủy";
                                 await _orderRepository.UpdateOrder(orderExist);
-                            } else if(paymentExist.Method == "VNPAY")
+
+                                var listDetails = await _orderRepository.GetOrderDetailsByOrderId(paymentExist.OrderID);
+                                foreach (var item in listDetails)
+                                {
+                                    var product = await _productRepositoty.GetProductByIdAsync((int)item.ProductId);
+                                    product.Quantity += (int)item.Quantity;
+                                    await _productRepositoty.UpdateProductAsync(product);
+                                }
+
+                            }
+                            else if (paymentExist.Method == "VNPAY")
                             {
                                 orderExist.Status = "Đã Hủy";
                                 await _orderRepository.UpdateOrder(orderExist);
@@ -345,6 +358,11 @@ namespace NET1806_LittleJoy.Service.Services
 
         public async Task<bool> UpdateOrderStatus(OrderUpdateRequestModel model)
         {
+            IConfiguration _configuration = new ConfigurationBuilder()
+                        .SetBasePath(Directory.GetCurrentDirectory())
+                        .AddJsonFile("appsettings.json")
+                        .Build();
+
             var paymentExist = await _paymentRepository.GetPaymentByOrderCode(model.OrderCode);
             var orderExist = await _orderRepository.GetOrderById(paymentExist.OrderID);
 
@@ -352,14 +370,14 @@ namespace NET1806_LittleJoy.Service.Services
             {
                 string status = "";
 
-                switch (model.Status) 
+                switch (model.Status)
                 {
                     case 1:
                         {
                             status = "Đặt Hàng Thành Công";
                             break;
                         }
-                    case 2: 
+                    case 2:
                         {
                             status = "Đã Hủy";
 
@@ -368,6 +386,27 @@ namespace NET1806_LittleJoy.Service.Services
 
                             orderExist.DeliveryStatus = "Giao Hàng Thất Bại";
                             await _orderRepository.UpdateOrder(orderExist);
+
+                            //huy don hang cong lai quantity cho cod
+                            var listDetails = await _orderRepository.GetOrderDetailsByOrderId(paymentExist.OrderID);
+                            foreach (var item in listDetails)
+                            {
+                                var product = await _productRepositoty.GetProductByIdAsync((int)item.ProductId);
+                                product.Quantity += (int)item.Quantity;
+                                await _productRepositoty.UpdateProductAsync(product);
+                            }
+
+                            if(paymentExist.Method == "VNPAY")
+                            {
+                                var user = await _userRepository.GetUserByIdAsync(orderExist.UserId);
+                                string body = EmailContent.NotificationEmail(_mapper.Map<UserModel>(user), _mapper.Map<PaymentModel>(paymentExist), "người dùng hủy đơn");
+                                await _mailService.sendEmailAsync(new MailRequest()
+                                {
+                                    ToEmail = _configuration["Notification:Email"],
+                                    Body = body,
+                                    Subject = "[Little Joy Alert] Hoàn Tiền Đơn Hàng #" + paymentExist.Code
+                                });
+                            }
                             break;
                         }
                 }
@@ -376,7 +415,7 @@ namespace NET1806_LittleJoy.Service.Services
                 {
                     throw new Exception("Không Có Gì Để Cập Nhật");
                 }
-                else 
+                else
                 {
                     orderExist.Status = status;
                     await _orderRepository.UpdateOrder(orderExist);
@@ -393,27 +432,20 @@ namespace NET1806_LittleJoy.Service.Services
         {
             var paymentExist = await _paymentRepository.GetPaymentByOrderCode(OrderCode);
 
-            if(paymentExist == null) 
+            if (paymentExist == null)
             {
                 throw new Exception("đơn hàng không tồn tại");
             }
 
             var orderExist = await _orderRepository.GetOrderById(paymentExist.OrderID);
 
-            if(paymentExist.Method == "COD")
+            if (orderExist.DeliveryStatus == "")
             {
-                if(orderExist.DeliveryStatus == "")
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return true;
             }
             else
             {
-                return false ;
+                return false;
             }
         }
 
@@ -453,7 +485,7 @@ namespace NET1806_LittleJoy.Service.Services
 
             var list = await _orderRepository.OrderFilterAsync(parameter, filterModel);
 
-            if(!list.Any())
+            if (!list.Any())
             {
                 throw new Exception("danh sách đơn hàng không tồn tại");
             }
@@ -524,7 +556,7 @@ namespace NET1806_LittleJoy.Service.Services
             List<RevenueOverviewModel> revenueOverviewModel = new List<RevenueOverviewModel>();
             for (int i = 1; i <= 12; i++)
             {
-                var item = await _orderRepository.GetRevenueOverviewByMonth(currentDate,i);
+                var item = await _orderRepository.GetRevenueOverviewByMonth(currentDate, i);
                 revenueOverviewModel.Add(new RevenueOverviewModel
                 {
                     Month = i,
@@ -540,7 +572,7 @@ namespace NET1806_LittleJoy.Service.Services
             List<ProductHighSalesModel> productList = new List<ProductHighSalesModel>();
             var order = await _orderRepository.GetAllOrderWithCurrentDate(currentDate);
 
-            if(order.Any())
+            if (order.Any())
             {
                 foreach (var item in order)
                 {
@@ -588,11 +620,11 @@ namespace NET1806_LittleJoy.Service.Services
 
         }
 
-        public async Task<bool> CheckExistInHighSales(OrderDetailModel model, List<ProductHighSalesModel> highSalesModels) 
+        public async Task<bool> CheckExistInHighSales(OrderDetailModel model, List<ProductHighSalesModel> highSalesModels)
         {
             foreach (var item in highSalesModels)
             {
-                if(item.ProductId == model.ProductId)
+                if (item.ProductId == model.ProductId)
                 {
                     return false;
                 }
