@@ -159,7 +159,7 @@ namespace NET1806_LittleJoy.Service.Services
                                     });
 
                                     await transaction.CommitAsync();
-                                    _semaphore.Release();
+                                    
                                     return _mapper.Map<PaymentModel>(result);
                                 }
                                 catch (Exception ex)
@@ -182,13 +182,14 @@ namespace NET1806_LittleJoy.Service.Services
                                         Body = body,
                                         Subject = "[Little Joy Alert] Hoàn Tiền Đơn Hàng #" + orderCode
                                     });
-                                    _semaphore.Release();
+                                    
                                     return _mapper.Map<PaymentModel>(result);
                                 }
                             }
                         }
                         finally
                         {
+                            _semaphore.Release();
                         }
                     }
                     else
