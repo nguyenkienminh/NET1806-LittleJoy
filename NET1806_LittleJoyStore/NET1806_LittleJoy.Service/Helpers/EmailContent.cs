@@ -334,5 +334,57 @@ namespace NET1806_LittleJoy.Service.Helpers
 "        </div>\n" +
 "    </div>";
         }
+
+
+        public static string NotificationEmail(UserModel? user, PaymentModel? model, OrderModel order, string reason)
+        {
+            return "<div style=\"background-color:#f8f8f8;font-family:sans-serif;padding:15px\">\n" +
+    "            <div style=\"max-width:1000px;margin:auto\">\n" +
+    "        <div style=\"background-color:#fff;padding:5px 20px;border-radius:10px; margin-bottom: 20px;display: flex;justify-content: center;\">\n" +
+    "                <div style=\"display: inline-block; width: 15%;\"><a href=\"https://littlejoy.vercel.app/\"><img \n" +
+    "                            src=\"https://firebasestorage.googleapis.com/v0/b/little-joy-2c5d3.appspot.com/o/Logo%20Little%20Joy%20Store.png?alt=media&token=c0752ee7-f2c0-400e-9024-632160b7aa66\"\n" +
+    "                            alt=\"\" style=\"width: 100%;\"></a></div> \n" +
+    "                <div style=\"display: inline-block; width: 85%;\"> \n" +
+    "                   <table style=\"width: 100%; height: 100%;\"> \n" +
+    "                        <tr style=\"height: 33%; width: 33%;\">\n" +
+    "                            <td></td> \n" +
+    "                            <td></td> \n" +
+    "                            <td></td> \n" +
+    "                        </tr>\n" +
+    "                        <tr style=\"height: 33%;\"> \n" +
+    "                            <td colspan=\"3\" style=\"text-align: center;\"> \n" +
+    "                                <span style=\"font-size: 22px; color: #3C75A6; font-weight: 600;\"> \n" +
+    "                                    Little Joy Store - Cửa Hàng Sữa Cho Mẹ Bầu Và Em Bé \n" +
+    "                                </span> \n" +
+    "                            </td> \n" +
+    "                        </tr> \n" +
+    "                        <tr style=\"height: 33%;\"> \n" +
+    "                            <td></td> \n" +
+    "                            <td></td> \n" +
+    "                        </tr> \n" +
+    "                    </table> \n" +
+    "                </div> \n" +
+    "            </div>\n" +
+    "                <div class=\"adM\">\n" +
+    "                    <div style=\"background-color:#fff;padding:5px 20px;color:#000;border-radius:0px 0px 2px 2px\">\n" +
+    "                        <div style=\"padding:35px 15px\">\n" +
+    "                            <p style=\"margin:0;font-size:16px\">\n" +
+    "                                Đơn hàng <span style=\"font-weight: 600; font-size: 20px;\">#" + model.Code + "</span> đã thanh toán thành công nhưng đã <span style=\"font-weight: 600; font-size: 20px; color: red;\">bị hủy</span> vì "+reason+". Vui lòng hoàn tiền cho khách hàng.\n" +
+    "                            </p>\n" +
+    "                            <br>\n" +
+    "                            <p style=\"margin:0;font-size:20px; font-weight: 600;\">THÔNG TIN KHÁCH HÀNG:</p>\n" +
+    "                            <ul style=\"margin-bottom: 0px;\">\n" +
+    "                                <li><div style=\"padding: 10px 0;\">Username: <span>" + user.UserName + "</span></div></li>\n" +
+    "                                <li><div style=\"padding: 10px 0;\">Họ và tên: <span>" + user.Fullname + "</span></div></li>\n" +
+    "                                <li><div style=\"padding: 10px 0;\">Email: <span>" + user.Email + "</span></div></li>\n" +
+    "                                <li><div style=\"padding: 10px 0;\">SĐT Đặt Hàng: <span>" + order.PhoneNumber + "</span></div></li>\n" +
+    "                                <li><div style=\"padding: 10px 0;\">SĐT Người Dùng: <span>" + user.PhoneNumber + "</span></div></li>\n" +
+    "                            </ul>\n" +
+    "                        </div>\n" +
+    "                    </div>\n" +
+    "                </div>\n" +
+    "            </div>\n" +
+    "        </div>";
+        }
     }
 }
