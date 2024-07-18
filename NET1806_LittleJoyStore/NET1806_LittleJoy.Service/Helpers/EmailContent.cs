@@ -336,7 +336,7 @@ namespace NET1806_LittleJoy.Service.Helpers
         }
 
 
-        public static string NotificationEmail(UserModel? user, PaymentModel? model, string reason)
+        public static string NotificationEmail(UserModel? user, PaymentModel? model, OrderModel order, string reason)
         {
             return "<div style=\"background-color:#f8f8f8;font-family:sans-serif;padding:15px\">\n" +
     "            <div style=\"max-width:1000px;margin:auto\">\n" +
@@ -377,7 +377,8 @@ namespace NET1806_LittleJoy.Service.Helpers
     "                                <li><div style=\"padding: 10px 0;\">Username: <span>" + user.UserName + "</span></div></li>\n" +
     "                                <li><div style=\"padding: 10px 0;\">Họ và tên: <span>" + user.Fullname + "</span></div></li>\n" +
     "                                <li><div style=\"padding: 10px 0;\">Email: <span>" + user.Email + "</span></div></li>\n" +
-    "                                <li><div style=\"padding: 10px 0;\">SĐT: <span>" + user.PhoneNumber + "</span></div></li>\n" +
+    "                                <li><div style=\"padding: 10px 0;\">SĐT Đặt Hàng: <span>" + order.PhoneNumber + "</span></div></li>\n" +
+    "                                <li><div style=\"padding: 10px 0;\">SĐT Người Dùng: <span>" + user.PhoneNumber + "</span></div></li>\n" +
     "                            </ul>\n" +
     "                        </div>\n" +
     "                    </div>\n" +
