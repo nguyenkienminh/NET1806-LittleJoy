@@ -366,7 +366,7 @@ namespace NET1806_LittleJoy.Service.Services
             var paymentExist = await _paymentRepository.GetPaymentByOrderCode(model.OrderCode);
             var orderExist = await _orderRepository.GetOrderById(paymentExist.OrderID);
 
-            if (orderExist.DeliveryStatus == "" && paymentExist.Method == "COD" && orderExist.Status != "Đã Hủy")
+            if (orderExist.DeliveryStatus == "" && orderExist.Status != "Đã Hủy")
             {
                 string status = "";
 
